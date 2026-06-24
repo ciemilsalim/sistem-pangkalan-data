@@ -11,6 +11,7 @@ use App\Http\Controllers\AdminChatController;
 use App\Http\Controllers\ChatMonitoringController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AcademicAuditController;
+use App\Http\Controllers\LmsModerationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -91,6 +92,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Audit Akademik LMS
     Route::get('/academic-audit', [AcademicAuditController::class, 'index'])->name('academic-audit.index');
+
+    // Moderasi & AI Audit LMS (Fase 3)
+    Route::get('/lms-moderation', [LmsModerationController::class, 'index'])->name('lms-moderation.index');
+    Route::delete('/lms-moderation/comments/{comment}', [LmsModerationController::class, 'destroyComment'])->name('lms-moderation.destroy_comment');
+    Route::delete('/lms-moderation/caches/{cache}', [LmsModerationController::class, 'destroyCache'])->name('lms-moderation.destroy_cache');
 
     // Obrolan Admin-Ortu
     Route::get('/chat/{selectedParent?}', [AdminChatController::class, 'index'])->name('chat.index');

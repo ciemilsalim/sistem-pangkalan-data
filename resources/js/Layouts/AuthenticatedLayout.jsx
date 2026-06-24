@@ -79,6 +79,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Audit Akademik
                                 </NavLink>
                                 <NavLink
+                                    href={route('lms-moderation.index')}
+                                    active={route().current('lms-moderation.*')}
+                                >
+                                    Moderasi LMS
+                                </NavLink>
+                                <NavLink
                                     href={route('settings.index')}
                                     active={route().current('settings.*')}
                                 >
@@ -235,6 +241,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={route().current('academic-audit.*')}
                         >
                             Audit Akademik
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('lms-moderation.index')}
+                            active={route().current('lms-moderation.*')}
+                        >
+                            Moderasi LMS
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
                             href={route('settings.index')}
