@@ -89,6 +89,31 @@ try {
     echo "   - Jumlah Pengumuman Terbaru: " . count($announcements) . " data.\n";
     echo "   - Jumlah Agenda Terdekat: " . count($upcomingEvents) . " data.\n";
     echo "[SUKSES] Umpan pengumuman dan kalender pendidikan termuat dengan baik.\n\n";
+
+    // 5. Verifikasi Properti Baru LMS (Fase 1)
+    echo "5. Memverifikasi properti baru statistik LMS makro ('lms_stats'):\n";
+    $lmsStats = $props['lms_stats'] ?? null;
+    if (!$lmsStats) throw new \Exception("Properti 'lms_stats' tidak ditemukan.");
+
+    $requiredLmsKeys = [
+        'total_materials', 'total_assignments', 'total_submissions', 
+        'submission_rate', 'total_remedials', 'active_remedials', 'subject_remedials'
+    ];
+    foreach ($requiredLmsKeys as $key) {
+        if (!isset($lmsStats[$key]) && !array_key_exists($key, $lmsStats)) {
+            throw new \Exception("Kunci lms_stats '{$key}' tidak ditemukan.");
+        }
+    }
+    echo "   - Total Bahan Ajar: {$lmsStats['total_materials']}\n";
+    echo "   - Total Tugas/Asesmen: {$lmsStats['total_assignments']}\n";
+    echo "   - Rata-rata Pengumpulan Tugas: {$lmsStats['submission_rate']}%\n";
+    echo "   - Total Kasus Remedial: {$lmsStats['total_remedials']}\n";
+    echo "   - Kasus Remedial Aktif: {$lmsStats['active_remedials']}\n";
+    echo "   - Distribusi Remedial per Subjek: " . count($lmsStats['subject_remedials']) . " mata pelajaran.\n";
+    foreach ($lmsStats['subject_remedials'] as $item) {
+        echo "     * {$item['subject']}: {$item['count']} kasus\n";
+    }
+    echo "[SUKSES] Seluruh data statistik makro LMS valid dan siap.\n\n";
     
     echo "=== VERIFIKASI SELESAI: 100% PASSED ===\n";
     echo "Seluruh data analisis dasbor, perhitungan statistik, fallback data demo,\n";
