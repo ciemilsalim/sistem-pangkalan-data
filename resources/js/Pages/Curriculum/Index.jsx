@@ -9,13 +9,13 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
 
-export default function Index({ auth, academicYears, semesters, levels, schoolClasses, subjects, teachers }) {
+export default function Index({ auth, academicYears, semesters, levels, schoolClasses, subjects, teachers, schedules, extracurriculars, studentsList }) {
     const [activeTab, setActiveTab] = useState('academicYears');
     const pageProps = usePage().props;
 
     // Entity Modals States
     const [modalType, setModalType] = useState(null); // 'create' or 'edit' or 'delete'
-    const [activeEntity, setActiveEntity] = useState(null); // 'academicYear', 'semester', 'level', 'schoolClass', 'subject'
+    const [activeEntity, setActiveEntity] = useState(null); // 'academicYear', 'semester', 'level', 'schoolClass', 'subject', 'schedule', 'extracurricular'
     const [selectedRecord, setSelectedRecord] = useState(null);
 
     // Form Hooks for each entity
@@ -24,6 +24,20 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
     const levelForm = useForm({ name: '' });
     const schoolClassForm = useForm({ name: '', level_id: '', teacher_id: '' });
     const subjectForm = useForm({ name: '', code: '', description: '' });
+    const scheduleForm = useForm({
+        school_class_id: '',
+        subject_id: '',
+        teacher_id: '',
+        day_of_week: '1',
+        start_time: '07:00',
+        end_time: '08:30',
+    });
+    const extracurricularForm = useForm({
+        name: '',
+        description: '',
+        teacher_id: '',
+        student_ids: [],
+    });
 
     // Open Create Modal
     const openCreateModal = (entityType) => {
@@ -60,6 +74,26 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
         } else if (entityType === 'subject') {
             subjectForm.reset();
             subjectForm.clearErrors();
+        } else if (entityType === 'schedule') {
+            scheduleForm.reset();
+            scheduleForm.setData({
+                school_class_id: schoolClasses.length > 0 ? schoolClasses[0].id.toString() : '',
+                subject_id: subjects.length > 0 ? subjects[0].id.toString() : '',
+                teacher_id: teachers.length > 0 ? teachers[0].id.toString() : '',
+                day_of_week: '1',
+                start_time: '07:00',
+                end_time: '08:30',
+            });
+            scheduleForm.clearErrors();
+        } else if (entityType === 'extracurricular') {
+            extracurricularForm.reset();
+            extracurricularForm.setData({
+                name: '',
+                description: '',
+                teacher_id: '',
+                student_ids: [],
+            });
+            extracurricularForm.clearErrors();
         }
     };
 
@@ -101,6 +135,27 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                 description: record.description || '',
             });
             subjectForm.clearErrors();
+        } else if (entityType === 'schedule') {
+            const startClean = record.start_time ? record.start_time.substring(0, 5) : '';
+            const endClean = record.end_time ? record.end_time.substring(0, 5) : '';
+            scheduleForm.setData({
+                school_class_id: record.teaching_assignment?.school_class_id?.toString() || '',
+                subject_id: record.teaching_assignment?.subject_id?.toString() || '',
+                teacher_id: record.teaching_assignment?.teacher_id?.toString() || '',
+                day_of_week: record.day_of_week.toString(),
+                start_time: startClean,
+                end_time: endClean,
+            });
+            scheduleForm.clearErrors();
+        } else if (entityType === 'extracurricular') {
+            const linkedStudentIds = record.students ? record.students.map(s => s.id) : [];
+            extracurricularForm.setData({
+                name: record.name,
+                description: record.description || '',
+                teacher_id: record.teacher_id ? record.teacher_id.toString() : '',
+                student_ids: linkedStudentIds,
+            });
+            extracurricularForm.clearErrors();
         }
     };
 
@@ -172,6 +227,26 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                     onSuccess: () => closeModal()
                 });
             }
+        } else if (activeEntity === 'schedule') {
+            if (modalType === 'create') {
+                scheduleForm.post(route('curriculum.schedules.store'), {
+                    onSuccess: () => closeModal()
+                });
+            } else {
+                scheduleForm.put(route('curriculum.schedules.update', selectedRecord.id), {
+                    onSuccess: () => closeModal()
+                });
+            }
+        } else if (activeEntity === 'extracurricular') {
+            if (modalType === 'create') {
+                extracurricularForm.post(route('curriculum.extracurriculars.store'), {
+                    onSuccess: () => closeModal()
+                });
+            } else {
+                extracurricularForm.put(route('curriculum.extracurriculars.update', selectedRecord.id), {
+                    onSuccess: () => closeModal()
+                });
+            }
         }
     };
 
@@ -190,6 +265,10 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             deleteRoute = route('curriculum.classes.destroy', selectedRecord.id);
         } else if (activeEntity === 'subject') {
             deleteRoute = route('curriculum.subjects.destroy', selectedRecord.id);
+        } else if (activeEntity === 'schedule') {
+            deleteRoute = route('curriculum.schedules.destroy', selectedRecord.id);
+        } else if (activeEntity === 'extracurricular') {
+            deleteRoute = route('curriculum.extracurriculars.destroy', selectedRecord.id);
         }
 
         router.delete(deleteRoute, {
@@ -300,6 +379,26 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 >
                                     Mata Pelajaran
                                 </button>
+                                <button
+                                    onClick={() => setActiveTab('schedules')}
+                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
+                                        activeTab === 'schedules'
+                                            ? 'border-indigo-500 text-indigo-600'
+                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                    }`}
+                                >
+                                    Jadwal Pelajaran
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('extracurriculars')}
+                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
+                                        activeTab === 'extracurriculars'
+                                            ? 'border-indigo-500 text-indigo-600'
+                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                    }`}
+                                >
+                                    Ekstrakurikuler
+                                </button>
                             </nav>
                         </div>
 
@@ -310,6 +409,8 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                             {activeTab === 'levels' && renderLevelsTab()}
                             {activeTab === 'schoolClasses' && renderSchoolClassesTab()}
                             {activeTab === 'subjects' && renderSubjectsTab()}
+                            {activeTab === 'schedules' && renderSchedulesTab()}
+                            {activeTab === 'extracurriculars' && renderExtracurricularsTab()}
                         </div>
                     </div>
                 </div>
@@ -507,6 +608,175 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                             </>
                         )}
 
+                        {activeEntity === 'schedule' && (
+                            <>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                    <div>
+                                        <InputLabel htmlFor="sch_class" value="Kelas" />
+                                        <select
+                                            id="sch_class"
+                                            value={scheduleForm.data.school_class_id}
+                                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                            onChange={(e) => scheduleForm.setData('school_class_id', e.target.value)}
+                                            required
+                                        >
+                                            <option value="">-- Pilih Kelas --</option>
+                                            {schoolClasses.map((cls) => (
+                                                <option key={cls.id} value={cls.id}>{cls.name}</option>
+                                            ))}
+                                        </select>
+                                        <InputError message={scheduleForm.errors.school_class_id} className="mt-2" />
+                                    </div>
+                                    <div>
+                                        <InputLabel htmlFor="sch_subject" value="Mata Pelajaran" />
+                                        <select
+                                            id="sch_subject"
+                                            value={scheduleForm.data.subject_id}
+                                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                            onChange={(e) => scheduleForm.setData('subject_id', e.target.value)}
+                                            required
+                                        >
+                                            <option value="">-- Pilih Mapel --</option>
+                                            {subjects.map((sub) => (
+                                                <option key={sub.id} value={sub.id}>{sub.name} ({sub.code})</option>
+                                            ))}
+                                        </select>
+                                        <InputError message={scheduleForm.errors.subject_id} className="mt-2" />
+                                    </div>
+                                    <div>
+                                        <InputLabel htmlFor="sch_teacher" value="Guru Pengampu" />
+                                        <select
+                                            id="sch_teacher"
+                                            value={scheduleForm.data.teacher_id}
+                                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                            onChange={(e) => scheduleForm.setData('teacher_id', e.target.value)}
+                                            required
+                                        >
+                                            <option value="">-- Pilih Guru --</option>
+                                            {teachers.map((t) => (
+                                                <option key={t.id} value={t.id}>{t.name}</option>
+                                            ))}
+                                        </select>
+                                        <InputError message={scheduleForm.errors.teacher_id} className="mt-2" />
+                                    </div>
+                                </div>
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="sch_day" value="Hari" />
+                                    <select
+                                        id="sch_day"
+                                        value={scheduleForm.data.day_of_week}
+                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        onChange={(e) => scheduleForm.setData('day_of_week', e.target.value)}
+                                        required
+                                    >
+                                        <option value="1">Senin</option>
+                                        <option value="2">Selasa</option>
+                                        <option value="3">Rabu</option>
+                                        <option value="4">Kamis</option>
+                                        <option value="5">Jumat</option>
+                                        <option value="6">Sabtu</option>
+                                        <option value="7">Minggu</option>
+                                    </select>
+                                    <InputError message={scheduleForm.errors.day_of_week} className="mt-2" />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <InputLabel htmlFor="sch_start" value="Jam Mulai (HH:MM)" />
+                                        <TextInput
+                                            id="sch_start"
+                                            type="time"
+                                            className="mt-1 block w-full"
+                                            value={scheduleForm.data.start_time}
+                                            onChange={(e) => scheduleForm.setData('start_time', e.target.value)}
+                                            required
+                                        />
+                                        <InputError message={scheduleForm.errors.start_time} className="mt-2" />
+                                    </div>
+                                    <div>
+                                        <InputLabel htmlFor="sch_end" value="Jam Selesai (HH:MM)" />
+                                        <TextInput
+                                            id="sch_end"
+                                            type="time"
+                                            className="mt-1 block w-full"
+                                            value={scheduleForm.data.end_time}
+                                            onChange={(e) => scheduleForm.setData('end_time', e.target.value)}
+                                            required
+                                        />
+                                        <InputError message={scheduleForm.errors.end_time} className="mt-2" />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeEntity === 'extracurricular' && (
+                            <>
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="extra_name" value="Nama Ekstrakurikuler (Contoh: Pramuka, Basket)" />
+                                    <TextInput
+                                        id="extra_name"
+                                        type="text"
+                                        className="mt-1 block w-full"
+                                        value={extracurricularForm.data.name}
+                                        onChange={(e) => extracurricularForm.setData('name', e.target.value)}
+                                        required
+                                    />
+                                    <InputError message={extracurricularForm.errors.name} className="mt-2" />
+                                </div>
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="extra_coach" value="Guru Pembina / Pelatih" />
+                                    <select
+                                        id="extra_coach"
+                                        value={extracurricularForm.data.teacher_id}
+                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        onChange={(e) => extracurricularForm.setData('teacher_id', e.target.value)}
+                                    >
+                                        <option value="">-- Tanpa Pembina / Pilih Nanti --</option>
+                                        {teachers.map((t) => (
+                                            <option key={t.id} value={t.id}>{t.name}</option>
+                                        ))}
+                                    </select>
+                                    <InputError message={extracurricularForm.errors.teacher_id} className="mt-2" />
+                                </div>
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="extra_desc" value="Deskripsi / Catatan Tambahan (Opsional)" />
+                                    <textarea
+                                        id="extra_desc"
+                                        rows="3"
+                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        value={extracurricularForm.data.description}
+                                        onChange={(e) => extracurricularForm.setData('description', e.target.value)}
+                                    />
+                                    <InputError message={extracurricularForm.errors.description} className="mt-2" />
+                                </div>
+                                <div className="mb-4">
+                                    <InputLabel value="Daftar Anggota Siswa (Pilih satu atau lebih)" />
+                                    <div className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm max-h-40 overflow-y-auto p-2 bg-white">
+                                        {studentsList.length === 0 ? (
+                                            <span className="text-sm text-gray-400 italic">Belum ada data siswa.</span>
+                                        ) : (
+                                            studentsList.map((student) => (
+                                                <label key={student.id} className="flex items-center mb-1.5 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 h-4 w-4"
+                                                        checked={extracurricularForm.data.student_ids.includes(student.id)}
+                                                        onChange={(e) => {
+                                                            const newIds = e.target.checked
+                                                                ? [...extracurricularForm.data.student_ids, student.id]
+                                                                : extracurricularForm.data.student_ids.filter(id => id !== student.id);
+                                                            extracurricularForm.setData('student_ids', newIds);
+                                                        }}
+                                                    />
+                                                    <span className="ml-2 text-sm text-gray-700 font-semibold">{student.name} <span className="text-xs text-gray-400">({student.nis})</span></span>
+                                                </label>
+                                            ))
+                                        )}
+                                    </div>
+                                    <InputError message={extracurricularForm.errors.student_ids} className="mt-2" />
+                                </div>
+                            </>
+                        )}
+
                         <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 mt-6">
                             <SecondaryButton type="button" onClick={closeModal}>
                                 Batal
@@ -516,7 +786,9 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 semesterForm.processing || 
                                 levelForm.processing || 
                                 schoolClassForm.processing || 
-                                subjectForm.processing
+                                subjectForm.processing ||
+                                scheduleForm.processing ||
+                                extracurricularForm.processing
                             }>
                                 Simpan Data
                             </PrimaryButton>
@@ -786,6 +1058,137 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <button onClick={() => openEditModal('subject', sub)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
                                             <button onClick={() => openDeleteModal('subject', sub)} className="text-red-600 hover:text-red-900">Hapus</button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
+    }
+
+    // 6. Schedules Tab
+    function renderSchedulesTab() {
+        const getDayName = (dayNum) => {
+            const days = {
+                1: 'Senin',
+                2: 'Selasa',
+                3: 'Rabu',
+                4: 'Kamis',
+                5: 'Jumat',
+                6: 'Sabtu',
+                7: 'Minggu'
+            };
+            return days[dayNum] || 'Tidak Diketahui';
+        };
+
+        return (
+            <div>
+                <div className="mb-4 flex items-center justify-between">
+                    <h3 className="text-md font-semibold text-gray-700">Daftar Jadwal Pelajaran</h3>
+                    {schoolClasses.length === 0 || subjects.length === 0 || teachers.length === 0 ? (
+                        <p className="text-xs text-red-500 font-semibold bg-red-50 p-2 border border-red-200 rounded">
+                            Pastikan data Kelas, Mata Pelajaran, dan Guru sudah tersedia sebelum membuat jadwal.
+                        </p>
+                    ) : (
+                        <PrimaryButton onClick={() => openCreateModal('schedule')} className="text-xs">
+                            + Tambah Jadwal Pelajaran
+                        </PrimaryButton>
+                    )}
+                </div>
+                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hari</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Waktu</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kelas</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mata Pelajaran</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Guru Pengampu</th>
+                                <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {schedules.length === 0 ? (
+                                <tr>
+                                    <td colSpan="6" className="px-6 py-8 text-center text-sm text-gray-500">Belum ada data jadwal pelajaran.</td>
+                                </tr>
+                            ) : (
+                                schedules.map((sch) => {
+                                    const startClean = sch.start_time ? sch.start_time.substring(0, 5) : '';
+                                    const endClean = sch.end_time ? sch.end_time.substring(0, 5) : '';
+                                    return (
+                                        <tr key={sch.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{getDayName(sch.day_of_week)}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-600">{startClean} - {endClean}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-950">{sch.teaching_assignment?.school_class?.name || '-'}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                                {sch.teaching_assignment?.subject?.name || '-'} <span className="text-xs text-gray-400 font-semibold">({sch.teaching_assignment?.subject?.code})</span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-semibold">
+                                                {sch.teaching_assignment?.teacher?.name || '-'}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button onClick={() => openEditModal('schedule', sch)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                                <button onClick={() => openDeleteModal('schedule', sch)} className="text-red-600 hover:text-red-900">Hapus</button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
+    }
+
+    // 7. Extracurriculars Tab
+    function renderExtracurricularsTab() {
+        return (
+            <div>
+                <div className="mb-4 flex items-center justify-between">
+                    <h3 className="text-md font-semibold text-gray-700">Daftar Kegiatan Ekstrakurikuler</h3>
+                    <PrimaryButton onClick={() => openCreateModal('extracurricular')} className="text-xs">
+                        + Tambah Ekstrakurikuler
+                    </PrimaryButton>
+                </div>
+                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Ekskul</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Guru Pembina</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah Anggota</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deskripsi</th>
+                                <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {extracurriculars.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="px-6 py-8 text-center text-sm text-gray-500">Belum ada data ekstrakurikuler.</td>
+                                </tr>
+                            ) : (
+                                extracurriculars.map((extra) => (
+                                    <tr key={extra.id} className="hover:bg-gray-50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{extra.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">
+                                            {extra.coach ? (
+                                                <span>{extra.coach.name} <span className="text-xs text-gray-400 font-normal">({extra.coach.nip || '-'})</span></span>
+                                            ) : (
+                                                <span className="text-gray-400 italic font-normal">Belum ditentukan</span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-700">
+                                            {extra.students ? extra.students.length : 0} Siswa
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{extra.description || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button onClick={() => openEditModal('extracurricular', extra)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                            <button onClick={() => openDeleteModal('extracurricular', extra)} className="text-red-600 hover:text-red-900">Hapus</button>
                                         </td>
                                     </tr>
                                 ))

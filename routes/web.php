@@ -6,6 +6,7 @@ use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\CalendarController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -53,6 +54,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/curriculum/subjects/{subject}', [CurriculumController::class, 'updateSubject'])->name('curriculum.subjects.update');
     Route::delete('/curriculum/subjects/{subject}', [CurriculumController::class, 'destroySubject'])->name('curriculum.subjects.destroy');
 
+    Route::post('/curriculum/schedules', [CurriculumController::class, 'storeSchedule'])->name('curriculum.schedules.store');
+    Route::put('/curriculum/schedules/{schedule}', [CurriculumController::class, 'updateSchedule'])->name('curriculum.schedules.update');
+    Route::delete('/curriculum/schedules/{schedule}', [CurriculumController::class, 'destroySchedule'])->name('curriculum.schedules.destroy');
+
+    Route::post('/curriculum/extracurriculars', [CurriculumController::class, 'storeExtracurricular'])->name('curriculum.extracurriculars.store');
+    Route::put('/curriculum/extracurriculars/{extracurricular}', [CurriculumController::class, 'updateExtracurricular'])->name('curriculum.extracurriculars.update');
+    Route::delete('/curriculum/extracurriculars/{extracurricular}', [CurriculumController::class, 'destroyExtracurricular'])->name('curriculum.extracurriculars.destroy');
+
     // People (Siswa, Guru, Wali) Routes
     Route::get('/people', [PeopleController::class, 'index'])->name('people.index');
     
@@ -74,6 +83,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Setting Routes
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+    // Calendar Routes
+    Route::resource('calendars', CalendarController::class);
 });
 
 require __DIR__.'/auth.php';

@@ -7,6 +7,7 @@ use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\ParentModel;
 use App\Models\SchoolClass;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
@@ -34,6 +35,9 @@ class PeopleController extends Controller
         // Fetch all students for parent creation dropdown (id and name only)
         $studentsList = Student::select('id', 'name', 'nis')->orderBy('name')->get();
 
+        // Fetch all subjects for teacher creation dropdown (id and name only)
+        $subjectsList = Subject::select('id', 'name', 'code')->orderBy('name')->get();
+
         // Initialize variables for paginated datasets
         $students = null;
         $teachers = null;
@@ -55,7 +59,7 @@ class PeopleController extends Controller
         }
 
         if ($tab === 'teachers') {
-            $query = Teacher::with(['user']);
+            $query = Teacher::with(['user', 'subjects']);
             if (!empty($search)) {
                 $query->where('name', 'like', "%{$search}%")
                       ->orWhere('nip', 'like', "%{$search}%")
@@ -65,7 +69,7 @@ class PeopleController extends Controller
             }
             $teachers = $query->orderBy('name')->paginate(10)->withQueryString();
         } else {
-            $teachers = Teacher::with(['user'])->orderBy('name')->limit(10)->get();
+            $teachers = Teacher::with(['user', 'subjects'])->orderBy('name')->limit(10)->get();
         }
 
         if ($tab === 'parents') {
@@ -89,6 +93,7 @@ class PeopleController extends Controller
             'schoolClasses' => $schoolClasses,
             'parentsList' => $parentsList,
             'studentsList' => $studentsList,
+            'subjectsList' => $subjectsList,
             'filters' => [
                 'tab' => $tab,
                 'search' => $search
@@ -216,6 +221,8 @@ class PeopleController extends Controller
             'phone_number' => 'nullable|string|max:20',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => ['required', Rules\Password::defaults()],
+            'subject_ids' => 'nullable|array',
+            'subject_ids.*' => 'exists:subjects,id',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -228,12 +235,17 @@ class PeopleController extends Controller
             ]);
 
             // Create teacher profile
-            Teacher::create([
+            $teacher = Teacher::create([
                 'user_id' => $user->id,
                 'name' => $request->name,
                 'nip' => $request->nip,
                 'phone_number' => $request->phone_number,
             ]);
+
+            // Sync subjects
+            if ($request->filled('subject_ids')) {
+                $teacher->subjects()->sync($request->subject_ids);
+            }
         });
 
         return redirect()->route('people.index', ['tab' => 'teachers'])->with('message', 'Guru berhasil ditambahkan.');
@@ -246,6 +258,8 @@ class PeopleController extends Controller
             'nip' => 'required|string|max:50|unique:teachers,nip,' . $teacher->id,
             'phone_number' => 'nullable|string|max:20',
             'email' => 'required|string|email|max:255|unique:users,email,' . $teacher->user_id,
+            'subject_ids' => 'nullable|array',
+            'subject_ids.*' => 'exists:subjects,id',
         ]);
 
         if ($request->filled('password')) {
@@ -271,6 +285,10 @@ class PeopleController extends Controller
                 $userData['password'] = Hash::make($request->password);
             }
             $teacher->user->update($userData);
+
+            // Sync subjects
+            $subjectIds = $request->input('subject_ids', []);
+            $teacher->subjects()->sync($subjectIds);
         });
 
         return redirect()->route('people.index', ['tab' => 'teachers'])->with('message', 'Data Guru berhasil diperbarui.');

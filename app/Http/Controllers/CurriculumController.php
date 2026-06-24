@@ -8,6 +8,10 @@ use App\Models\Level;
 use App\Models\SchoolClass;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\Schedule;
+use App\Models\TeachingAssignment;
+use App\Models\Extracurricular;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -29,6 +33,21 @@ class CurriculumController extends Controller
         // Fetch teachers list for class homeroom selection (id and name only)
         $teachers = Teacher::select('id', 'name', 'nip')->orderBy('name')->get();
 
+        // Fetch schedules eager loading related assignment data
+        $schedules = Schedule::with([
+            'teachingAssignment.schoolClass',
+            'teachingAssignment.subject',
+            'teachingAssignment.teacher'
+        ])->orderBy('day_of_week')
+          ->orderBy('start_time')
+          ->get();
+
+        // Fetch extracurriculars with coach and students
+        $extracurriculars = Extracurricular::with(['coach', 'students'])->orderBy('name')->get();
+
+        // Fetch students list for extracurricular member selection (id, name, and nis)
+        $studentsList = Student::select('id', 'name', 'nis')->orderBy('name')->get();
+
         return Inertia::render('Curriculum/Index', [
             'academicYears' => $academicYears,
             'semesters' => $semesters,
@@ -36,6 +55,9 @@ class CurriculumController extends Controller
             'schoolClasses' => $schoolClasses,
             'subjects' => $subjects,
             'teachers' => $teachers,
+            'schedules' => $schedules,
+            'extracurriculars' => $extracurriculars,
+            'studentsList' => $studentsList,
             'flash' => [
                 'message' => session('message'),
             ]
@@ -294,5 +316,158 @@ class CurriculumController extends Controller
         $subject->delete();
 
         return redirect()->route('curriculum.index')->with('message', 'Mata Pelajaran berhasil dihapus.');
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                                6. SCHEDULES                                */
+    /* -------------------------------------------------------------------------- */
+
+    public function storeSchedule(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'school_class_id' => 'required|exists:school_classes,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'teacher_id' => 'required|exists:teachers,id',
+            'day_of_week' => 'required|integer|between:1,7',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+        ]);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+            // Find or create TeachingAssignment
+            $assignment = TeachingAssignment::firstOrCreate(
+                [
+                    'school_class_id' => $request->school_class_id,
+                    'subject_id' => $request->subject_id,
+                ],
+                [
+                    'teacher_id' => $request->teacher_id,
+                ]
+            );
+
+            // If the teacher has changed, update it to the newly selected teacher
+            if ($assignment->teacher_id != $request->teacher_id) {
+                $assignment->update(['teacher_id' => $request->teacher_id]);
+            }
+
+            // Create Schedule pointing to this teaching assignment
+            Schedule::create([
+                'teaching_assignment_id' => $assignment->id,
+                'day_of_week' => $request->day_of_week,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+            ]);
+        });
+
+        return redirect()->route('curriculum.index')->with('message', 'Jadwal Pelajaran berhasil ditambahkan.');
+    }
+
+    public function updateSchedule(Request $request, Schedule $schedule): RedirectResponse
+    {
+        $request->validate([
+            'school_class_id' => 'required|exists:school_classes,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'teacher_id' => 'required|exists:teachers,id',
+            'day_of_week' => 'required|integer|between:1,7',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+        ]);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $schedule) {
+            // Find or create TeachingAssignment
+            $assignment = TeachingAssignment::firstOrCreate(
+                [
+                    'school_class_id' => $request->school_class_id,
+                    'subject_id' => $request->subject_id,
+                ],
+                [
+                    'teacher_id' => $request->teacher_id,
+                ]
+            );
+
+            // If the teacher has changed, update it to the newly selected teacher
+            if ($assignment->teacher_id != $request->teacher_id) {
+                $assignment->update(['teacher_id' => $request->teacher_id]);
+            }
+
+            // Update Schedule attributes
+            $schedule->update([
+                'teaching_assignment_id' => $assignment->id,
+                'day_of_week' => $request->day_of_week,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+            ]);
+        });
+
+        return redirect()->route('curriculum.index')->with('message', 'Jadwal Pelajaran berhasil diperbarui.');
+    }
+
+    public function destroySchedule(Schedule $schedule): RedirectResponse
+    {
+        $schedule->delete();
+        return redirect()->route('curriculum.index')->with('message', 'Jadwal Pelajaran berhasil dihapus.');
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                             7. EXTRACURRICULARS                            */
+    /* -------------------------------------------------------------------------- */
+
+    public function storeExtracurricular(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:extracurriculars,name',
+            'description' => 'nullable|string',
+            'teacher_id' => 'nullable|exists:teachers,id',
+            'student_ids' => 'nullable|array',
+            'student_ids.*' => 'exists:students,id',
+        ]);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+            $extracurricular = Extracurricular::create([
+                'name' => $request->name,
+                'description' => $request->description,
+                'teacher_id' => $request->teacher_id ? $request->teacher_id : null,
+            ]);
+
+            if ($request->filled('student_ids')) {
+                $extracurricular->students()->sync($request->student_ids);
+            }
+        });
+
+        return redirect()->route('curriculum.index')->with('message', 'Ekstrakurikuler berhasil ditambahkan.');
+    }
+
+    public function updateExtracurricular(Request $request, Extracurricular $extracurricular): RedirectResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:extracurriculars,name,' . $extracurricular->id,
+            'description' => 'nullable|string',
+            'teacher_id' => 'nullable|exists:teachers,id',
+            'student_ids' => 'nullable|array',
+            'student_ids.*' => 'exists:students,id',
+        ]);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $extracurricular) {
+            $extracurricular->update([
+                'name' => $request->name,
+                'description' => $request->description,
+                'teacher_id' => $request->teacher_id ? $request->teacher_id : null,
+            ]);
+
+            $studentIds = $request->input('student_ids', []);
+            $extracurricular->students()->sync($studentIds);
+        });
+
+        return redirect()->route('curriculum.index')->with('message', 'Ekstrakurikuler berhasil diperbarui.');
+    }
+
+    public function destroyExtracurricular(Extracurricular $extracurricular): RedirectResponse
+    {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($extracurricular) {
+            $extracurricular->students()->detach();
+            $extracurricular->delete();
+        });
+
+        return redirect()->route('curriculum.index')->with('message', 'Ekstrakurikuler berhasil dihapus.');
     }
 }

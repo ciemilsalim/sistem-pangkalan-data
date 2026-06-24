@@ -55,6 +55,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Manajemen Pengumuman
                                 </NavLink>
                                 <NavLink
+                                    href={route('calendars.index')}
+                                    active={route().current('calendars.*')}
+                                >
+                                    Kalender Akademik
+                                </NavLink>
+                                <NavLink
                                     href={route('settings.index')}
                                     active={route().current('settings.*')}
                                 >
@@ -187,6 +193,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={route().current('announcements.*')}
                         >
                             Manajemen Pengumuman
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('calendars.index')}
+                            active={route().current('calendars.*')}
+                        >
+                            Kalender Akademik
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
                             href={route('settings.index')}

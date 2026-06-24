@@ -9,7 +9,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
 
-export default function Index({ auth, students, teachers, parents, schoolClasses, parentsList, studentsList, filters }) {
+export default function Index({ auth, students, teachers, parents, schoolClasses, parentsList, studentsList, subjectsList, filters }) {
     const activeTab = filters.tab || 'students';
     const [search, setSearch] = useState(filters.search || '');
     const pageProps = usePage().props;
@@ -35,6 +35,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         phone_number: '',
         email: '',
         password: '',
+        subject_ids: [],
     });
 
     const parentForm = useForm({
@@ -99,6 +100,14 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
             studentForm.clearErrors();
         } else if (entityType === 'teacher') {
             teacherForm.reset();
+            teacherForm.setData({
+                name: '',
+                nip: '',
+                phone_number: '',
+                email: '',
+                password: '',
+                subject_ids: [],
+            });
             teacherForm.clearErrors();
         } else if (entityType === 'parent') {
             parentForm.reset();
@@ -124,12 +133,14 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
             });
             studentForm.clearErrors();
         } else if (entityType === 'teacher') {
+            const linkedSubjectIds = record.subjects ? record.subjects.map(s => s.id) : [];
             teacherForm.setData({
                 name: record.name,
                 nip: record.nip,
                 phone_number: record.phone_number || '',
                 email: record.user?.email || '',
                 password: '', // optional
+                subject_ids: linkedSubjectIds,
             });
             teacherForm.clearErrors();
         } else if (entityType === 'parent') {
@@ -511,6 +522,32 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                     />
                                     <InputError message={teacherForm.errors.password} className="mt-2" />
                                 </div>
+                                <div className="mb-4">
+                                    <InputLabel value="Mata Pelajaran Diampu (Pilih satu atau lebih)" />
+                                    <div className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm max-h-32 overflow-y-auto p-2 bg-white">
+                                        {subjectsList.length === 0 ? (
+                                            <span className="text-sm text-gray-400 italic">Belum ada data mata pelajaran.</span>
+                                        ) : (
+                                            subjectsList.map((subject) => (
+                                                <label key={subject.id} className="flex items-center mb-1.5 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                                        checked={teacherForm.data.subject_ids.includes(subject.id)}
+                                                        onChange={(e) => {
+                                                            const newIds = e.target.checked
+                                                                ? [...teacherForm.data.subject_ids, subject.id]
+                                                                : teacherForm.data.subject_ids.filter(id => id !== subject.id);
+                                                            teacherForm.setData('subject_ids', newIds);
+                                                        }}
+                                                    />
+                                                    <span className="ml-2 text-sm text-gray-700">{subject.name} ({subject.code})</span>
+                                                </label>
+                                            ))
+                                        )}
+                                    </div>
+                                    <InputError message={teacherForm.errors.subject_ids} className="mt-2" />
+                                </div>
                             </>
                         )}
 
@@ -701,6 +738,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                             <tr>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Nama Guru</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">NIP</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Mata Pelajaran Diampu</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">No. Telepon</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Email Akun</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
@@ -716,6 +754,19 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                     <tr key={teacher.id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{teacher.name}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-bold">{teacher.nip}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-600">
+                                            {teacher.subjects && teacher.subjects.length > 0 ? (
+                                                <div className="flex flex-wrap gap-1">
+                                                    {teacher.subjects.map((sub) => (
+                                                        <span key={sub.id} className="inline-flex items-center rounded bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700 border border-indigo-100">
+                                                            {sub.name} ({sub.code})
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <span className="text-gray-400 italic text-xs">Belum dihubungkan</span>
+                                            )}
+                                        </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{teacher.phone_number || '-'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{teacher.user?.email || '-'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
