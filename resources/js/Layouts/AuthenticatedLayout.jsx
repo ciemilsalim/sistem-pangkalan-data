@@ -61,6 +61,18 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Kalender Akademik
                                 </NavLink>
                                 <NavLink
+                                    href={route('chat.index')}
+                                    active={route().current('chat.*')}
+                                >
+                                    Obrolan Ortu
+                                </NavLink>
+                                <NavLink
+                                    href={route('monitoring.chats.index')}
+                                    active={route().current('monitoring.chats.*')}
+                                >
+                                    Pengawasan Chat
+                                </NavLink>
+                                <NavLink
                                     href={route('settings.index')}
                                     active={route().current('settings.*')}
                                 >
@@ -199,6 +211,18 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={route().current('calendars.*')}
                         >
                             Kalender Akademik
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('chat.index')}
+                            active={route().current('chat.*')}
+                        >
+                            Obrolan Ortu
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('monitoring.chats.index')}
+                            active={route().current('monitoring.chats.*')}
+                        >
+                            Pengawasan Chat
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
                             href={route('settings.index')}

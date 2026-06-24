@@ -7,6 +7,8 @@ use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\AdminChatController;
+use App\Http\Controllers\ChatMonitoringController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -86,6 +88,16 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Calendar Routes
     Route::resource('calendars', CalendarController::class);
+
+    // Obrolan Admin-Ortu
+    Route::get('/chat/{selectedParent?}', [AdminChatController::class, 'index'])->name('chat.index');
+    Route::post('/chat/conversations/{conversation}/messages', [AdminChatController::class, 'storeMessage'])->name('chat.store_message');
+
+    // Pengawasan Chat (Monitoring)
+    Route::get('/monitoring/chats', [ChatMonitoringController::class, 'index'])->name('monitoring.chats.index');
+    Route::get('/monitoring/chats/{conversation}', [ChatMonitoringController::class, 'show'])->name('monitoring.chats.show');
+    Route::delete('/monitoring/chats/messages/{message}', [ChatMonitoringController::class, 'destroyMessage'])->name('monitoring.chats.destroy_message');
+    Route::delete('/monitoring/chats/{conversation}', [ChatMonitoringController::class, 'destroyConversation'])->name('monitoring.chats.destroy_conversation');
 });
 
 require __DIR__.'/auth.php';
