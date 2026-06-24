@@ -30,6 +30,36 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Dashboard
                                 </NavLink>
+                                <NavLink
+                                    href={route('users.index')}
+                                    active={route().current('users.*')}
+                                >
+                                    Manajemen User
+                                </NavLink>
+                                <NavLink
+                                    href={route('curriculum.index')}
+                                    active={route().current('curriculum.*')}
+                                >
+                                    Manajemen Kurikulum
+                                </NavLink>
+                                <NavLink
+                                    href={route('people.index')}
+                                    active={route().current('people.*')}
+                                >
+                                    Manajemen Sivitas
+                                </NavLink>
+                                <NavLink
+                                    href={route('announcements.index')}
+                                    active={route().current('announcements.*')}
+                                >
+                                    Manajemen Pengumuman
+                                </NavLink>
+                                <NavLink
+                                    href={route('settings.index')}
+                                    active={route().current('settings.*')}
+                                >
+                                    Pengaturan
+                                </NavLink>
                             </div>
                         </div>
 
@@ -133,6 +163,36 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={route().current('dashboard')}
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('users.index')}
+                            active={route().current('users.*')}
+                        >
+                            Manajemen User
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('curriculum.index')}
+                            active={route().current('curriculum.*')}
+                        >
+                            Manajemen Kurikulum
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('people.index')}
+                            active={route().current('people.*')}
+                        >
+                            Manajemen Sivitas
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('announcements.index')}
+                            active={route().current('announcements.*')}
+                        >
+                            Manajemen Pengumuman
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('settings.index')}
+                            active={route().current('settings.*')}
+                        >
+                            Pengaturan
                         </ResponsiveNavLink>
                     </div>
 
