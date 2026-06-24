@@ -10,6 +10,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\AdminChatController;
 use App\Http\Controllers\ChatMonitoringController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AcademicAuditController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -87,6 +88,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Calendar Routes
     Route::resource('calendars', CalendarController::class);
+
+    // Audit Akademik LMS
+    Route::get('/academic-audit', [AcademicAuditController::class, 'index'])->name('academic-audit.index');
 
     // Obrolan Admin-Ortu
     Route::get('/chat/{selectedParent?}', [AdminChatController::class, 'index'])->name('chat.index');

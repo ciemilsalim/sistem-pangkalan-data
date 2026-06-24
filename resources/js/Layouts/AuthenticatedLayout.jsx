@@ -73,6 +73,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Pengawasan Chat
                                 </NavLink>
                                 <NavLink
+                                    href={route('academic-audit.index')}
+                                    active={route().current('academic-audit.*')}
+                                >
+                                    Audit Akademik
+                                </NavLink>
+                                <NavLink
                                     href={route('settings.index')}
                                     active={route().current('settings.*')}
                                 >
@@ -223,6 +229,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={route().current('monitoring.chats.*')}
                         >
                             Pengawasan Chat
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('academic-audit.index')}
+                            active={route().current('academic-audit.*')}
+                        >
+                            Audit Akademik
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
                             href={route('settings.index')}
