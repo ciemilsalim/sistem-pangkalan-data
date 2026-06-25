@@ -279,7 +279,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                     Manajemen Kurikulum & Akademik
                 </h2>
             }
@@ -326,15 +326,15 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                     )}
 
                     {/* Tabs navigation */}
-                    <div className="mb-6 bg-white rounded-lg shadow border border-gray-200">
-                        <div className="border-b border-gray-200">
+                    <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                        <div className="border-b border-gray-200 dark:border-gray-700">
                             <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
                                 <button
                                     onClick={() => setActiveTab('academicYears')}
                                     className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
                                         activeTab === 'academicYears'
                                             ? 'border-indigo-500 text-indigo-600'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
                                     Tahun Akademik
@@ -344,7 +344,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
                                         activeTab === 'semesters'
                                             ? 'border-indigo-500 text-indigo-600'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
                                     Semester
@@ -354,7 +354,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
                                         activeTab === 'levels'
                                             ? 'border-indigo-500 text-indigo-600'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
                                     Tingkat Kelas
@@ -364,7 +364,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
                                         activeTab === 'schoolClasses'
                                             ? 'border-indigo-500 text-indigo-600'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
                                     Kelas
@@ -374,7 +374,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
                                         activeTab === 'subjects'
                                             ? 'border-indigo-500 text-indigo-600'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
                                     Mata Pelajaran
@@ -384,7 +384,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
                                         activeTab === 'schedules'
                                             ? 'border-indigo-500 text-indigo-600'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
                                     Jadwal Pelajaran
@@ -394,7 +394,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
                                         activeTab === 'extracurriculars'
                                             ? 'border-indigo-500 text-indigo-600'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
                                     Ekstrakurikuler
@@ -420,7 +420,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             {modalType && modalType !== 'delete' && (
                 <Modal show={true} onClose={closeModal}>
                     <form onSubmit={handleSubmit} className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
                             {modalType === 'create' ? 'Tambah ' : 'Edit '} 
                             {activeEntity === 'academicYear' && 'Tahun Akademik'}
                             {activeEntity === 'semester' && 'Semester'}
@@ -448,11 +448,11 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     <input
                                         id="ay_active"
                                         type="checkbox"
-                                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                        className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500"
                                         checked={academicYearForm.data.is_active}
                                         onChange={(e) => academicYearForm.setData('is_active', e.target.checked)}
                                     />
-                                    <label htmlFor="ay_active" className="ml-2 text-sm text-gray-600 font-semibold">
+                                    <label htmlFor="ay_active" className="ml-2 text-sm text-gray-600 dark:text-gray-400 font-semibold">
                                         Set sebagai Tahun Akademik Aktif
                                     </label>
                                 </div>
@@ -466,7 +466,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     <select
                                         id="sem_ay"
                                         value={semesterForm.data.academic_year_id}
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                         onChange={(e) => semesterForm.setData('academic_year_id', e.target.value)}
                                         required
                                     >
@@ -493,11 +493,11 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     <input
                                         id="sem_active"
                                         type="checkbox"
-                                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                        className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500"
                                         checked={semesterForm.data.is_active}
                                         onChange={(e) => semesterForm.setData('is_active', e.target.checked)}
                                     />
-                                    <label htmlFor="sem_active" className="ml-2 text-sm text-gray-600 font-semibold">
+                                    <label htmlFor="sem_active" className="ml-2 text-sm text-gray-600 dark:text-gray-400 font-semibold">
                                         Set sebagai Semester Aktif
                                     </label>
                                 </div>
@@ -540,7 +540,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     <select
                                         id="cls_lvl"
                                         value={schoolClassForm.data.level_id}
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                         onChange={(e) => schoolClassForm.setData('level_id', e.target.value)}
                                         required
                                     >
@@ -555,7 +555,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     <select
                                         id="cls_teacher"
                                         value={schoolClassForm.data.teacher_id}
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                         onChange={(e) => schoolClassForm.setData('teacher_id', e.target.value)}
                                     >
                                         <option value="">-- Pilih Wali Kelas --</option>
@@ -599,7 +599,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     <textarea
                                         id="sub_desc"
                                         rows="3"
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                         value={subjectForm.data.description}
                                         onChange={(e) => subjectForm.setData('description', e.target.value)}
                                     />
@@ -616,7 +616,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                         <select
                                             id="sch_class"
                                             value={scheduleForm.data.school_class_id}
-                                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                             onChange={(e) => scheduleForm.setData('school_class_id', e.target.value)}
                                             required
                                         >
@@ -632,7 +632,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                         <select
                                             id="sch_subject"
                                             value={scheduleForm.data.subject_id}
-                                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                             onChange={(e) => scheduleForm.setData('subject_id', e.target.value)}
                                             required
                                         >
@@ -648,7 +648,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                         <select
                                             id="sch_teacher"
                                             value={scheduleForm.data.teacher_id}
-                                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                             onChange={(e) => scheduleForm.setData('teacher_id', e.target.value)}
                                             required
                                         >
@@ -665,7 +665,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     <select
                                         id="sch_day"
                                         value={scheduleForm.data.day_of_week}
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                         onChange={(e) => scheduleForm.setData('day_of_week', e.target.value)}
                                         required
                                     >
@@ -727,7 +727,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     <select
                                         id="extra_coach"
                                         value={extracurricularForm.data.teacher_id}
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                         onChange={(e) => extracurricularForm.setData('teacher_id', e.target.value)}
                                     >
                                         <option value="">-- Tanpa Pembina / Pilih Nanti --</option>
@@ -742,7 +742,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     <textarea
                                         id="extra_desc"
                                         rows="3"
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                         value={extracurricularForm.data.description}
                                         onChange={(e) => extracurricularForm.setData('description', e.target.value)}
                                     />
@@ -750,7 +750,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 </div>
                                 <div className="mb-4">
                                     <InputLabel value="Daftar Anggota Siswa (Pilih satu atau lebih)" />
-                                    <div className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm max-h-40 overflow-y-auto p-2 bg-white">
+                                    <div className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm max-h-40 overflow-y-auto p-2 bg-white dark:bg-gray-800">
                                         {studentsList.length === 0 ? (
                                             <span className="text-sm text-gray-400 italic">Belum ada data siswa.</span>
                                         ) : (
@@ -758,7 +758,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                                 <label key={student.id} className="flex items-center mb-1.5 cursor-pointer">
                                                     <input
                                                         type="checkbox"
-                                                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 h-4 w-4"
+                                                        className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500 h-4 w-4"
                                                         checked={extracurricularForm.data.student_ids.includes(student.id)}
                                                         onChange={(e) => {
                                                             const newIds = e.target.checked
@@ -767,7 +767,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                                             extracurricularForm.setData('student_ids', newIds);
                                                         }}
                                                     />
-                                                    <span className="ml-2 text-sm text-gray-700 font-semibold">{student.name} <span className="text-xs text-gray-400">({student.nis})</span></span>
+                                                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 font-semibold">{student.name} <span className="text-xs text-gray-400">({student.nis})</span></span>
                                                 </label>
                                             ))
                                         )}
@@ -801,8 +801,8 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             {modalType === 'delete' && (
                 <Modal show={true} onClose={closeModal}>
                     <form onSubmit={handleDelete} className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Hapus Komponen Kurikulum</h3>
-                        <p className="text-sm text-gray-600 mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Hapus Komponen Kurikulum</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                             Apakah Anda yakin ingin menghapus data <strong>{selectedRecord?.name || selectedRecord?.code}</strong>? 
                             Tindakan ini tidak dapat dibatalkan dan dapat memicu eror jika data ini sedang digunakan oleh komponen lain.
                         </p>
@@ -829,38 +829,38 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
         return (
             <div>
                 <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-md font-semibold text-gray-700">Daftar Tahun Akademik</h3>
+                    <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Tahun Akademik</h3>
                     <PrimaryButton onClick={() => openCreateModal('academicYear')} className="text-xs">
                         + Tambah Tahun Akademik
                     </PrimaryButton>
                 </div>
-                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tahun Akademik</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tahun Akademik</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             {academicYears.length === 0 ? (
                                 <tr>
-                                    <td colSpan="3" className="px-6 py-8 text-center text-sm text-gray-500">Belum ada data tahun akademik.</td>
+                                    <td colSpan="3" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data tahun akademik.</td>
                                 </tr>
                             ) : (
                                 academicYears.map((ay) => (
-                                    <tr key={ay.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{ay.name}</td>
+                                    <tr key={ay.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">{ay.name}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {ay.is_active ? (
                                                 <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 border border-green-200">Aktif</span>
                                             ) : (
-                                                <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 border border-gray-200">Tidak Aktif</span>
+                                                <span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700">Tidak Aktif</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('academicYear', ay)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                            <button onClick={() => openEditModal('academicYear', ay)} className="text-indigo-600 hover:text-indigo-600 mr-4">Edit</button>
                                             <button onClick={() => openDeleteModal('academicYear', ay)} className="text-red-600 hover:text-red-900">Hapus</button>
                                         </td>
                                     </tr>
@@ -878,7 +878,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
         return (
             <div>
                 <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-md font-semibold text-gray-700">Daftar Semester</h3>
+                    <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Semester</h3>
                     {academicYears.length === 0 ? (
                         <p className="text-xs text-red-500 font-semibold">Tambahkan Tahun Akademik terlebih dahulu sebelum membuat Semester.</p>
                     ) : (
@@ -887,35 +887,35 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                         </PrimaryButton>
                     )}
                 </div>
-                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Semester</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tahun Akademik</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Semester</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tahun Akademik</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             {semesters.length === 0 ? (
                                 <tr>
-                                    <td colSpan="4" className="px-6 py-8 text-center text-sm text-gray-500">Belum ada data semester.</td>
+                                    <td colSpan="4" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data semester.</td>
                                 </tr>
                             ) : (
                                 semesters.map((sem) => (
-                                    <tr key={sem.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{sem.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{sem.academic_year?.name || '-'}</td>
+                                    <tr key={sem.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">{sem.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{sem.academic_year?.name || '-'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {sem.is_active ? (
                                                 <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 border border-green-200">Aktif</span>
                                             ) : (
-                                                <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 border border-gray-200">Tidak Aktif</span>
+                                                <span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700">Tidak Aktif</span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('semester', sem)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                            <button onClick={() => openEditModal('semester', sem)} className="text-indigo-600 hover:text-indigo-600 mr-4">Edit</button>
                                             <button onClick={() => openDeleteModal('semester', sem)} className="text-red-600 hover:text-red-900">Hapus</button>
                                         </td>
                                     </tr>
@@ -933,30 +933,30 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
         return (
             <div>
                 <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-md font-semibold text-gray-700">Daftar Tingkat Kelas</h3>
+                    <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Tingkat Kelas</h3>
                     <PrimaryButton onClick={() => openCreateModal('level')} className="text-xs">
                         + Tambah Tingkat Kelas
                     </PrimaryButton>
                 </div>
-                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tingkat</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tingkat</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             {levels.length === 0 ? (
                                 <tr>
-                                    <td colSpan="2" className="px-6 py-8 text-center text-sm text-gray-500">Belum ada data tingkat kelas.</td>
+                                    <td colSpan="2" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data tingkat kelas.</td>
                                 </tr>
                             ) : (
                                 levels.map((lvl) => (
-                                    <tr key={lvl.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{lvl.name}</td>
+                                    <tr key={lvl.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">{lvl.name}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('level', lvl)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                            <button onClick={() => openEditModal('level', lvl)} className="text-indigo-600 hover:text-indigo-600 mr-4">Edit</button>
                                             <button onClick={() => openDeleteModal('level', lvl)} className="text-red-600 hover:text-red-900">Hapus</button>
                                         </td>
                                     </tr>
@@ -974,7 +974,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
         return (
             <div>
                 <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-md font-semibold text-gray-700">Daftar Kelas</h3>
+                    <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Kelas</h3>
                     {levels.length === 0 ? (
                         <p className="text-xs text-red-500 font-semibold">Tambahkan Tingkat Kelas terlebih dahulu sebelum membuat Kelas.</p>
                     ) : (
@@ -983,27 +983,27 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                         </PrimaryButton>
                     )}
                 </div>
-                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Kelas</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tingkat</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Wali Kelas</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nama Kelas</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tingkat</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Wali Kelas</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             {schoolClasses.length === 0 ? (
                                 <tr>
-                                    <td colSpan="4" className="px-6 py-8 text-center text-sm text-gray-500">Belum ada data kelas.</td>
+                                    <td colSpan="4" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data kelas.</td>
                                 </tr>
                             ) : (
                                 schoolClasses.map((cls) => (
-                                    <tr key={cls.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{cls.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{cls.level?.name || '-'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-semibold">
+                                    <tr key={cls.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">{cls.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{cls.level?.name || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 font-semibold">
                                             {cls.homeroom_teacher ? (
                                                 <span>{cls.homeroom_teacher.name} <span className="text-xs text-gray-400">({cls.homeroom_teacher.nip || 'NIP -'})</span></span>
                                             ) : (
@@ -1011,7 +1011,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('schoolClass', cls)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                            <button onClick={() => openEditModal('schoolClass', cls)} className="text-indigo-600 hover:text-indigo-600 mr-4">Edit</button>
                                             <button onClick={() => openDeleteModal('schoolClass', cls)} className="text-red-600 hover:text-red-900">Hapus</button>
                                         </td>
                                     </tr>
@@ -1029,34 +1029,34 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
         return (
             <div>
                 <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-md font-semibold text-gray-700">Daftar Mata Pelajaran</h3>
+                    <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Mata Pelajaran</h3>
                     <PrimaryButton onClick={() => openCreateModal('subject')} className="text-xs">
                         + Tambah Mata Pelajaran
                     </PrimaryButton>
                 </div>
-                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kode</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Mata Pelajaran</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deskripsi</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Kode</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nama Mata Pelajaran</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Deskripsi</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             {subjects.length === 0 ? (
                                 <tr>
-                                    <td colSpan="4" className="px-6 py-8 text-center text-sm text-gray-500">Belum ada data mata pelajaran.</td>
+                                    <td colSpan="4" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data mata pelajaran.</td>
                                 </tr>
                             ) : (
                                 subjects.map((sub) => (
-                                    <tr key={sub.id} className="hover:bg-gray-50">
+                                    <tr key={sub.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-600">{sub.code}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{sub.name}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{sub.description || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">{sub.name}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{sub.description || '-'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('subject', sub)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                            <button onClick={() => openEditModal('subject', sub)} className="text-indigo-600 hover:text-indigo-600 mr-4">Edit</button>
                                             <button onClick={() => openDeleteModal('subject', sub)} className="text-red-600 hover:text-red-900">Hapus</button>
                                         </td>
                                     </tr>
@@ -1087,7 +1087,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
         return (
             <div>
                 <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-md font-semibold text-gray-700">Daftar Jadwal Pelajaran</h3>
+                    <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Jadwal Pelajaran</h3>
                     {schoolClasses.length === 0 || subjects.length === 0 || teachers.length === 0 ? (
                         <p className="text-xs text-red-500 font-semibold bg-red-50 p-2 border border-red-200 rounded">
                             Pastikan data Kelas, Mata Pelajaran, dan Guru sudah tersedia sebelum membuat jadwal.
@@ -1098,40 +1098,40 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                         </PrimaryButton>
                     )}
                 </div>
-                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hari</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Waktu</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kelas</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mata Pelajaran</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Guru Pengampu</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Hari</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Waktu</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Kelas</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Mata Pelajaran</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Guru Pengampu</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             {schedules.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="px-6 py-8 text-center text-sm text-gray-500">Belum ada data jadwal pelajaran.</td>
+                                    <td colSpan="6" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data jadwal pelajaran.</td>
                                 </tr>
                             ) : (
                                 schedules.map((sch) => {
                                     const startClean = sch.start_time ? sch.start_time.substring(0, 5) : '';
                                     const endClean = sch.end_time ? sch.end_time.substring(0, 5) : '';
                                     return (
-                                        <tr key={sch.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{getDayName(sch.day_of_week)}</td>
+                                        <tr key={sch.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-gray-100">{getDayName(sch.day_of_week)}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-600">{startClean} - {endClean}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-950">{sch.teaching_assignment?.school_class?.name || '-'}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                                                 {sch.teaching_assignment?.subject?.name || '-'} <span className="text-xs text-gray-400 font-semibold">({sch.teaching_assignment?.subject?.code})</span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-semibold">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 font-semibold">
                                                 {sch.teaching_assignment?.teacher?.name || '-'}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <button onClick={() => openEditModal('schedule', sch)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                                <button onClick={() => openEditModal('schedule', sch)} className="text-indigo-600 hover:text-indigo-600 mr-4">Edit</button>
                                                 <button onClick={() => openDeleteModal('schedule', sch)} className="text-red-600 hover:text-red-900">Hapus</button>
                                             </td>
                                         </tr>
@@ -1150,44 +1150,44 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
         return (
             <div>
                 <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-md font-semibold text-gray-700">Daftar Kegiatan Ekstrakurikuler</h3>
+                    <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Kegiatan Ekstrakurikuler</h3>
                     <PrimaryButton onClick={() => openCreateModal('extracurricular')} className="text-xs">
                         + Tambah Ekstrakurikuler
                     </PrimaryButton>
                 </div>
-                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Ekskul</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Guru Pembina</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah Anggota</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deskripsi</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nama Ekskul</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Guru Pembina</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Jumlah Anggota</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Deskripsi</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             {extracurriculars.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-8 text-center text-sm text-gray-500">Belum ada data ekstrakurikuler.</td>
+                                    <td colSpan="5" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data ekstrakurikuler.</td>
                                 </tr>
                             ) : (
                                 extracurriculars.map((extra) => (
-                                    <tr key={extra.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{extra.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">
+                                    <tr key={extra.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-gray-100">{extra.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 font-semibold">
                                             {extra.coach ? (
                                                 <span>{extra.coach.name} <span className="text-xs text-gray-400 font-normal">({extra.coach.nip || '-'})</span></span>
                                             ) : (
                                                 <span className="text-gray-400 italic font-normal">Belum ditentukan</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-700">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-600">
                                             {extra.students ? extra.students.length : 0} Siswa
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{extra.description || '-'}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{extra.description || '-'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('extracurricular', extra)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                            <button onClick={() => openEditModal('extracurricular', extra)} className="text-indigo-600 hover:text-indigo-600 mr-4">Edit</button>
                                             <button onClick={() => openDeleteModal('extracurricular', extra)} className="text-red-600 hover:text-red-900">Hapus</button>
                                         </td>
                                     </tr>

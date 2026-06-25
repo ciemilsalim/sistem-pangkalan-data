@@ -121,7 +121,7 @@ export default function Index({ auth, announcements, filters }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                     Manajemen Pengumuman Sekolah
                 </h2>
             }
@@ -150,7 +150,7 @@ export default function Index({ auth, announcements, filters }) {
                     )}
 
                     {/* Filter and Create Header */}
-                    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white p-4 rounded-lg shadow border border-gray-200">
+                    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                         <form onSubmit={handleSearchSubmit} className="flex flex-wrap items-center gap-3">
                             <div className="w-80">
                                 <TextInput
@@ -158,7 +158,7 @@ export default function Index({ auth, announcements, filters }) {
                                     type="text"
                                     name="search"
                                     value={search}
-                                    className="block w-full text-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md"
+                                    className="block w-full text-sm border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md"
                                     placeholder="Cari judul atau isi pengumuman..."
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
@@ -191,21 +191,21 @@ export default function Index({ auth, announcements, filters }) {
                     </div>
 
                     {/* Announcements Table */}
-                    <div className="overflow-hidden bg-white shadow sm:rounded-lg border border-gray-200">
+                    <div className="overflow-hidden bg-white dark:bg-gray-800 shadow sm:rounded-lg border border-gray-200 dark:border-gray-700">
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                                <thead className="bg-gray-50 dark:bg-gray-900/50">
                                     <tr>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                             Banner
                                         </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                             Judul
                                         </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                             Penulis
                                         </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                             Tanggal Terbit
                                         </th>
                                         <th scope="col" className="relative px-6 py-3">
@@ -213,43 +213,43 @@ export default function Index({ auth, announcements, filters }) {
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-200 bg-white">
+                                <tbody className="divide-y divide-gray-200 bg-white dark:bg-gray-800">
                                     {announcements.data.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="px-6 py-10 text-center text-sm text-gray-500">
+                                            <td colSpan="5" className="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
                                                 Belum ada pengumuman yang diterbitkan.
                                             </td>
                                         </tr>
                                     ) : (
                                         announcements.data.map((ann) => (
-                                            <tr key={ann.id} className="hover:bg-gray-50">
+                                            <tr key={ann.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
                                                 <td className="whitespace-nowrap px-6 py-4">
                                                     {ann.banner_url ? (
                                                         <img
                                                             src={ann.banner_url}
                                                             alt={ann.title}
-                                                            className="h-10 w-16 object-cover rounded border border-gray-200 shadow-sm"
+                                                            className="h-10 w-16 object-cover rounded border border-gray-200 dark:border-gray-700 shadow-sm"
                                                         />
                                                     ) : (
-                                                        <div className="h-10 w-16 bg-gray-100 border border-gray-200 rounded flex items-center justify-center text-xs text-gray-400">
+                                                        <div className="h-10 w-16 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded flex items-center justify-center text-xs text-gray-400">
                                                             No Banner
                                                         </div>
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <div className="text-sm font-semibold text-gray-900 line-clamp-1">{ann.title}</div>
+                                                    <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-1">{ann.title}</div>
                                                     <div className="text-xs text-gray-400 line-clamp-1">{ann.content}</div>
                                                 </td>
                                                 <td className="whitespace-nowrap px-6 py-4">
-                                                    <div className="text-sm text-gray-700 font-semibold">{ann.user?.name || 'Admin'}</div>
+                                                    <div className="text-sm text-gray-700 dark:text-gray-300 font-semibold">{ann.user?.name || 'Admin'}</div>
                                                 </td>
-                                                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 font-semibold">
+                                                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400 font-semibold">
                                                     {ann.published_at ? new Date(ann.published_at).toLocaleString('id-ID') : '-'}
                                                 </td>
                                                 <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                                                     <button
                                                         onClick={() => openEditModal(ann)}
-                                                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                                        className="text-indigo-600 hover:text-indigo-600 mr-4"
                                                     >
                                                         Edit
                                                     </button>
@@ -269,24 +269,24 @@ export default function Index({ auth, announcements, filters }) {
 
                         {/* Pagination */}
                         {announcements.links.length > 3 && (
-                            <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+                            <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 sm:px-6">
                                 <div className="flex flex-1 justify-between sm:hidden">
                                     <Link
                                         href={announcements.prev_page_url || '#'}
-                                        className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 ${!announcements.prev_page_url && 'pointer-events-none opacity-50'}`}
+                                        className={`relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 ${!announcements.prev_page_url && 'pointer-events-none opacity-50'}`}
                                     >
                                         Sebelumnya
                                     </Link>
                                     <Link
                                         href={announcements.next_page_url || '#'}
-                                        className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 ${!announcements.next_page_url && 'pointer-events-none opacity-50'}`}
+                                        className={`relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 ${!announcements.next_page_url && 'pointer-events-none opacity-50'}`}
                                     >
                                         Berikutnya
                                     </Link>
                                 </div>
                                 <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                                     <div>
-                                        <p className="text-sm text-gray-700 font-medium">
+                                        <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
                                             Menampilkan <span className="font-semibold">{announcements.from || 0}</span> sampai <span className="font-semibold">{announcements.to || 0}</span> dari <span className="font-semibold">{announcements.total}</span> data
                                         </p>
                                     </div>
@@ -299,8 +299,8 @@ export default function Index({ auth, announcements, filters }) {
                                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                                     className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold border ${
                                                         link.active
-                                                            ? 'z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 border-indigo-600'
-                                                            : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0 border-gray-300'
+                                                            ? 'z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 border-indigo-500'
+                                                            : 'text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 focus:outline-offset-0 border-gray-300 dark:border-gray-600'
                                                     } ${!link.url && 'pointer-events-none opacity-50'} ${
                                                         index === 0 ? 'rounded-l-md' : ''
                                                     } ${index === announcements.links.length - 1 ? 'rounded-r-md' : ''}`}
@@ -318,7 +318,7 @@ export default function Index({ auth, announcements, filters }) {
             {/* Create Modal */}
             <Modal show={isCreateOpen} onClose={() => setIsCreateOpen(false)}>
                 <form onSubmit={handleCreateSubmit} className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Buat Pengumuman Baru</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Buat Pengumuman Baru</h3>
                     
                     <div className="mb-4">
                         <InputLabel htmlFor="create_title" value="Judul Pengumuman" />
@@ -338,7 +338,7 @@ export default function Index({ auth, announcements, filters }) {
                         <textarea
                             id="create_content"
                             rows="5"
-                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                             value={createForm.data.content}
                             onChange={(e) => createForm.setData('content', e.target.value)}
                             required
@@ -365,7 +365,7 @@ export default function Index({ auth, announcements, filters }) {
                                 id="create_banner"
                                 type="file"
                                 accept="image/*"
-                                className="mt-1.5 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
+                                className="mt-1.5 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-600 cursor-pointer"
                                 onChange={(e) => createForm.setData('banner', e.target.files[0])}
                             />
                             <InputError message={createForm.errors.banner} className="mt-2" />
@@ -386,7 +386,7 @@ export default function Index({ auth, announcements, filters }) {
             {/* Edit Modal */}
             <Modal show={isEditOpen} onClose={() => setIsEditOpen(false)}>
                 <form onSubmit={handleEditSubmit} className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Edit Pengumuman</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Edit Pengumuman</h3>
                     
                     <div className="mb-4">
                         <InputLabel htmlFor="edit_title" value="Judul Pengumuman" />
@@ -406,7 +406,7 @@ export default function Index({ auth, announcements, filters }) {
                         <textarea
                             id="edit_content"
                             rows="5"
-                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                             value={editForm.data.content}
                             onChange={(e) => editForm.setData('content', e.target.value)}
                             required
@@ -433,7 +433,7 @@ export default function Index({ auth, announcements, filters }) {
                                 id="edit_banner"
                                 type="file"
                                 accept="image/*"
-                                className="mt-1.5 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
+                                className="mt-1.5 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-600 cursor-pointer"
                                 onChange={(e) => editForm.setData('banner', e.target.files[0])}
                             />
                             <InputError message={editForm.errors.banner} className="mt-2" />
@@ -441,12 +441,12 @@ export default function Index({ auth, announcements, filters }) {
                     </div>
 
                     {selectedAnnouncement?.banner_url && (
-                        <div className="mb-6 p-3 bg-gray-50 rounded border border-gray-100">
-                            <span className="text-xs font-semibold text-gray-500 block mb-2">Banner Saat Ini:</span>
+                        <div className="mb-6 p-3 bg-gray-50 dark:bg-gray-900/50 rounded border border-gray-100">
+                            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block mb-2">Banner Saat Ini:</span>
                             <img
                                 src={selectedAnnouncement.banner_url}
                                 alt="Current Banner"
-                                className="h-20 w-32 object-cover rounded border border-gray-200"
+                                className="h-20 w-32 object-cover rounded border border-gray-200 dark:border-gray-700"
                             />
                         </div>
                     )}
@@ -465,8 +465,8 @@ export default function Index({ auth, announcements, filters }) {
             {/* Delete Confirmation Modal */}
             <Modal show={isDeleteOpen} onClose={() => setIsDeleteOpen(false)}>
                 <form onSubmit={handleDeleteSubmit} className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Hapus Pengumuman</h3>
-                    <p className="text-sm text-gray-600 mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Hapus Pengumuman</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                         Apakah Anda yakin ingin menghapus pengumuman berjudul <strong>{selectedAnnouncement?.title}</strong>?
                         Tindakan ini tidak dapat dibatalkan dan pengumuman tidak akan terlihat lagi di seluruh aplikasi.
                     </p>

@@ -112,7 +112,7 @@ export default function Index({ auth, users, filters }) {
     const renderRoleBadge = (role) => {
         const badges = {
             admin: 'bg-red-100 text-red-800 border-red-200',
-            teacher: 'bg-blue-100 text-blue-800 border-blue-200',
+            teacher: 'bg-indigo-600 text-indigo-600 border-indigo-500',
             student: 'bg-green-100 text-green-800 border-green-200',
             parent: 'bg-purple-100 text-purple-800 border-purple-200',
         };
@@ -124,7 +124,7 @@ export default function Index({ auth, users, filters }) {
         };
 
         return (
-            <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${badges[role] || 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+            <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${badges[role] || 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700'}`}>
                 {labels[role] || role}
             </span>
         );
@@ -133,7 +133,7 @@ export default function Index({ auth, users, filters }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                     Manajemen User & Akun
                 </h2>
             }
@@ -180,7 +180,7 @@ export default function Index({ auth, users, filters }) {
                     )}
 
                     {/* Filter and Create Header */}
-                    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white p-4 rounded-lg shadow border border-gray-200">
+                    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                         <form onSubmit={handleSearchSubmit} className="flex flex-wrap items-center gap-3">
                             <div className="w-64">
                                 <TextInput
@@ -188,7 +188,7 @@ export default function Index({ auth, users, filters }) {
                                     type="text"
                                     name="search"
                                     value={search}
-                                    className="block w-full text-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md"
+                                    className="block w-full text-sm border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md"
                                     placeholder="Cari nama atau email..."
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
@@ -197,7 +197,7 @@ export default function Index({ auth, users, filters }) {
                                 <select
                                     id="role-filter"
                                     value={roleFilter}
-                                    className="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                    className="block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                     onChange={(e) => setRoleFilter(e.target.value)}
                                 >
                                     <option value="">Semua Peran</option>
@@ -234,21 +234,21 @@ export default function Index({ auth, users, filters }) {
                     </div>
 
                     {/* Users Table */}
-                    <div className="overflow-hidden bg-white shadow sm:rounded-lg border border-gray-200">
+                    <div className="overflow-hidden bg-white dark:bg-gray-800 shadow sm:rounded-lg border border-gray-200 dark:border-gray-700">
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                                <thead className="bg-gray-50 dark:bg-gray-900/50">
                                     <tr>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                             Nama
                                         </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                             Email
                                         </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                             Peran
                                         </th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                             Aktivitas Terakhir
                                         </th>
                                         <th scope="col" className="relative px-6 py-3">
@@ -256,32 +256,32 @@ export default function Index({ auth, users, filters }) {
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-200 bg-white">
+                                <tbody className="divide-y divide-gray-200 bg-white dark:bg-gray-800">
                                     {users.data.length === 0 ? (
                                         <tr>
-                                            <td colSpan="5" className="px-6 py-10 text-center text-sm text-gray-500">
+                                            <td colSpan="5" className="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
                                                 Tidak ada data pengguna ditemukan.
                                             </td>
                                         </tr>
                                     ) : (
                                         users.data.map((user) => (
-                                            <tr key={user.id} className="hover:bg-gray-50">
+                                            <tr key={user.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
                                                 <td className="whitespace-nowrap px-6 py-4">
-                                                    <div className="text-sm font-semibold text-gray-900">{user.name}</div>
+                                                    <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">{user.name}</div>
                                                 </td>
                                                 <td className="whitespace-nowrap px-6 py-4">
-                                                    <div className="text-sm text-gray-500">{user.email}</div>
+                                                    <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
                                                 </td>
                                                 <td className="whitespace-nowrap px-6 py-4">
                                                     {renderRoleBadge(user.role)}
                                                 </td>
-                                                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                                                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                                     {user.last_seen_at ? new Date(user.last_seen_at).toLocaleString('id-ID') : '-'}
                                                 </td>
                                                 <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                                                     <button
                                                         onClick={() => openEditModal(user)}
-                                                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                                        className="text-indigo-600 hover:text-indigo-600 mr-4"
                                                     >
                                                         Edit
                                                     </button>
@@ -303,24 +303,24 @@ export default function Index({ auth, users, filters }) {
 
                         {/* Pagination */}
                         {users.links.length > 3 && (
-                            <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+                            <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 sm:px-6">
                                 <div className="flex flex-1 justify-between sm:hidden">
                                     <Link
                                         href={users.prev_page_url || '#'}
-                                        className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 ${!users.prev_page_url && 'pointer-events-none opacity-50'}`}
+                                        className={`relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 ${!users.prev_page_url && 'pointer-events-none opacity-50'}`}
                                     >
                                         Sebelumnya
                                     </Link>
                                     <Link
                                         href={users.next_page_url || '#'}
-                                        className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 ${!users.next_page_url && 'pointer-events-none opacity-50'}`}
+                                        className={`relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 ${!users.next_page_url && 'pointer-events-none opacity-50'}`}
                                     >
                                         Berikutnya
                                     </Link>
                                 </div>
                                 <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                                     <div>
-                                        <p className="text-sm text-gray-700">
+                                        <p className="text-sm text-gray-700 dark:text-gray-300">
                                             Menampilkan <span className="font-semibold">{users.from || 0}</span> sampai <span className="font-semibold">{users.to || 0}</span> dari <span className="font-semibold">{users.total}</span> data
                                         </p>
                                     </div>
@@ -333,8 +333,8 @@ export default function Index({ auth, users, filters }) {
                                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                                     className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold border ${
                                                         link.active
-                                                            ? 'z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 border-indigo-600'
-                                                            : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0 border-gray-300'
+                                                            ? 'z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 border-indigo-500'
+                                                            : 'text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 focus:outline-offset-0 border-gray-300 dark:border-gray-600'
                                                     } ${!link.url && 'pointer-events-none opacity-50'} ${
                                                         index === 0 ? 'rounded-l-md' : ''
                                                     } ${index === users.links.length - 1 ? 'rounded-r-md' : ''}`}
@@ -352,7 +352,7 @@ export default function Index({ auth, users, filters }) {
             {/* Create Modal */}
             <Modal show={isCreateOpen} onClose={() => setIsCreateOpen(false)}>
                 <form onSubmit={handleCreateSubmit} className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Tambah Pengguna Baru</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Tambah Pengguna Baru</h3>
                     
                     <div className="mb-4">
                         <InputLabel htmlFor="create_name" value="Nama Lengkap" />
@@ -385,7 +385,7 @@ export default function Index({ auth, users, filters }) {
                         <select
                             id="create_role"
                             value={createForm.data.role}
-                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                             onChange={(e) => createForm.setData('role', e.target.value)}
                             required
                         >
@@ -424,7 +424,7 @@ export default function Index({ auth, users, filters }) {
             {/* Edit Modal */}
             <Modal show={isEditOpen} onClose={() => setIsEditOpen(false)}>
                 <form onSubmit={handleEditSubmit} className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Edit Pengguna</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Edit Pengguna</h3>
                     
                     <div className="mb-4">
                         <InputLabel htmlFor="edit_name" value="Nama Lengkap" />
@@ -457,7 +457,7 @@ export default function Index({ auth, users, filters }) {
                         <select
                             id="edit_role"
                             value={editForm.data.role}
-                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                             onChange={(e) => editForm.setData('role', e.target.value)}
                             required
                         >
@@ -496,8 +496,8 @@ export default function Index({ auth, users, filters }) {
             {/* Delete Confirmation Modal */}
             <Modal show={isDeleteOpen} onClose={() => setIsDeleteOpen(false)}>
                 <form onSubmit={handleDeleteSubmit} className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Hapus Akun Pengguna</h3>
-                    <p className="text-sm text-gray-600 mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Hapus Akun Pengguna</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                         Apakah Anda yakin ingin menghapus akun milik <strong>{selectedUser?.name}</strong> ({selectedUser?.email})?
                         Tindakan ini tidak dapat dibatalkan dan semua data terkait akun ini akan terpengaruh.
                     </p>

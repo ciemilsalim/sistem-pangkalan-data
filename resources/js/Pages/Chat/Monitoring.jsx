@@ -48,7 +48,7 @@ export default function Monitoring({ conversations, filters }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                     Pengawasan Obrolan
                 </h2>
             }
@@ -78,10 +78,10 @@ export default function Monitoring({ conversations, filters }) {
                     </div>
 
                     {/* Filter and Content Card */}
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-xl">
-                        <div className="border-b border-gray-200 bg-white p-6">
+                    <div className="overflow-hidden bg-white dark:bg-gray-800 shadow-sm sm:rounded-xl">
+                        <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
                             <form onSubmit={handleSearch} className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
-                                <h3 className="text-base font-semibold text-gray-900 shrink-0">
+                                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 shrink-0">
                                     Daftar Percakapan Guru-Ortu
                                 </h3>
                                 <div className="flex flex-1 max-w-md items-center gap-2">
@@ -89,7 +89,7 @@ export default function Monitoring({ conversations, filters }) {
                                         <input
                                             type="text"
                                             placeholder="Cari Guru, Wali Murid, atau Siswa..."
-                                            className="w-full rounded-lg border-gray-300 pl-9 pr-4 text-sm focus:border-blue-500 focus:ring-blue-500"
+                                            className="w-full rounded-lg border-gray-300 dark:border-gray-600 pl-9 pr-4 text-sm focus:border-indigo-500 focus:ring-indigo-500"
                                             value={search}
                                             onChange={(e) => setSearch(e.target.value)}
                                         />
@@ -101,7 +101,7 @@ export default function Monitoring({ conversations, filters }) {
                                     </div>
                                     <button
                                         type="submit"
-                                        className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition"
+                                        className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-3.5 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-600 transition"
                                     >
                                         Cari
                                     </button>
@@ -109,7 +109,7 @@ export default function Monitoring({ conversations, filters }) {
                                         <button
                                             type="button"
                                             onClick={handleReset}
-                                            className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition"
+                                            className="inline-flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:bg-gray-900/50 transition"
                                         >
                                             Reset
                                         </button>
@@ -122,7 +122,7 @@ export default function Monitoring({ conversations, filters }) {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="border-b border-gray-100 bg-gray-50/50 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                                    <tr className="border-b border-gray-100 bg-gray-50 dark:bg-gray-900/50/50 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                         <th className="px-6 py-3">Pihak Terlibat & Siswa</th>
                                         <th className="px-6 py-3">Pesan Terakhir</th>
                                         <th className="px-6 py-3 text-center">Jumlah Pesan</th>
@@ -142,7 +142,7 @@ export default function Monitoring({ conversations, filters }) {
                                                     <td className="px-6 py-4">
                                                         <div className="flex flex-col gap-1.5">
                                                             <div className="flex items-center gap-2">
-                                                                <span className="inline-flex items-center rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700 border border-indigo-100">
+                                                                <span className="inline-flex items-center rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600 border border-indigo-500">
                                                                     Guru: {teacherName}
                                                                 </span>
                                                                 <span className="text-gray-400">↔</span>
@@ -150,8 +150,8 @@ export default function Monitoring({ conversations, filters }) {
                                                                     Ortu: {parentName}
                                                                 </span>
                                                             </div>
-                                                            <div className="text-xs text-gray-500">
-                                                                Membahas Siswa: <span className="font-semibold text-gray-700">{studentName}</span>
+                                                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                                Membahas Siswa: <span className="font-semibold text-gray-700 dark:text-gray-300">{studentName}</span>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -160,7 +160,7 @@ export default function Monitoring({ conversations, filters }) {
                                                     <td className="px-6 py-4 max-w-md">
                                                         {conv.last_message ? (
                                                             <div className="flex flex-col">
-                                                                <p className="text-gray-600 truncate text-xs">
+                                                                <p className="text-gray-600 dark:text-gray-400 truncate text-xs">
                                                                     "{conv.last_message.body}"
                                                                 </p>
                                                                 <span className="text-[10px] text-gray-400 mt-1">
@@ -184,7 +184,7 @@ export default function Monitoring({ conversations, filters }) {
                                                         <div className="flex justify-end items-center gap-2">
                                                             <Link
                                                                 href={route('monitoring.chats.show', { conversation: conv.id })}
-                                                                className="inline-flex items-center justify-center rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 hover:text-blue-800 transition shadow-sm border border-blue-150"
+                                                                className="inline-flex items-center justify-center rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-600 hover:text-indigo-600 transition shadow-sm border border-blue-150"
                                                             >
                                                                 Audit Percakapan
                                                             </Link>
@@ -202,7 +202,7 @@ export default function Monitoring({ conversations, filters }) {
                                         })
                                     ) : (
                                         <tr>
-                                            <td colSpan="4" className="px-6 py-12 text-center text-gray-500">
+                                            <td colSpan="4" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                                                 Tidak ada percakapan guru-ortu yang ditemukan.
                                             </td>
                                         </tr>

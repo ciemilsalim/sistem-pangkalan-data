@@ -43,8 +43,8 @@ export default function MonitoringDetail({ conversation, messages }) {
             header={
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <Link href={route('monitoring.chats.index')} className="hover:text-blue-600 transition flex items-center gap-1">
+                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                            <Link href={route('monitoring.chats.index')} className="hover:text-indigo-600 transition flex items-center gap-1">
                                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                                 </svg>
@@ -53,7 +53,7 @@ export default function MonitoringDetail({ conversation, messages }) {
                             <span>/</span>
                             <span className="text-gray-400">Detail Audit</span>
                         </div>
-                        <h2 className="text-xl font-semibold leading-tight text-gray-800 mt-1">
+                        <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200 mt-1">
                             Audit Percakapan: {teacherName} & {parentName}
                         </h2>
                     </div>
@@ -73,31 +73,31 @@ export default function MonitoringDetail({ conversation, messages }) {
                 <div className="mx-auto max-w-4xl sm:px-6 lg:px-8">
                     
                     {/* Context Card */}
-                    <div className="mb-6 rounded-xl bg-white p-6 shadow-sm border border-gray-150">
-                        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Informasi Percakapan</h3>
+                    <div className="mb-6 rounded-xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-150">
+                        <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-4">Informasi Percakapan</h3>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div className="rounded-lg bg-slate-50 p-4 border border-slate-100">
                                 <span className="text-[10px] font-bold text-gray-400 uppercase">Guru Pengajar</span>
-                                <p className="font-semibold text-gray-800 mt-1">{teacherName}</p>
-                                <p className="text-xs text-gray-500 mt-0.5">NIP: {conversation.teacher?.nip || '-'}</p>
+                                <p className="font-semibold text-gray-800 dark:text-gray-200 mt-1">{teacherName}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">NIP: {conversation.teacher?.nip || '-'}</p>
                             </div>
                             <div className="rounded-lg bg-slate-50 p-4 border border-slate-100">
                                 <span className="text-[10px] font-bold text-gray-400 uppercase">Wali Murid (Orang Tua)</span>
-                                <p className="font-semibold text-gray-800 mt-1">{parentName}</p>
-                                <p className="text-xs text-gray-500 mt-0.5">Tlp: {conversation.parent?.phone_number || '-'}</p>
+                                <p className="font-semibold text-gray-800 dark:text-gray-200 mt-1">{parentName}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Tlp: {conversation.parent?.phone_number || '-'}</p>
                             </div>
                             <div className="rounded-lg bg-slate-50 p-4 border border-slate-100">
                                 <span className="text-[10px] font-bold text-gray-400 uppercase">Siswa Terkait</span>
-                                <p className="font-semibold text-gray-800 mt-1">{studentName}</p>
-                                <p className="text-xs text-gray-500 mt-0.5">NISN: {conversation.student?.nisn || '-'}</p>
+                                <p className="font-semibold text-gray-800 dark:text-gray-200 mt-1">{studentName}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">NISN: {conversation.student?.nisn || '-'}</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Messages Thread container */}
-                    <div className="rounded-xl bg-white shadow-sm border border-gray-150 overflow-hidden">
-                        <div className="border-b border-gray-200 bg-gray-50/70 px-6 py-4">
-                            <h3 className="text-sm font-bold text-gray-800">
+                    <div className="rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-150 overflow-hidden">
+                        <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50/70 px-6 py-4">
+                            <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">
                                 Log Riwayat Pesan ({messages.length} pesan)
                             </h3>
                         </div>
@@ -109,13 +109,13 @@ export default function MonitoringDetail({ conversation, messages }) {
                                     const isParent = msg.user_id === conversation.parent?.user_id;
                                     
                                     let senderLabel = 'Sistem';
-                                    let bubbleStyle = 'bg-white border-gray-200';
-                                    let badgeStyle = 'bg-gray-100 text-gray-600';
+                                    let bubbleStyle = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700';
+                                    let badgeStyle = 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
 
                                     if (isTeacher) {
                                         senderLabel = `Guru: ${teacherName}`;
-                                        bubbleStyle = 'bg-indigo-50/40 border-indigo-100 border-l-4 border-l-indigo-500';
-                                        badgeStyle = 'bg-indigo-100 text-indigo-800';
+                                        bubbleStyle = 'bg-indigo-50/40 border-indigo-500 border-l-4 border-l-indigo-';
+                                        badgeStyle = 'bg-indigo-600 text-indigo-600';
                                     } else if (isParent) {
                                         senderLabel = `Orang Tua: ${parentName}`;
                                         bubbleStyle = 'bg-sky-50/40 border-sky-100 border-l-4 border-l-sky-500';
@@ -125,7 +125,7 @@ export default function MonitoringDetail({ conversation, messages }) {
                                     return (
                                         <div
                                             key={msg.id}
-                                            className={`group relative flex flex-col gap-2 rounded-xl border p-4 bg-white shadow-sm transition-all duration-150 hover:shadow-md ${bubbleStyle}`}
+                                            className={`group relative flex flex-col gap-2 rounded-xl border p-4 bg-white dark:bg-gray-800 shadow-sm transition-all duration-150 hover:shadow-md ${bubbleStyle}`}
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
@@ -149,14 +149,14 @@ export default function MonitoringDetail({ conversation, messages }) {
                                                 </button>
                                             </div>
 
-                                            <div className="text-sm text-gray-700 whitespace-pre-wrap break-words leading-relaxed pr-8">
+                                            <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words leading-relaxed pr-8">
                                                 {msg.body}
                                             </div>
                                         </div>
                                     );
                                 })
                             ) : (
-                                <div className="py-12 text-center text-sm text-gray-500">
+                                <div className="py-12 text-center text-sm text-gray-500 dark:text-gray-400">
                                     Belum ada pesan yang dikirim dalam percakapan ini.
                                 </div>
                             )}

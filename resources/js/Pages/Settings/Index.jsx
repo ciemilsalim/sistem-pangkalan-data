@@ -35,7 +35,7 @@ export default function Index({ auth, settings }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                     Pengaturan Aplikasi & Sekolah
                 </h2>
             }
@@ -66,8 +66,8 @@ export default function Index({ auth, settings }) {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         
                         {/* SECTION 1: INFORMASI SEKOLAH */}
-                        <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-                            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-3 mb-6">
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-100 pb-3 mb-6">
                                 1. Informasi Sekolah
                             </h3>
                             <div className="space-y-4">
@@ -126,14 +126,14 @@ export default function Index({ auth, settings }) {
                         </div>
 
                         {/* SECTION 2: JAM KERJA & ABSENSI */}
-                        <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-                            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-3 mb-6">
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-100 pb-3 mb-6">
                                 2. Jam Kerja & Batas Waktu Absensi
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Student Timing */}
-                                <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                                    <h4 className="text-sm font-bold text-gray-700 mb-4">Jam Absensi Siswa</h4>
+                                <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-100">
+                                    <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4">Jam Absensi Siswa</h4>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <InputLabel htmlFor="jam_masuk" value="Jam Masuk Siswa" />
@@ -163,8 +163,8 @@ export default function Index({ auth, settings }) {
                                 </div>
 
                                 {/* Teacher Timing */}
-                                <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                                    <h4 className="text-sm font-bold text-gray-700 mb-4">Jam Absensi Guru</h4>
+                                <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-100">
+                                    <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4">Jam Absensi Guru</h4>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <InputLabel htmlFor="jam_masuk_guru" value="Jam Masuk Guru" />
@@ -196,8 +196,8 @@ export default function Index({ auth, settings }) {
                         </div>
 
                         {/* SECTION 3: LOKASI SEKOLAH & GEOFENCING */}
-                        <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-                            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-3 mb-6">
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-100 pb-3 mb-6">
                                 3. Koordinat & Geofencing (Radius Absensi Mobile)
                             </h3>
                             <div className="space-y-4">
@@ -249,8 +249,8 @@ export default function Index({ auth, settings }) {
                         </div>
 
                         {/* SECTION 4: SISTEM & APLIKASI */}
-                        <div className="bg-white p-6 rounded-lg shadow border border-gray-200">
-                            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-3 mb-6">
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-100 pb-3 mb-6">
                                 4. Konfigurasi Sistem & Aplikasi
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -259,7 +259,7 @@ export default function Index({ auth, settings }) {
                                     <select
                                         id="send_notification"
                                         value={data.send_absent_notification}
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                         onChange={(e) => setData('send_absent_notification', e.target.value)}
                                         required
                                     >
@@ -273,7 +273,7 @@ export default function Index({ auth, settings }) {
                                     <select
                                         id="dark_mode"
                                         value={data.dark_mode}
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                         onChange={(e) => setData('dark_mode', e.target.value)}
                                         required
                                     >
@@ -286,7 +286,7 @@ export default function Index({ auth, settings }) {
                         </div>
 
                         {/* SUBMIT PANEL */}
-                        <div className="flex items-center justify-end bg-gray-50 p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center justify-end bg-gray-50 dark:bg-gray-900/50 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                             <PrimaryButton type="submit" disabled={processing} className="px-6 py-2.5">
                                 Simpan Semua Pengaturan
                             </PrimaryButton>

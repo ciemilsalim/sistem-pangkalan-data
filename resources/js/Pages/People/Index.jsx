@@ -228,7 +228,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                     Manajemen Sivitas Akademika (Siswa, Guru, Wali)
                 </h2>
             }
@@ -257,7 +257,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                     )}
 
                     {/* Filter and Create Header */}
-                    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white p-4 rounded-lg shadow border border-gray-200">
+                    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                         <form onSubmit={handleSearchSubmit} className="flex flex-wrap items-center gap-3">
                             <div className="w-80">
                                 <TextInput
@@ -265,7 +265,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                     type="text"
                                     name="search"
                                     value={search}
-                                    className="block w-full text-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md"
+                                    className="block w-full text-sm border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md"
                                     placeholder={
                                         activeTab === 'students' ? 'Cari nama, NIS, atau email...' :
                                         activeTab === 'teachers' ? 'Cari nama, NIP, atau email...' :
@@ -301,15 +301,15 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                     </div>
 
                     {/* Tabs navigation */}
-                    <div className="mb-6 bg-white rounded-lg shadow border border-gray-200">
-                        <div className="border-b border-gray-200">
+                    <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                        <div className="border-b border-gray-200 dark:border-gray-700">
                             <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
                                 <button
                                     onClick={() => handleTabSwitch('students')}
                                     className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-semibold ${
                                         activeTab === 'students'
                                             ? 'border-indigo-500 text-indigo-600'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
                                     Siswa ({students?.total || 0})
@@ -319,7 +319,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                     className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-semibold ${
                                         activeTab === 'teachers'
                                             ? 'border-indigo-500 text-indigo-600'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
                                     Guru ({teachers?.total || 0})
@@ -329,7 +329,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                     className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-semibold ${
                                         activeTab === 'parents'
                                             ? 'border-indigo-500 text-indigo-600'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
                                     Wali Murid ({parents?.total || 0})
@@ -351,7 +351,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
             {modalType && modalType !== 'delete' && (
                 <Modal show={true} onClose={closeModal}>
                     <form onSubmit={handleSubmit} className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
                             {modalType === 'create' ? 'Tambah ' : 'Edit '}
                             {activeEntity === 'student' && 'Siswa'}
                             {activeEntity === 'teacher' && 'Guru'}
@@ -391,7 +391,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                         <select
                                             id="stud_class"
                                             value={studentForm.data.school_class_id}
-                                            className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                             onChange={(e) => studentForm.setData('school_class_id', e.target.value)}
                                             required
                                         >
@@ -430,7 +430,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                 </div>
                                 <div className="mb-4">
                                     <InputLabel value="Hubungkan dengan Wali Murid (Pilih satu atau lebih)" />
-                                    <div className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm max-h-32 overflow-y-auto p-2 bg-white">
+                                    <div className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm max-h-32 overflow-y-auto p-2 bg-white dark:bg-gray-800">
                                         {parentsList.length === 0 ? (
                                             <span className="text-sm text-gray-400 italic">Belum ada data wali murid.</span>
                                         ) : (
@@ -438,7 +438,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                                 <label key={parent.id} className="flex items-center mb-1.5 cursor-pointer">
                                                     <input
                                                         type="checkbox"
-                                                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                                        className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500"
                                                         checked={studentForm.data.parent_ids.includes(parent.id)}
                                                         onChange={(e) => {
                                                             const newIds = e.target.checked
@@ -447,7 +447,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                                             studentForm.setData('parent_ids', newIds);
                                                         }}
                                                     />
-                                                    <span className="ml-2 text-sm text-gray-700">{parent.name}</span>
+                                                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{parent.name}</span>
                                                 </label>
                                             ))
                                         )}
@@ -524,7 +524,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                 </div>
                                 <div className="mb-4">
                                     <InputLabel value="Mata Pelajaran Diampu (Pilih satu atau lebih)" />
-                                    <div className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm max-h-32 overflow-y-auto p-2 bg-white">
+                                    <div className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm max-h-32 overflow-y-auto p-2 bg-white dark:bg-gray-800">
                                         {subjectsList.length === 0 ? (
                                             <span className="text-sm text-gray-400 italic">Belum ada data mata pelajaran.</span>
                                         ) : (
@@ -532,7 +532,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                                 <label key={subject.id} className="flex items-center mb-1.5 cursor-pointer">
                                                     <input
                                                         type="checkbox"
-                                                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                                        className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500"
                                                         checked={teacherForm.data.subject_ids.includes(subject.id)}
                                                         onChange={(e) => {
                                                             const newIds = e.target.checked
@@ -541,7 +541,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                                             teacherForm.setData('subject_ids', newIds);
                                                         }}
                                                     />
-                                                    <span className="ml-2 text-sm text-gray-700">{subject.name} ({subject.code})</span>
+                                                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{subject.name} ({subject.code})</span>
                                                 </label>
                                             ))
                                         )}
@@ -604,7 +604,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                 </div>
                                 <div className="mb-4">
                                     <InputLabel value="Hubungkan dengan Anak (Siswa) (Pilih satu atau lebih)" />
-                                    <div className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm max-h-32 overflow-y-auto p-2 bg-white">
+                                    <div className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm max-h-32 overflow-y-auto p-2 bg-white dark:bg-gray-800">
                                         {studentsList.length === 0 ? (
                                             <span className="text-sm text-gray-400 italic">Belum ada data siswa.</span>
                                         ) : (
@@ -612,7 +612,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                                 <label key={student.id} className="flex items-center mb-1.5 cursor-pointer">
                                                     <input
                                                         type="checkbox"
-                                                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                                        className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500"
                                                         checked={parentForm.data.student_ids.includes(student.id)}
                                                         onChange={(e) => {
                                                             const newIds = e.target.checked
@@ -621,7 +621,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                                             parentForm.setData('student_ids', newIds);
                                                         }}
                                                     />
-                                                    <span className="ml-2 text-sm text-gray-700">{student.name} ({student.nis})</span>
+                                                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{student.name} ({student.nis})</span>
                                                 </label>
                                             ))
                                         )}
@@ -651,8 +651,8 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
             {modalType === 'delete' && (
                 <Modal show={true} onClose={closeModal}>
                     <form onSubmit={handleDelete} className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Hapus Profil & Akun Pengguna</h3>
-                        <p className="text-sm text-gray-600 mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Hapus Profil & Akun Pengguna</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                             Apakah Anda yakin ingin menghapus data <strong>{selectedRecord?.name}</strong>? 
                             Tindakan ini akan menghapus data profil akademik beserta **akun login terkait** dari sistem secara permanen.
                         </p>
@@ -678,31 +678,31 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     function renderStudentsTab() {
         return (
             <div>
-                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Siswa</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">NIS</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Kelas</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Email Akun</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Wali Murid</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Siswa</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">NIS</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Kelas</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Email Akun</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Wali Murid</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             {students.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="px-6 py-8 text-center text-sm text-gray-500">Belum ada data siswa ditemukan.</td>
+                                    <td colSpan="6" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data siswa ditemukan.</td>
                                 </tr>
                             ) : (
                                 students.data.map((student) => (
-                                    <tr key={student.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{student.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-semibold">{student.nis}</td>
+                                    <tr key={student.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">{student.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-semibold">{student.nis}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-950 font-bold">{student.school_class?.name || '-'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{student.user?.email || '-'}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{student.user?.email || '-'}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                                             {student.parents && student.parents.length > 0 ? (
                                                 <div className="flex flex-wrap gap-1">
                                                     {student.parents.map((p) => (
@@ -714,7 +714,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('student', student)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                            <button onClick={() => openEditModal('student', student)} className="text-indigo-600 hover:text-indigo-600 mr-4">Edit</button>
                                             <button onClick={() => openDeleteModal('student', student)} className="text-red-600 hover:text-red-900">Hapus</button>
                                         </td>
                                     </tr>
@@ -732,33 +732,33 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     function renderTeachersTab() {
         return (
             <div>
-                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Nama Guru</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">NIP</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Mata Pelajaran Diampu</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">No. Telepon</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Email Akun</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Nama Guru</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">NIP</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Mata Pelajaran Diampu</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">No. Telepon</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Email Akun</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             {teachers.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-8 text-center text-sm text-gray-500">Belum ada data guru ditemukan.</td>
+                                    <td colSpan="5" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data guru ditemukan.</td>
                                 </tr>
                             ) : (
                                 teachers.data.map((teacher) => (
-                                    <tr key={teacher.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{teacher.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-bold">{teacher.nip}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">
+                                    <tr key={teacher.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">{teacher.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-bold">{teacher.nip}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                                             {teacher.subjects && teacher.subjects.length > 0 ? (
                                                 <div className="flex flex-wrap gap-1">
                                                     {teacher.subjects.map((sub) => (
-                                                        <span key={sub.id} className="inline-flex items-center rounded bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700 border border-indigo-100">
+                                                        <span key={sub.id} className="inline-flex items-center rounded bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-600 border border-indigo-500">
                                                             {sub.name} ({sub.code})
                                                         </span>
                                                     ))}
@@ -767,10 +767,10 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                                 <span className="text-gray-400 italic text-xs">Belum dihubungkan</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{teacher.phone_number || '-'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{teacher.user?.email || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">{teacher.phone_number || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{teacher.user?.email || '-'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('teacher', teacher)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                            <button onClick={() => openEditModal('teacher', teacher)} className="text-indigo-600 hover:text-indigo-600 mr-4">Edit</button>
                                             <button onClick={() => openDeleteModal('teacher', teacher)} className="text-red-600 hover:text-red-900">Hapus</button>
                                         </td>
                                     </tr>
@@ -788,29 +788,29 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     function renderParentsTab() {
         return (
             <div>
-                <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Wali Murid</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">No. Telepon</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Email Akun</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Anak Terhubung</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Wali Murid</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">No. Telepon</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Email Akun</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Anak Terhubung</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             {parents.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan="5" className="px-6 py-8 text-center text-sm text-gray-500">Belum ada data wali murid ditemukan.</td>
+                                    <td colSpan="5" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data wali murid ditemukan.</td>
                                 </tr>
                             ) : (
                                 parents.data.map((parent) => (
-                                    <tr key={parent.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{parent.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{parent.phone_number || '-'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{parent.user?.email || '-'}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">
+                                    <tr key={parent.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">{parent.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">{parent.phone_number || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{parent.user?.email || '-'}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                                             {parent.students && parent.students.length > 0 ? (
                                                 <div className="flex flex-wrap gap-1">
                                                     {parent.students.map((child) => (
@@ -824,7 +824,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('parent', parent)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+                                            <button onClick={() => openEditModal('parent', parent)} className="text-indigo-600 hover:text-indigo-600 mr-4">Edit</button>
                                             <button onClick={() => openDeleteModal('parent', parent)} className="text-red-600 hover:text-red-900">Hapus</button>
                                         </td>
                                     </tr>
@@ -843,24 +843,24 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         if (!paginator || paginator.links.length <= 3) return null;
 
         return (
-            <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4">
+            <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 sm:px-6 mt-4">
                 <div className="flex flex-1 justify-between sm:hidden">
                     <Link
                         href={paginator.prev_page_url || '#'}
-                        className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 ${!paginator.prev_page_url && 'pointer-events-none opacity-50'}`}
+                        className={`relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 ${!paginator.prev_page_url && 'pointer-events-none opacity-50'}`}
                     >
                         Sebelumnya
                     </Link>
                     <Link
                         href={paginator.next_page_url || '#'}
-                        className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 ${!paginator.next_page_url && 'pointer-events-none opacity-50'}`}
+                        className={`relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 ${!paginator.next_page_url && 'pointer-events-none opacity-50'}`}
                     >
                         Berikutnya
                     </Link>
                 </div>
                 <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                     <div>
-                        <p className="text-sm text-gray-700 font-medium">
+                        <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
                             Menampilkan <span className="font-semibold">{paginator.from || 0}</span> sampai <span className="font-semibold">{paginator.to || 0}</span> dari <span className="font-semibold">{paginator.total}</span> data
                         </p>
                     </div>
@@ -873,8 +873,8 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                     className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold border ${
                                         link.active
-                                            ? 'z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 border-indigo-600'
-                                            : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0 border-gray-300'
+                                            ? 'z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 border-indigo-500'
+                                            : 'text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 focus:outline-offset-0 border-gray-300 dark:border-gray-600'
                                     } ${!link.url && 'pointer-events-none opacity-50'} ${
                                         index === 0 ? 'rounded-l-md' : ''
                                     } ${index === paginator.links.length - 1 ? 'rounded-r-md' : ''}`}

@@ -135,24 +135,24 @@ export default function Index({ auth, calendars, filters }) {
         if (!paginator || paginator.links.length <= 3) return null;
 
         return (
-            <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 mt-4">
+            <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 sm:px-6 mt-4">
                 <div className="flex flex-1 justify-between sm:hidden">
                     <Link
                         href={paginator.prev_page_url || '#'}
-                        className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 ${!paginator.prev_page_url && 'pointer-events-none opacity-50'}`}
+                        className={`relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 ${!paginator.prev_page_url && 'pointer-events-none opacity-50'}`}
                     >
                         Sebelumnya
                     </Link>
                     <Link
                         href={paginator.next_page_url || '#'}
-                        className={`relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 ${!paginator.next_page_url && 'pointer-events-none opacity-50'}`}
+                        className={`relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 ${!paginator.next_page_url && 'pointer-events-none opacity-50'}`}
                     >
                         Berikutnya
                     </Link>
                 </div>
                 <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                     <div>
-                        <p className="text-sm text-gray-700 font-medium">
+                        <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
                             Menampilkan <span className="font-semibold">{paginator.from || 0}</span> sampai <span className="font-semibold">{paginator.to || 0}</span> dari <span className="font-semibold">{paginator.total}</span> agenda
                         </p>
                     </div>
@@ -165,8 +165,8 @@ export default function Index({ auth, calendars, filters }) {
                                     dangerouslySetInnerHTML={{ __html: link.label }}
                                     className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold border ${
                                         link.active
-                                            ? 'z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 border-indigo-600'
-                                            : 'text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0 border-gray-300'
+                                            ? 'z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 border-indigo-500'
+                                            : 'text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 focus:outline-offset-0 border-gray-300 dark:border-gray-600'
                                     } ${!link.url && 'pointer-events-none opacity-50'} ${
                                         index === 0 ? 'rounded-l-md' : ''
                                     } ${index === paginator.links.length - 1 ? 'rounded-r-md' : ''}`}
@@ -182,7 +182,7 @@ export default function Index({ auth, calendars, filters }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                     Kalender Akademik & Pendidikan
                 </h2>
             }
@@ -211,7 +211,7 @@ export default function Index({ auth, calendars, filters }) {
                     )}
 
                     {/* Filter and Create Header */}
-                    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                         <form onSubmit={handleSearchSubmit} className="flex flex-wrap items-center gap-3">
                             <div className="w-80">
                                 <TextInput
@@ -219,7 +219,7 @@ export default function Index({ auth, calendars, filters }) {
                                     type="text"
                                     name="search"
                                     value={search}
-                                    className="block w-full text-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                    className="block w-full text-sm border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
                                     placeholder="Cari judul kegiatan atau deskripsi..."
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
@@ -247,31 +247,31 @@ export default function Index({ auth, calendars, filters }) {
                     </div>
 
                     {/* Table Card */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                         <div className="p-6">
-                            <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                            <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                                 <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-50">
+                                    <thead className="bg-gray-50 dark:bg-gray-900/50">
                                         <tr>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Kegiatan / Agenda</th>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Tanggal Mulai</th>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Tanggal Selesai</th>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Kategori</th>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Deskripsi</th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Kegiatan / Agenda</th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Tanggal Mulai</th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Tanggal Selesai</th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Kategori</th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Deskripsi</th>
                                             <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                                         </tr>
                                     </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
+                                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                                         {calendars.data.length === 0 ? (
                                             <tr>
-                                                <td colSpan="6" className="px-6 py-8 text-center text-sm text-gray-500">Belum ada agenda kalender akademik ditemukan.</td>
+                                                <td colSpan="6" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada agenda kalender akademik ditemukan.</td>
                                             </tr>
                                         ) : (
                                             calendars.data.map((cal) => (
-                                                <tr key={cal.id} className="hover:bg-gray-50">
+                                                <tr key={cal.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-950">{cal.title}</td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">{formatReadableDate(cal.start_date)}</td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 font-semibold">{cal.end_date ? formatReadableDate(cal.end_date) : '-'}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 font-semibold">{formatReadableDate(cal.start_date)}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 font-semibold">{cal.end_date ? formatReadableDate(cal.end_date) : '-'}</td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                         <div className="flex flex-wrap gap-1">
                                                             {cal.is_holiday ? (
@@ -285,15 +285,15 @@ export default function Index({ auth, calendars, filters }) {
                                                                 </span>
                                                             ) : null}
                                                             {!cal.is_holiday && !cal.is_self_study ? (
-                                                                <span className="inline-flex items-center rounded bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700 border border-indigo-100">
+                                                                <span className="inline-flex items-center rounded bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-600 border border-indigo-500">
                                                                     Kegiatan Sekolah
                                                                 </span>
                                                             ) : null}
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate">{cal.description || '-'}</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate">{cal.description || '-'}</td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                        <button onClick={() => openEditModal(cal)} className="text-indigo-600 hover:text-indigo-900 mr-4 font-semibold">Edit</button>
+                                                        <button onClick={() => openEditModal(cal)} className="text-indigo-600 hover:text-indigo-600 mr-4 font-semibold">Edit</button>
                                                         <button onClick={() => openDeleteModal(cal)} className="text-red-600 hover:text-red-900 font-semibold">Hapus</button>
                                                     </td>
                                                 </tr>
@@ -312,7 +312,7 @@ export default function Index({ auth, calendars, filters }) {
             {modalType && modalType !== 'delete' && (
                 <Modal show={true} onClose={closeModal}>
                     <form onSubmit={handleSubmit} className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
                             {modalType === 'create' ? 'Tambah ' : 'Edit '} Agenda Akademik
                         </h3>
 
@@ -361,7 +361,7 @@ export default function Index({ auth, calendars, filters }) {
                             <textarea
                                 id="cal_desc"
                                 rows="3"
-                                className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                 value={calendarForm.data.description}
                                 onChange={(e) => calendarForm.setData('description', e.target.value)}
                                 placeholder="Tulis catatan penting terkait agenda di sini..."
@@ -369,30 +369,30 @@ export default function Index({ auth, calendars, filters }) {
                             <InputError message={calendarForm.errors.description} className="mt-2" />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-gray-50 p-3 rounded-lg border border-gray-200">
-                            <label className="flex items-center cursor-pointer p-2 rounded hover:bg-white transition">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <label className="flex items-center cursor-pointer p-2 rounded hover:bg-white dark:bg-gray-800 transition">
                                 <input
                                     type="checkbox"
-                                    className="rounded border-gray-300 text-red-600 shadow-sm focus:ring-red-500 h-4 w-4"
+                                    className="rounded border-gray-300 dark:border-gray-600 text-red-600 shadow-sm focus:ring-red-500 h-4 w-4"
                                     checked={calendarForm.data.is_holiday}
                                     onChange={(e) => calendarForm.setData('is_holiday', e.target.checked)}
                                 />
                                 <div className="ml-3">
                                     <span className="text-sm font-bold text-red-700">Hari Libur Sekolah</span>
-                                    <span className="block text-xs text-gray-500">Sekolah libur & siswa tidak masuk.</span>
+                                    <span className="block text-xs text-gray-500 dark:text-gray-400">Sekolah libur & siswa tidak masuk.</span>
                                 </div>
                             </label>
 
-                            <label className="flex items-center cursor-pointer p-2 rounded hover:bg-white transition">
+                            <label className="flex items-center cursor-pointer p-2 rounded hover:bg-white dark:bg-gray-800 transition">
                                 <input
                                     type="checkbox"
-                                    className="rounded border-gray-300 text-amber-600 shadow-sm focus:ring-amber-500 h-4 w-4"
+                                    className="rounded border-gray-300 dark:border-gray-600 text-amber-600 shadow-sm focus:ring-amber-500 h-4 w-4"
                                     checked={calendarForm.data.is_self_study}
                                     onChange={(e) => calendarForm.setData('is_self_study', e.target.checked)}
                                 />
                                 <div className="ml-3">
                                     <span className="text-sm font-bold text-amber-700">Belajar Mandiri</span>
-                                    <span className="block text-xs text-gray-500">Siswa belajar di rumah/daring.</span>
+                                    <span className="block text-xs text-gray-500 dark:text-gray-400">Siswa belajar di rumah/daring.</span>
                                 </div>
                             </label>
                         </div>
@@ -413,8 +413,8 @@ export default function Index({ auth, calendars, filters }) {
             {modalType === 'delete' && (
                 <Modal show={true} onClose={closeModal}>
                     <form onSubmit={handleDelete} className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Hapus Agenda Akademik</h3>
-                        <p className="text-sm text-gray-600 mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Hapus Agenda Akademik</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                             Apakah Anda yakin ingin menghapus agenda <strong>{selectedRecord?.title}</strong>?
                             Tindakan ini tidak dapat dibatalkan.
                         </p>
