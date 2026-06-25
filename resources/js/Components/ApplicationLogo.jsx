@@ -1,20 +1,17 @@
 export default function ApplicationLogo(props) {
     return (
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-            {/* Bottom Layer */}
-            <path d="M12 11L4 15L12 19L20 15L12 11Z" fill="currentColor" />
-            <path d="M4 15V18L12 22V19L4 15Z" fill="currentColor" fillOpacity="0.65" />
-            <path d="M20 15V18L12 22V19L20 15Z" fill="currentColor" fillOpacity="0.35" />
+            {/* Bottom Disk */}
+            <ellipse cx="12" cy="18.5" rx="9" ry="2.5" fill="currentColor" fillOpacity="0.6" />
+            <path d="M 3 18.5 v 3 a 9 2.5 0 0 0 18 0 v -3 a 9 2.5 0 0 1 -18 0 Z" fill="currentColor" fillOpacity="0.25" />
             
-            {/* Middle Layer */}
-            <path d="M12 6.5L4 10.5L12 14.5L20 10.5L12 6.5Z" fill="currentColor" />
-            <path d="M4 10.5V13.5L12 17.5V14.5L4 10.5Z" fill="currentColor" fillOpacity="0.65" />
-            <path d="M20 10.5V13.5L12 17.5V14.5L20 10.5Z" fill="currentColor" fillOpacity="0.35" />
+            {/* Middle Disk */}
+            <ellipse cx="12" cy="11.5" rx="9" ry="2.5" fill="currentColor" fillOpacity="0.8" />
+            <path d="M 3 11.5 v 3 a 9 2.5 0 0 0 18 0 v -3 a 9 2.5 0 0 1 -18 0 Z" fill="currentColor" fillOpacity="0.45" />
             
-            {/* Top Layer */}
-            <path d="M12 2L4 6L12 10L20 6L12 2Z" fill="currentColor" />
-            <path d="M4 6V9L12 13V10L4 6Z" fill="currentColor" fillOpacity="0.65" />
-            <path d="M20 6V9L12 13V10L20 6Z" fill="currentColor" fillOpacity="0.35" />
+            {/* Top Disk */}
+            <ellipse cx="12" cy="4.5" rx="9" ry="2.5" fill="currentColor" />
+            <path d="M 3 4.5 v 3 a 9 2.5 0 0 0 18 0 v -3 a 9 2.5 0 0 1 -18 0 Z" fill="currentColor" fillOpacity="0.65" />
         </svg>
     );
 }

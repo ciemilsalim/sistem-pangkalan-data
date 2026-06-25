@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import InputLabel from '@/Components/InputLabel';
@@ -9,7 +10,7 @@ export default function Index({ auth, settings }) {
     const pageProps = usePage().props;
 
     // Initialize form with existing setting values from database
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         school_name: settings.school_name || '',
         school_address: settings.school_address || '',
         school_headmaster_name: settings.school_headmaster_name || '',
@@ -23,11 +24,28 @@ export default function Index({ auth, settings }) {
         school_radius: settings.school_radius || '100',
         send_absent_notification: settings.send_absent_notification || 'off',
         dark_mode: settings.dark_mode || 'off',
+        school_logo: null,
+        _method: 'PUT',
     });
+
+    const [logoPreview, setLogoPreview] = useState(null);
+
+    useEffect(() => {
+        if (!data.school_logo) {
+            setLogoPreview(null);
+            return;
+        }
+
+        const objectUrl = URL.createObjectURL(data.school_logo);
+        setLogoPreview(objectUrl);
+
+        // free memory when ever this component is unmounted or logo is changed
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [data.school_logo]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(route('settings.update'), {
+        post(route('settings.update'), {
             preserveScroll: true
         });
     };
@@ -121,6 +139,58 @@ export default function Index({ auth, settings }) {
                                         />
                                         <InputError message={errors.school_headmaster_nip} className="mt-2" />
                                     </div>
+                                </div>
+
+                                <div className="border-t border-gray-100 dark:border-gray-700/50 pt-4 mt-4">
+                                    <InputLabel htmlFor="school_logo" value="Logo Sekolah" className="mb-2" />
+                                    <div className="flex items-center gap-6">
+                                        {/* Logo Preview */}
+                                        <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center justify-center transition-colors">
+                                            {logoPreview ? (
+                                                <img
+                                                    src={logoPreview}
+                                                    alt="Preview Logo"
+                                                    className="h-full w-full object-contain p-1.5"
+                                                />
+                                            ) : settings.school_logo_url ? (
+                                                <img
+                                                    src={settings.school_logo_url}
+                                                    alt="Logo Sekolah"
+                                                    className="h-full w-full object-contain p-1.5"
+                                                />
+                                            ) : (
+                                                <svg className="h-10 w-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                                </svg>
+                                            )}
+                                        </div>
+
+                                        {/* Upload Controls */}
+                                        <div className="flex flex-col gap-1.5">
+                                            <input
+                                                id="school_logo"
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={(e) => {
+                                                    if (e.target.files?.[0]) {
+                                                        setData('school_logo', e.target.files[0]);
+                                                    }
+                                                }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => document.getElementById('school_logo').click()}
+                                                className="inline-flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 cursor-pointer"
+                                            >
+                                                Pilih File Logo
+                                            </button>
+                                            <p className="text-xs text-gray-400 dark:text-gray-500">
+                                                Dukungan format: PNG, JPG, JPEG (Maks. 2MB)
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <InputError message={errors.school_logo} className="mt-2" />
                                 </div>
                             </div>
                         </div>

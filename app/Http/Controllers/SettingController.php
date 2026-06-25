@@ -33,9 +33,15 @@ class SettingController extends Controller
             'school_radius' => '100',
             'send_absent_notification' => 'off',
             'dark_mode' => 'off',
+            'school_logo' => '',
         ];
 
         $settings = array_merge($defaultKeys, $settings);
+
+        // Add logo URL if logo exists
+        $settings['school_logo_url'] = $settings['school_logo'] 
+            ? asset('storage/' . $settings['school_logo']) 
+            : null;
 
         return Inertia::render('Settings/Index', [
             'settings' => $settings,
@@ -64,6 +70,7 @@ class SettingController extends Controller
             'school_radius' => 'required|integer|min:10',
             'send_absent_notification' => 'required|string|in:on,off',
             'dark_mode' => 'required|string|in:on,off',
+            'school_logo' => 'nullable|image|max:2048',
         ]);
 
         $settingsData = $request->only([
@@ -91,6 +98,20 @@ class SettingController extends Controller
             Setting::updateOrCreate(
                 ['key' => $key],
                 ['value' => $value]
+            );
+        }
+
+        // Handle school logo upload
+        if ($request->hasFile('school_logo')) {
+            $oldLogo = Setting::where('key', 'school_logo')->value('value');
+            if ($oldLogo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldLogo);
+            }
+            
+            $logoPath = $request->file('school_logo')->store('school_logos', 'public');
+            Setting::updateOrCreate(
+                ['key' => 'school_logo'],
+                ['value' => $logoPath]
             );
         }
 
