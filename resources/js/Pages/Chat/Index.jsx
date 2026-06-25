@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, useForm, router, Link } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
 export default function Index({ conversations, selectedParentId, activeConversation, messages }) {
@@ -99,7 +99,7 @@ export default function Index({ conversations, selectedParentId, activeConversat
                     <div className="flex h-[calc(100vh-200px)] min-h-[500px] overflow-hidden rounded-xl bg-white dark:bg-gray-800 shadow-md">
                         
                         {/* LEFT SIDEBAR - CONTACT LIST */}
-                        <div className="flex w-full flex-col border-r border-gray-200 dark:border-gray-700 md:w-80 lg:w-96 shrink-0 bg-gray-50 dark:bg-gray-900/50/50">
+                        <div className={`flex-col border-r border-gray-200 dark:border-gray-700 w-full md:w-80 lg:w-96 shrink-0 bg-gray-50 dark:bg-gray-900/50 ${activeConversation ? 'hidden md:flex' : 'flex'}`}>
                             {/* Search bar */}
                             <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                                 <div className="relative">
@@ -174,13 +174,23 @@ export default function Index({ conversations, selectedParentId, activeConversat
                         </div>
 
                         {/* RIGHT SIDE - CONVERSATION PANEL */}
-                        <div className="flex flex-1 flex-col bg-slate-50">
+                        <div className={`flex-1 flex-col bg-slate-50 dark:bg-gray-900/10 ${activeConversation ? 'flex' : 'hidden md:flex'}`}>
                             {activeConversation ? (
                                 <>
                                     {/* Active Chat Header */}
-                                    <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-4 shadow-sm z-10">
+                                    <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 md:px-6 py-4 shadow-sm z-10 shrink-0">
                                         <div className="flex items-center gap-3">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 dark:bg-indigo-700 font-bold text-white">
+                                            {/* Mobile Back Button */}
+                                            <Link 
+                                                href={route('chat.index')}
+                                                className="md:hidden p-1.5 -ml-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+                                                </svg>
+                                            </Link>
+                                            
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 dark:bg-indigo-700 font-bold text-white shrink-0">
                                                 {(activeConversation.parent?.name || 'O').charAt(0).toUpperCase()}
                                             </div>
                                             <div>

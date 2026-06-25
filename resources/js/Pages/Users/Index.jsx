@@ -112,7 +112,7 @@ export default function Index({ auth, users, filters }) {
     const renderRoleBadge = (role) => {
         const badges = {
             admin: 'bg-red-100 text-red-800 border-red-200',
-            teacher: 'bg-indigo-600 text-indigo-600 border-indigo-500',
+            teacher: 'bg-indigo-100 text-indigo-800 border-indigo-200',
             student: 'bg-green-100 text-green-800 border-green-200',
             parent: 'bg-purple-100 text-purple-800 border-purple-200',
         };

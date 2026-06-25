@@ -116,42 +116,40 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     
                     {/* Welcome Banner */}
-                    <div className="mb-6 rounded-2xl bg-indigo-600 dark:bg-indigo-700 p-6 text-white shadow-md relative overflow-hidden">
-                        <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white dark:bg-gray-800/10 blur-xl"></div>
-                        <div className="absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-white dark:bg-gray-800/10 blur-xl"></div>
-                        <div className="relative z-10">
-                            <h3 className="text-lg font-bold sm:text-xl">Selamat Datang di Sistem Portal SIASEK</h3>
-                            <p className="text-sm text-indigo-100 mt-1 max-w-2xl">
-                                Kelola seluruh kurikulum, sivitas akademika, agenda pendidikan, pengumuman portal, dan moderasi kepatuhan obrolan secara terintegrasi dari satu dasbor kendali utama.
-                            </p>
-                        </div>
+                    <div className="mb-6 rounded-2xl bg-gradient-to-br from-indigo-100 via-indigo-50 to-blue-50 dark:from-indigo-900/50 dark:via-indigo-950/40 dark:to-blue-900/30 border border-indigo-200/60 dark:border-indigo-800/50 p-6 shadow-sm">
+                        <h3 className="text-lg font-bold sm:text-xl text-indigo-900 dark:text-indigo-100">
+                            Selamat Datang di Sistem Portal SIASEK
+                        </h3>
+                        <p className="text-sm text-indigo-700 dark:text-indigo-300 mt-1.5 max-w-3xl leading-relaxed">
+                            Kelola seluruh kurikulum, sivitas akademika, agenda pendidikan, pengumuman portal, dan moderasi kepatuhan obrolan secara terintegrasi dari satu dasbor kendali utama.
+                        </p>
                     </div>
 
                     {/* TAB BAR NAVIGATION */}
-                    <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6 bg-white dark:bg-gray-800 p-1 rounded-xl shadow-sm max-w-md">
+                    <div className="flex sm:inline-flex w-full sm:w-auto mb-8 bg-slate-100/80 dark:bg-gray-900/50 p-1.5 rounded-xl border border-gray-200/50 dark:border-gray-800/50 backdrop-blur-sm">
                         <button
                             onClick={() => setActiveTab('school')}
-                            className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 text-sm font-semibold rounded-lg transition duration-150 ${
+                            className={`flex-1 sm:flex-none flex items-center justify-center gap-2.5 py-2.5 px-6 text-sm font-semibold rounded-lg transition-all duration-300 ease-out ${
                                 activeTab === 'school'
-                                    ? 'bg-indigo-600 dark:bg-indigo-700 text-white shadow-sm hover:bg-indigo-700 dark:hover:bg-indigo-600'
-                                    : 'text-gray-500 dark:text-gray-500 dark:text-gray-400 hover:text-gray-750 hover:bg-gray-50 dark:bg-gray-900/50'
+                                    ? 'bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-black/5 dark:ring-white/5'
+                                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:bg-slate-200/50 dark:hover:bg-gray-800/50 dark:hover:text-gray-200'
                             }`}
                         >
-                            <svg className="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            <svg className={`h-5 w-5 transition-transform duration-300 ${activeTab === 'school' ? 'scale-110' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={activeTab === 'school' ? "2.5" : "2"} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                             </svg>
                             Ringkasan Sekolah
                         </button>
                         <button
                             onClick={() => setActiveTab('lms')}
-                            className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 text-sm font-semibold rounded-lg transition duration-150 ${
+                            className={`flex-1 sm:flex-none flex items-center justify-center gap-2.5 py-2.5 px-6 text-sm font-semibold rounded-lg transition-all duration-300 ease-out ${
                                 activeTab === 'lms'
-                                    ? 'bg-indigo-600 dark:bg-indigo-700 text-white shadow-sm hover:bg-indigo-700 dark:hover:bg-indigo-600'
-                                    : 'text-gray-500 dark:text-gray-500 dark:text-gray-400 hover:text-gray-750 hover:bg-gray-50 dark:bg-gray-900/50'
+                                    ? 'bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-black/5 dark:ring-white/5'
+                                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:bg-slate-200/50 dark:hover:bg-gray-800/50 dark:hover:text-gray-200'
                             }`}
                         >
-                            <svg className="h-4.5 w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            <svg className={`h-5 w-5 transition-transform duration-300 ${activeTab === 'lms' ? 'scale-110' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={activeTab === 'lms' ? "2.5" : "2"} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                             </svg>
                             Analisis LMS
                         </button>
@@ -588,7 +586,12 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                         <div className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm">Pengumuman Terbaru</h3>
-                                <Link href={route('announcements.index')} className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition">Lihat Semua</Link>
+                                <Link href={route('announcements.index')} className="group flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-all bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-1.5 rounded-lg">
+                                    Lihat Semua
+                                    <svg className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                </Link>
                             </div>
 
                             <div className="space-y-4">
@@ -612,7 +615,15 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                         <div className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700">
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm">Agenda Akademik Terdekat</h3>
-                                <Link href={route('calendars.index')} className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition">Lihat Kalender</Link>
+                                <Link href={route('calendars.index')} className="group flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-all bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-1.5 rounded-lg">
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    Lihat Kalender
+                                    <svg className="w-3 h-3 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </Link>
                             </div>
 
                             <div className="space-y-3.5">
