@@ -118,11 +118,84 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                     {/* Welcome Banner */}
                     <div className="mb-6 rounded-2xl bg-gradient-to-br from-indigo-100 via-indigo-50 to-blue-50 dark:from-indigo-900/50 dark:via-indigo-950/40 dark:to-blue-900/30 border border-indigo-200/60 dark:border-indigo-800/50 p-6 shadow-sm">
                         <h3 className="text-lg font-bold sm:text-xl text-indigo-900 dark:text-indigo-100">
-                            Selamat Datang di Sistem Portal SIASEK
+                            Selamat Datang di SIPADA (Sistem Pangkalan Data)
                         </h3>
                         <p className="text-sm text-indigo-700 dark:text-indigo-300 mt-1.5 max-w-3xl leading-relaxed">
-                            Kelola seluruh kurikulum, sivitas akademika, agenda pendidikan, pengumuman portal, dan moderasi kepatuhan obrolan secara terintegrasi dari satu dasbor kendali utama.
+                            SIPADA merupakan pusat data inti (central database hub) yang mengintegrasikan seluruh data akademik, kurikulum, sivitas sekolah, dan administrasi untuk ekosistem besar SIASEK. Sebagai platform penyedia data utama, seluruh informasi dikelola di sini untuk dikonsumsi oleh aplikasi lain seperti Aplikasi Absensi, LMS Mokopani, dan Zexam.
                         </p>
+                    </div>
+
+                    {/* Ecosystem Quick Access (Single Sign-On) */}
+                    <div className="mb-8">
+                        <div className="flex items-center gap-2 mb-4">
+                            <span className="flex h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                Jalur Cepat Ekosistem SIASEK
+                            </h4>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            {/* Card 1: LMS Mokopani */}
+                            <a
+                                href="/sso/redirect/lms"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group block relative overflow-hidden rounded-2xl border border-indigo-100 dark:border-gray-800/80 bg-white dark:bg-gray-800 p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-900/40 hover:-translate-y-0.5"
+                            >
+                                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-indigo-50/50 dark:bg-indigo-950/10 transition-transform duration-500 group-hover:scale-125"></div>
+                                <div className="relative flex items-start gap-4">
+                                    <div className="rounded-xl bg-indigo-50 dark:bg-indigo-950/40 p-3 text-indigo-600 dark:text-indigo-400 transition-colors duration-300 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50">
+                                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                        </svg>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h5 className="font-bold text-gray-900 dark:text-gray-100 transition-colors duration-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                                            LMS Mokopani
+                                        </h5>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                                            Buka platform pembelajaran digital, modul ajar berbasis AI, penugasan, dan penilaian siswa secara otomatis tanpa login ulang.
+                                        </p>
+                                        <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+                                            <span>Masuk Aplikasi</span>
+                                            <svg className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+
+                            {/* Card 2: Aplikasi Absensi */}
+                            <a
+                                href="/sso/redirect/absensi"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group block relative overflow-hidden rounded-2xl border border-blue-100 dark:border-gray-800/80 bg-white dark:bg-gray-800 p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:border-blue-200 dark:hover:border-blue-900/40 hover:-translate-y-0.5"
+                            >
+                                <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-blue-50/50 dark:bg-blue-950/10 transition-transform duration-500 group-hover:scale-125"></div>
+                                <div className="relative flex items-start gap-4">
+                                    <div className="rounded-xl bg-blue-50 dark:bg-blue-950/40 p-3 text-blue-600 dark:text-blue-400 transition-colors duration-300 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50">
+                                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                        </svg>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h5 className="font-bold text-gray-900 dark:text-gray-100 transition-colors duration-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                            Aplikasi Absensi
+                                        </h5>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
+                                            Buka panel pemantauan kehadiran harian, jadwal piket guru, perizinan dispensasi, dan laporan rekapitulasi secara instan.
+                                        </p>
+                                        <div className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                                            <span>Masuk Aplikasi</span>
+                                            <svg className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
 
                     {/* TAB BAR NAVIGATION */}
