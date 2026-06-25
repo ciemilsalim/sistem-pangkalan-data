@@ -11,6 +11,8 @@ export default function Login({ status, canResetPassword }) {
         email: '',
         password: '',
         remember: false,
+        username_honey: '',
+        honey_time: Date.now(),
     });
 
     const submit = (e) => {
@@ -32,6 +34,21 @@ export default function Login({ status, canResetPassword }) {
             )}
 
             <form onSubmit={submit}>
+                {/* Honeypot Fields - Invisible to normal users, traps bots */}
+                <div style={{ display: 'none', position: 'absolute', left: '-9999px' }} aria-hidden="true">
+                    <label htmlFor="username_honey">Biarkan kolom ini kosong jika Anda manusia</label>
+                    <input 
+                        type="text" 
+                        id="username_honey" 
+                        name="username_honey"
+                        value={data.username_honey}
+                        onChange={(e) => setData('username_honey', e.target.value)}
+                        autoComplete="off"
+                        tabIndex="-1"
+                    />
+                    <input type="hidden" name="honey_time" value={data.honey_time} />
+                </div>
+
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
 

@@ -77,7 +77,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 <div className={`h-16 flex items-center border-b border-gray-200 dark:border-gray-800 shrink-0 transition-all duration-300 ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-between px-6'}`}>
                     <Link href="/" className={`flex items-center overflow-hidden transition-all duration-300 ${isSidebarCollapsed ? 'w-0 opacity-0 hidden' : 'w-auto opacity-100'}`}>
                         <ApplicationLogo className="block h-8 w-auto fill-current text-indigo-600 dark:text-indigo-500 shrink-0" />
-                        <span className="ml-3 font-semibold text-lg text-gray-900 dark:text-gray-100 tracking-tight">Siasek</span>
+                        <span className="ml-3 font-semibold text-lg text-gray-900 dark:text-gray-100 tracking-tight">SIPADA</span>
                     </Link>
                     <button 
                         onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -153,7 +153,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         <Link href="/">
                             <ApplicationLogo className="block h-6 w-auto fill-current text-indigo-600 dark:text-indigo-500 drop-shadow-sm" />
                         </Link>
-                        <span className="font-bold text-lg text-gray-900 dark:text-gray-100 tracking-tight">Siasek</span>
+                        <span className="font-bold text-lg text-gray-900 dark:text-gray-100 tracking-tight">SIPADA</span>
                     </div>
                     <div className="flex items-center gap-2.5">
                         <div className="text-right">
@@ -318,17 +318,37 @@ export default function AuthenticatedLayout({ header, children }) {
                 )}
 
                 {/* Page Content */}
-                <main className="flex-1 overflow-y-auto pt-14 md:pt-0 pb-20 md:pb-0 relative">
+                <main className="flex-1 overflow-y-auto pt-14 md:pt-0 pb-20 md:pb-0 relative flex flex-col">
                     {header && (
-                        <div className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800 transition-colors duration-200">
+                        <div className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800 transition-colors duration-200 shrink-0">
                             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                                 {header}
                             </div>
                         </div>
                     )}
-                    <div className="p-4 sm:p-6 lg:p-8">
+                    <div className="p-4 sm:p-6 lg:p-8 flex-1">
                         {children}
                     </div>
+
+                    {/* Footer */}
+                    <footer className="mt-auto border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-colors duration-200 shrink-0">
+                        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                            <div className="py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                                <div className="flex items-center gap-2">
+                                    <ApplicationLogo className="w-5 h-5 text-indigo-600 dark:text-indigo-500" />
+                                    <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-tight">SIPADA - Sistem Pangkalan Data</span>
+                                </div>
+                                <div className="text-center md:text-right">
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                                        &copy; {new Date().getFullYear()} SIPADA (Ekosistem SIASEK). Hak cipta dilindungi undang-undang.
+                                    </p>
+                                    <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
+                                        Dibuat dengan <span className="text-red-500">&hearts;</span> oleh <span className="font-semibold text-indigo-600 dark:text-indigo-400">Zahradev</span> &middot; Versi 1.0.0
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </footer>
                 </main>
             </div>
         </div>

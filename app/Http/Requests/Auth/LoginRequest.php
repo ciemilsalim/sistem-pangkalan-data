@@ -30,6 +30,8 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'username_honey' => ['nullable', 'string'],
+            'honey_time' => ['nullable', 'numeric'],
         ];
     }
 
@@ -41,6 +43,33 @@ class LoginRequest extends FormRequest
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
+
+        // Honeypot Anti-Bot Protection
+        $isBot = false;
+        
+        // 1. Check if the hidden honeypot field was filled by a bot
+        if (!empty($this->username_honey)) {
+            $isBot = true;
+        }
+        
+        // 2. Check if the form was submitted too fast (less than 2 seconds)
+        if ($this->honey_time) {
+            $timeTaken = time() - (intval($this->honey_time) / 1000);
+            if ($timeTaken < 2) {
+                $isBot = true;
+            }
+        } else {
+            // Missing timestamp means a bot probably stripped the fields
+            $isBot = true;
+        }
+
+        // If a bot is detected, throw a generic auth failure to confuse it
+        if ($isBot) {
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
+        }
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
