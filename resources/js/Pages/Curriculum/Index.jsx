@@ -124,7 +124,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
         } else if (entityType === 'schoolClass') {
             schoolClassForm.setData({
                 name: record.name,
-                level_id: record.level_id.toString(),
+                level_id: record.level_id ? record.level_id.toString() : '',
                 teacher_id: record.teacher_id ? record.teacher_id.toString() : '',
             });
             schoolClassForm.clearErrors();
