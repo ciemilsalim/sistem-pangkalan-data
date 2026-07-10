@@ -1,59 +1,113 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏛️ SIPADA — Sistem Pangkalan Data Akademik (Core SIASEK)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+SIPADA (Sistem Pangkalan Data Akademik) adalah tulang punggung (Core) dari ekosistem **SIASEK (Sistem Informasi Akademik Ekosistem)**. Aplikasi ini dirancang khusus untuk Administrasi Tata Usaha (TU) dan Kepala Sekolah dalam mengelola Master Data Pendidikan secara terpusat.
 
-## About Laravel
+Platform ini mengusung arsitektur *Enterprise-Ready* dengan fitur **Global Semester Filtering** dan **Soft Deletes**, menjamin integritas riwayat data siswa tetap aman dari waktu ke waktu.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🛠️ Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Platform Administrasi ini dibangun dengan teknologi yang mementingkan produktivitas dan fungsionalitas UI:
 
-## Learning Laravel
+* **Backend Framework**: [Laravel 11](https://laravel.com) (PHP 8.2+)
+* **Frontend Bridge**: [Inertia.js v2.0](https://inertiajs.com) 
+* **Frontend Framework**: [React v19](https://react.dev) + [TypeScript](https://www.typescriptlang.org)
+* **Styling & Design System**: [Tailwind CSS v4](https://tailwindcss.com) & Komponen Antarmuka Modern
+* **Database**: MySQL (Database Terpusat `db_absen`)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## ✨ Peran Sentral di Ekosistem SIASEK
 
-## Laravel Sponsors
+Karena SIPADA adalah pondasi dari semua sistem SIASEK lainnya (Aplikasi Presensi dan LMS Mokopani), maka **seluruh migrasi database utama berada di dalam repositori ini**. 
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+SIPADA mengelola:
+* Data Guru & Tenaga Kependidikan
+* Data Siswa & Wali Murid
+* Tahun Ajaran & Semester (Sistem Waktu Global)
+* Rombongan Belajar (Kelas) & Buku Induk Pemindahan Siswa
+* Jadwal Pelajaran Induk
+* Ekstrakurikuler
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 🚀 Panduan Instalasi (Wajib Dilakukan Pertama)
 
-## Contributing
+Jika Anda ingin menjalankan ekosistem SIASEK secara lengkap, **Anda wajib menginstal SIPADA terlebih dahulu** karena SIPADA memegang kendali atas struktur tabel database (`migrations`).
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Ikuti langkah-langkah di bawah ini:
 
-## Code of Conduct
+### 1. Kloning & Masuk ke Folder Proyek
+```bash
+git clone <url-repo-sipada> sistem-pangkalan-data
+cd sistem-pangkalan-data
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 2. Instal Dependensi Backend (Composer)
+```bash
+composer install
+```
 
-## Security Vulnerabilities
+### 3. Instal Dependensi Frontend (NPM)
+```bash
+npm install
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 4. Salin & Konfigurasi File Lingkungan (`.env`)
+Salin file `.env.example` menjadi file `.env`:
+```bash
+copy .env.example .env
+```
 
-## License
+Buka file `.env` di editor Anda dan atur koneksi MySQL Anda:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=db_absen
+DB_USERNAME=root
+DB_PASSWORD=
+```
+*(Pastikan Anda telah membuat database kosong bernama `db_absen` di phpMyAdmin / MySQL Anda).*
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 5. Generate Application Key
+```bash
+php artisan key:generate
+```
+
+### 6. Migrasi Database & Data Awal (Penting!)
+Jalankan perintah berikut untuk membangun struktur tabel ekosistem SIASEK dan menyuntikkan data *dummy* awal:
+```bash
+php artisan migrate:fresh --seed
+```
+
+---
+
+## 🖥️ Menjalankan Aplikasi secara Lokal
+
+Jalankan dua perintah berikut di terminal terpisah:
+
+### Terminal 1: Server Backend
+```bash
+php artisan serve --port=8001
+```
+*Catatan: Kami menyarankan menggunakan port 8001 untuk SIPADA agar tidak bentrok dengan aplikasi Presensi / LMS.*
+
+### Terminal 2: Server Compilator Frontend (Vite)
+```bash
+npm run dev
+```
+
+Sekarang, buka browser Anda dan akses `http://127.0.0.1:8001`. Anda dapat masuk menggunakan kredensial Admin TU yang telah dihasilkan dari proses *seeding*.
+
+---
+
+## 📖 Fitur Kunci: "Smart Auto-Select Semester"
+
+SIPADA dilengkapi dengan Dropdown Semester Global di sudut kanan atas layar.
+1. **Frictionless Workflow**: Admin TU secara default bekerja pada "Semester Berjalan". Semua data yang dimasukkan (Siswa, Kelas, Jadwal) otomatis terikat ke semester aktif.
+2. **Riwayat Terjaga**: Admin dapat mengubah tuas dropdown untuk mundur ke semester lalu (melihat arsip) atau maju ke semester depan (untuk persiapan kelas tahun ajaran baru).
+
+---
+*Dibuat dengan dedikasi penuh untuk kemajuan ekosistem pendidikan digital Indonesia.*
