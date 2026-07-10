@@ -1,16 +1,40 @@
-<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Bottom Layer -->
-    <path d="M12 11L4 15L12 19L20 15L12 11Z" fill="#4F46E5" />
-    <path d="M4 15V18L12 22V19L4 15Z" fill="#4F46E5" fill-opacity="0.65" />
-    <path d="M20 15V18L12 22V19L20 15Z" fill="#4F46E5" fill-opacity="0.35" />
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <!-- Outer Hexagon Orbit -->
+    <polygon 
+        points="50,5 90,25 90,75 50,95 10,75 10,25" 
+        stroke="url(#emblemGradientCyan)" 
+        stroke-width="6" 
+        stroke-dasharray="18, 12" 
+        fill="none"
+    />
     
-    <!-- Middle Layer -->
-    <path d="M12 6.5L4 10.5L12 14.5L20 10.5L12 6.5Z" fill="#4F46E5" />
-    <path d="M4 10.5V13.5L12 17.5V14.5L4 10.5Z" fill="#4F46E5" fill-opacity="0.65" />
-    <path d="M20 10.5V13.5L12 17.5V14.5L20 10.5Z" fill="#4F46E5" fill-opacity="0.35" />
+    <!-- Inner Hologram Core -->
+    <polygon 
+        points="50,22 75,36 75,64 50,78 25,64 25,36" 
+        fill="url(#emblemGradientIndigo)" 
+        fill-opacity="0.8"
+        stroke="#06b6d4" 
+        stroke-width="3"
+    />
+
+    <!-- Glowing Core Dot -->
+    <circle cx="50" cy="50" r="14" fill="#06b6d4" fill-opacity="1" />
+    <circle cx="50" cy="50" r="6" fill="#ffffff" fill-opacity="1" />
     
-    <!-- Top Layer -->
-    <path d="M12 2L4 6L12 10L20 6L12 2Z" fill="#4F46E5" />
-    <path d="M4 6V9L12 13V10L4 6Z" fill="#4F46E5" fill-opacity="0.65" />
-    <path d="M20 6V9L12 13V10L20 6Z" fill="#4F46E5" fill-opacity="0.35" />
+    <!-- Connection Node Beams -->
+    <line x1="50" y1="5" x2="50" y2="40" stroke="#6366f1" stroke-width="3" stroke-dasharray="3, 3" />
+    <line x1="10" y1="75" x2="38" y2="58" stroke="#6366f1" stroke-width="3" stroke-dasharray="3, 3" />
+    <line x1="90" y1="75" x2="62" y2="58" stroke="#6366f1" stroke-width="3" stroke-dasharray="3, 3" />
+
+    <defs>
+        <linearGradient id="emblemGradientCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#06b6d4" />
+            <stop offset="50%" stop-color="#3b82f6" />
+            <stop offset="100%" stop-color="#6366f1" />
+        </linearGradient>
+        <linearGradient id="emblemGradientIndigo" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6366f1" stop-opacity="0.9" />
+            <stop offset="100%" stop-color="#a855f7" stop-opacity="0.9" />
+        </linearGradient>
+    </defs>
 </svg>
