@@ -427,11 +427,27 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                         {/* IMPORT FORM FIELDS */}
                         {modalType === 'import' && (
                             <div className="mb-4">
-                                <InputLabel htmlFor="import_file" value="Pilih File Excel" />
+                                <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                    <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">Panduan Import Data</h4>
+                                    <p className="text-xs text-blue-700 dark:text-blue-400 mb-3">
+                                        Pastikan file Excel atau CSV yang Anda unggah memiliki header (baris pertama) dengan nama kolom: <strong>nis</strong>, <strong>nama</strong>, dan <strong>kelas</strong> (opsional).
+                                    </p>
+                                    <a
+                                        href="/templates/import_siswa.csv"
+                                        download
+                                        className="inline-flex items-center text-xs font-medium text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 hover:underline"
+                                    >
+                                        <svg className="mr-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                        Unduh Contoh Format CSV
+                                    </a>
+                                </div>
+
+                                <InputLabel htmlFor="import_file" value="Pilih File Excel / CSV" />
                                 <input
                                     id="import_file"
                                     type="file"
-                                    className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                                    className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
                                     onChange={(e) => importForm.setData('file', e.target.files[0])}
                                     required
                                 />
