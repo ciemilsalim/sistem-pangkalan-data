@@ -20,18 +20,36 @@
 
         <div id="card-grid" class="flex flex-wrap gap-4">
             @forelse ($students as $student)
-                <div class="student-card-container break-inside-avoid relative" style="width: 53.98mm; height: 85.6mm; border: 1px solid #e5e7eb; background: #fff; display: flex; flex-direction: column; text-align: center; overflow: hidden;">
-                    <div style="background-color: #0284c7; color: white; padding: 10px;">
-                        <p style="font-weight: bold; font-size: 14px; margin: 0;">{{ config('app.name', 'Sipada') }}</p>
+                <div class="student-card-container break-inside-avoid relative rounded-2xl bg-white border border-gray-200 flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-md transition-shadow" style="width: 53.98mm; height: 85.6mm;">
+                    <!-- Header with Playful Modern Gradient -->
+                    <div class="card-header bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white py-3 px-2 relative overflow-hidden text-center">
+                        <!-- Decorative light circles -->
+                        <div class="absolute -right-3 -top-3 w-10 h-10 bg-white opacity-10 rounded-full"></div>
+                        <div class="absolute -left-4 -bottom-4 w-12 h-12 bg-white opacity-10 rounded-full"></div>
+                        
+                        <p class="font-extrabold text-[12px] tracking-wider uppercase drop-shadow-sm">SIASEK PRESENSI</p>
+                        <p class="text-[9px] text-indigo-100 font-semibold tracking-widest mt-0.5">SMPN 1 BIAU</p>
                     </div>
-                    <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 10px;">
-                        <div style="padding: 8px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                            {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(120)->generate($student->nis . '-' . $student->unique_id) !!}
+                    
+                    <!-- QR Code Container -->
+                    <div class="flex-grow flex items-center justify-center p-3 bg-slate-50/50">
+                        <div class="p-2 bg-white rounded-xl shadow-sm border border-purple-100/50">
+                            {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(110)->generate($student->nis . '-' . $student->unique_id) !!}
                         </div>
                     </div>
-                    <div style="padding: 10px; border-top: 1px solid #eee;">
-                        <p style="font-weight: bold; font-size: 14px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $student->name }}">{{ $student->name }}</p>
-                        <p style="font-size: 11px; color: #666; margin: 4px 0 0;">NIS: {{ $student->nis }} | {{ $student->schoolClass->name ?? 'Tanpa Kelas' }}</p>
+                    
+                    <!-- Student Details -->
+                    <div class="px-3 pb-2 pt-1 text-center">
+                        <p class="font-bold text-[13px] text-gray-800 truncate" title="{{ $student->name }}">{{ $student->name }}</p>
+                        <p class="text-[10px] text-gray-500 font-semibold mt-0.5">NIS: {{ $student->nis }}</p>
+                        <div class="mt-1.5 inline-block px-3 py-0.5 bg-purple-50 text-purple-600 rounded-full text-[9px] font-bold border border-purple-100">
+                            Kelas {{ $student->schoolClass->name ?? '-' }}
+                        </div>
+                    </div>
+                    
+                    <!-- Footer with Developer Credit -->
+                    <div class="bg-slate-100/80 border-t border-slate-100 py-1 text-center text-[8px] text-slate-400 font-medium tracking-wide">
+                        Developed by <span class="text-purple-500 font-bold">Zahradev</span>
                     </div>
                 </div>
             @empty
@@ -41,6 +59,10 @@
     </div>
 
     <style>
+        .student-card-container {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
         @media print {
             body > * { visibility: hidden; }
             #card-grid, #card-grid * { visibility: visible; }
@@ -57,7 +79,12 @@
             }
             .print-hidden { display: none !important; }
             body { background-color: #fff !important; }
-            .student-card-container { box-shadow: none !important; border: 1px solid #ccc !important; }
+            .student-card-container { 
+                box-shadow: none !important; 
+                border: 1px solid #e2e8f0 !important; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+            }
         }
     </style>
 </body>
