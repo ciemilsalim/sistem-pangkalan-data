@@ -65,6 +65,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/curriculum/extracurriculars/{extracurricular}', [CurriculumController::class, 'updateExtracurricular'])->name('curriculum.extracurriculars.update');
     Route::delete('/curriculum/extracurriculars/{extracurricular}', [CurriculumController::class, 'destroyExtracurricular'])->name('curriculum.extracurriculars.destroy');
 
+    // Promotions
+    Route::get('/academic-promotions', [App\Http\Controllers\PromotionController::class, 'index'])->name('promotions.index');
+    Route::get('/academic-promotions/students', [App\Http\Controllers\PromotionController::class, 'getStudents'])->name('promotions.students');
+    Route::post('/academic-promotions/process', [App\Http\Controllers\PromotionController::class, 'process'])->name('promotions.process');
+
     // People (Siswa, Guru, Wali) Routes
     Route::get('/people', [PeopleController::class, 'index'])->name('people.index');
     Route::get('/people/students/qr', [PeopleController::class, 'qr'])->name('people.students.qr');

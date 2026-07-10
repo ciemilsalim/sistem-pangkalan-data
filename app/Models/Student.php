@@ -21,7 +21,8 @@ class Student extends Model
         'school_class_id',
         'unique_id',
         'photo',
-        'face_descriptor'
+        'face_descriptor',
+        'status'
     ];
 
     public function user()
@@ -54,6 +55,11 @@ class Student extends Model
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function classHistories()
+    {
+        return $this->hasMany(StudentClassHistory::class);
     }
 
     /**
