@@ -146,6 +146,28 @@ class PeopleController extends Controller
         return redirect()->route('people.index', ['tab' => 'students'])->with('message', 'Siswa berhasil ditambahkan.');
     }
 
+    public function importStudent(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+
+        try {
+            \Maatwebsite\Excel\Facades\Excel::import(new \App\Imports\StudentsImport, $request->file('file'));
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errorMessages = [];
+            foreach ($failures as $failure) {
+                $errorMessages[] = 'Baris ' . $failure->row() . ': ' . implode(', ', $failure->errors()) . ' (Nilai: ' . $failure->values()[$failure->attribute()] . ')';
+            }
+            return redirect()->route('people.index', ['tab' => 'students'])->withErrors(['import_errors' => implode(" | ", $errorMessages)]);
+        } catch (\Exception $e) {
+            return redirect()->route('people.index', ['tab' => 'students'])->withErrors(['import_errors' => 'Gagal mengimpor file: ' . $e->getMessage()]);
+        }
+
+        return redirect()->route('people.index', ['tab' => 'students'])->with('message', 'Data siswa berhasil diimpor!');
+    }
+
     public function updateStudent(Request $request, Student $student): RedirectResponse
     {
         $request->validate([

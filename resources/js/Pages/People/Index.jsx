@@ -46,6 +46,10 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         student_ids: [],
     });
 
+    const importForm = useForm({
+        file: null,
+    });
+
     // Handle Tab Switch (reloads page via Inertia with new tab param)
     const handleTabSwitch = (newTab) => {
         router.get(route('people.index'), {
@@ -170,7 +174,27 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         setSelectedRecord(null);
     };
 
-    // Submit Handlers
+    // Form Submit Handlers
+    const handleStudentSubmit = (e) => {
+        e.preventDefault();
+        if (modalType === 'create') {
+            studentForm.post(route('people.students.store'), {
+                onSuccess: () => closeModal(),
+            });
+        } else {
+            studentForm.put(route('people.students.update', selectedRecord.id), {
+                onSuccess: () => closeModal(),
+            });
+        }
+    };
+
+    const handleImportSubmit = (e) => {
+        e.preventDefault();
+        importForm.post(route('people.students.import'), {
+            onSuccess: () => closeModal(),
+        });
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -255,6 +279,23 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                             </div>
                         </div>
                     )}
+                    
+                    {pageProps.errors && pageProps.errors.import_errors && (
+                        <div className="mb-4 bg-red-100 dark:bg-red-900 border-l-4 border-red-500 text-red-700 dark:text-red-200 p-4 rounded-lg shadow-sm" role="alert">
+                            <div className="flex">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm font-medium text-red-800">
+                                        Terjadi kesalahan saat mengimpor Excel: {pageProps.errors.import_errors}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Filter and Create Header */}
                     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
@@ -288,13 +329,25 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
 
                         <div className="flex gap-2 w-full sm:w-auto">
                             {activeTab === 'students' && (
-                                <a
-                                    href={route('people.students.qr')}
-                                    target="_blank"
-                                    className="inline-flex items-center justify-center px-4 py-2 bg-sky-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-sky-700 active:bg-sky-900 focus:outline-none focus:border-sky-900 focus:ring ring-sky-300 disabled:opacity-25 transition ease-in-out duration-150 w-full sm:w-auto"
-                                >
-                                    Cetak QR
-                                </a>
+                                <>
+                                    <SecondaryButton
+                                        onClick={() => {
+                                            setActiveEntity('student');
+                                            setModalType('import');
+                                            importForm.reset();
+                                        }}
+                                        className="w-full sm:w-auto text-xs px-3 py-1 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800 dark:hover:bg-green-900/50"
+                                    >
+                                        Import Excel
+                                    </SecondaryButton>
+                                    <a
+                                        href={route('people.students.qr')}
+                                        target="_blank"
+                                        className="inline-flex items-center justify-center px-4 py-2 bg-sky-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-sky-700 active:bg-sky-900 focus:outline-none focus:border-sky-900 focus:ring ring-sky-300 disabled:opacity-25 transition ease-in-out duration-150 w-full sm:w-auto"
+                                    >
+                                        Cetak QR
+                                    </a>
+                                </>
                             )}
                             <PrimaryButton
                                 onClick={() => openCreateModal(activeTab.slice(0, -1))} // slice 's' (students -> student)
@@ -359,16 +412,31 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
             {/* Create & Edit Modal */}
             {modalType && modalType !== 'delete' && (
                 <Modal show={true} onClose={closeModal}>
-                    <form onSubmit={handleSubmit} className="p-6">
+                    <form onSubmit={modalType === 'import' ? handleImportSubmit : handleSubmit} className="p-6">
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
-                            {modalType === 'create' ? 'Tambah ' : 'Edit '}
+                            {modalType === 'create' ? 'Tambah ' : modalType === 'import' ? 'Import ' : 'Edit '}
                             {activeEntity === 'student' && 'Siswa'}
                             {activeEntity === 'teacher' && 'Guru'}
                             {activeEntity === 'parent' && 'Wali Murid'}
                         </h3>
 
+                        {/* IMPORT FORM FIELDS */}
+                        {modalType === 'import' && (
+                            <div className="mb-4">
+                                <InputLabel htmlFor="import_file" value="Pilih File Excel" />
+                                <input
+                                    id="import_file"
+                                    type="file"
+                                    className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                                    onChange={(e) => importForm.setData('file', e.target.files[0])}
+                                    required
+                                />
+                                <InputError message={importForm.errors.file} className="mt-2" />
+                            </div>
+                        )}
+
                         {/* STUDENT FORM FIELDS */}
-                        {activeEntity === 'student' && (
+                        {activeEntity === 'student' && modalType !== 'import' && (
                             <>
                                 <div className="mb-4">
                                     <InputLabel htmlFor="stud_name" value="Nama Lengkap Siswa" />
@@ -640,16 +708,17 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                             </>
                         )}
 
-                        <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 mt-6">
+                        <div className="mt-6 flex justify-end border-t pt-4 border-gray-200 dark:border-gray-700">
                             <SecondaryButton type="button" onClick={closeModal}>
                                 Batal
                             </SecondaryButton>
-                            <PrimaryButton type="submit" disabled={
-                                studentForm.processing ||
-                                teacherForm.processing ||
+                            <PrimaryButton className="ml-3" disabled={
+                                modalType === 'import' ? importForm.processing :
+                                activeEntity === 'student' ? studentForm.processing :
+                                activeEntity === 'teacher' ? teacherForm.processing :
                                 parentForm.processing
                             }>
-                                Simpan Data
+                                {modalType === 'import' ? 'Import' : 'Simpan Data'}
                             </PrimaryButton>
                         </div>
                     </form>
