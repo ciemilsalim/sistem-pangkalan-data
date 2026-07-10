@@ -34,6 +34,15 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'activeSemesterId' => session('active_semester_id') ?? \App\Models\Semester::where('is_active', true)->value('id'),
+            'semestersList' => \App\Models\Semester::with('academicYear')->orderByDesc('id')->get()->map(function ($s) {
+                return [
+                    'id' => $s->id,
+                    'name' => $s->name,
+                    'academic_year' => $s->academicYear ? $s->academicYear->name : '',
+                    'is_active' => $s->is_active
+                ];
+            }),
         ];
     }
 }

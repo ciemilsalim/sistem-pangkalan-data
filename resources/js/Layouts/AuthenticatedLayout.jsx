@@ -19,8 +19,20 @@ const SunIcon = () => (
 );
 
 export default function AuthenticatedLayout({ header, children }) {
-    const user = usePage().props.auth.user;
+    const { auth, semestersList, activeSemesterId } = usePage().props;
+    const user = auth.user;
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+
+    const activeSemester = semestersList?.find(s => s.id === activeSemesterId);
+    const activeSemesterName = activeSemester ? `${activeSemester.name} ${activeSemester.academic_year ? `(${activeSemester.academic_year})` : ''}` : 'Pilih Semester';
+
+    const switchSemester = (id) => {
+        import('@inertiajs/react').then(({ router }) => {
+            router.post(route('academic-periods.switch'), { semester_id: id }, {
+                preserveScroll: true
+            });
+        });
+    };
     
     // Sidebar collapse state
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
@@ -114,6 +126,44 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
 
                     <div className="flex items-center gap-4">
+                        {/* Semester Switch Dropdown */}
+                        {semestersList && semestersList.length > 0 && (
+                            <div className="relative">
+                                <Dropdown>
+                                    <Dropdown.Trigger>
+                                        <span className="inline-flex rounded-md">
+                                            <button
+                                                type="button"
+                                                className="inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm font-semibold leading-4 text-gray-700 dark:text-gray-300 transition duration-150 ease-in-out hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 dark:focus:ring-offset-gray-900"
+                                            >
+                                                {activeSemesterName}
+                                                <svg className="-me-0.5 ms-2 h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                </svg>
+                                            </button>
+                                        </span>
+                                    </Dropdown.Trigger>
+                                    <Dropdown.Content align="right" width="48">
+                                        <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+                                            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tahun Ajaran & Semester</p>
+                                        </div>
+                                        {semestersList.map(semester => (
+                                            <button
+                                                key={semester.id}
+                                                onClick={() => switchSemester(semester.id)}
+                                                className={`w-full text-left block w-full px-4 py-2 text-sm leading-5 transition duration-150 ease-in-out focus:outline-none ${semester.id == activeSemesterId ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-semibold' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 focus:bg-gray-100 dark:focus:bg-gray-800'}`}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <span>{semester.name} {semester.academic_year ? `(${semester.academic_year})` : ''}</span>
+                                                    {semester.is_active ? <span className="ml-2 inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-[10px] font-bold text-green-700 dark:text-green-400">AKTIF</span> : null}
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </Dropdown.Content>
+                                </Dropdown>
+                            </div>
+                        )}
+
                         <button
                             onClick={toggleDarkMode}
                             className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
@@ -291,6 +341,30 @@ export default function AuthenticatedLayout({ header, children }) {
                                             {isDarkMode ? <SunIcon /> : <MoonIcon />}
                                         </button>
                                     </div>
+                                    
+                                    {/* Mobile Semester Dropdown */}
+                                    {semestersList && semestersList.length > 0 && (
+                                        <div className="mb-4">
+                                            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 px-1">Pilih Semester</p>
+                                            <div className="space-y-1">
+                                                {semestersList.map(semester => (
+                                                    <button
+                                                        key={semester.id}
+                                                        onClick={() => {
+                                                            switchSemester(semester.id);
+                                                            setShowingNavigationDropdown(false);
+                                                        }}
+                                                        className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${semester.id == activeSemesterId ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800' : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
+                                                    >
+                                                        <div className="flex items-center justify-between">
+                                                            <span>{semester.name} {semester.academic_year ? `(${semester.academic_year})` : ''}</span>
+                                                            {semester.is_active ? <span className="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-0.5 text-[10px] font-bold text-green-700 dark:text-green-400">AKTIF</span> : null}
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                     
                                     <div className="flex gap-3">
                                         <Link

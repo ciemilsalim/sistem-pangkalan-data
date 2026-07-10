@@ -14,7 +14,20 @@ class Schedule extends Model
         'day_of_week',
         'start_time',
         'end_time',
+        'semester_id',
+        'academic_year_id',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (empty($model->semester_id)) {
+                $model->semester_id = session('active_semester_id') ?? \App\Models\Semester::where('is_active', true)->value('id');
+                $model->academic_year_id = session('active_academic_year_id') ?? \App\Models\Semester::where('is_active', true)->value('academic_year_id');
+            }
+        });
+    }
 
     /**
      * Mendapatkan data penugasan (guru, mapel, kelas)

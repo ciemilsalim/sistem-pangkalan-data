@@ -12,6 +12,7 @@ use App\Http\Controllers\ChatMonitoringController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AcademicAuditController;
 use App\Http\Controllers\LmsModerationController;
+use App\Http\Controllers\AcademicPeriodController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -29,6 +30,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('users', UserController::class);
+
+    // Academic Period Switch
+    Route::post('/academic-periods/switch', [AcademicPeriodController::class, 'switch'])->name('academic-periods.switch');
 
     // Curriculum Routes
     Route::get('/curriculum', [CurriculumController::class, 'index'])->name('curriculum.index');
