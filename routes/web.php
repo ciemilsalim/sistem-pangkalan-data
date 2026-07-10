@@ -68,6 +68,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // People (Siswa, Guru, Wali) Routes
     Route::get('/people', [PeopleController::class, 'index'])->name('people.index');
     Route::get('/people/students/qr', [PeopleController::class, 'qr'])->name('people.students.qr');
+    Route::get('/people/students/template', [PeopleController::class, 'downloadTemplate'])->name('people.students.template');
     Route::post('/people/students/import', [PeopleController::class, 'importStudent'])->name('people.students.import');
     
     Route::post('/people/students', [PeopleController::class, 'storeStudent'])->name('people.students.store');

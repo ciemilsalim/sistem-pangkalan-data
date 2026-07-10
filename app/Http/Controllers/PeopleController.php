@@ -146,6 +146,15 @@ class PeopleController extends Controller
         return redirect()->route('people.index', ['tab' => 'students'])->with('message', 'Siswa berhasil ditambahkan.');
     }
 
+    public function downloadTemplate()
+    {
+        $file = public_path('templates/import_siswa.csv');
+        $headers = [
+            'Content-Type' => 'text/csv',
+        ];
+        return response()->download($file, 'import_siswa.csv', $headers);
+    }
+
     public function importStudent(Request $request): RedirectResponse
     {
         $request->validate([

@@ -433,8 +433,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                         Pastikan file Excel atau CSV yang Anda unggah memiliki header (baris pertama) dengan nama kolom: <strong>nis</strong>, <strong>nama</strong>, dan <strong>kelas</strong> (opsional).
                                     </p>
                                     <a
-                                        href="/templates/import_siswa.csv"
-                                        download
+                                        href={route('people.students.template')}
                                         className="inline-flex items-center text-xs font-medium text-blue-700 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-200 hover:underline"
                                     >
                                         <svg className="mr-1.5 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
