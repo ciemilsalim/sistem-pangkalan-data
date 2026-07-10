@@ -299,9 +299,9 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                     )}
 
                     {/* Filter and Create Header */}
-                    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
-                        <form onSubmit={handleSearchSubmit} className="flex flex-wrap items-center gap-3">
-                            <div className="w-80">
+                    <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                        <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-3 w-full xl:w-auto">
+                            <div className="w-full sm:w-80">
                                 <TextInput
                                     id="search"
                                     type="text"
@@ -316,19 +316,19 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
                             </div>
-                            <div className="flex gap-2">
-                                <PrimaryButton type="submit" className="px-4 py-2 text-xs">
+                            <div className="flex gap-2 w-full sm:w-auto">
+                                <PrimaryButton type="submit" className="flex-1 sm:flex-none justify-center px-4 py-2 text-xs">
                                     Cari
                                 </PrimaryButton>
                                 {(filters.search || search) && (
-                                    <SecondaryButton onClick={handleReset} type="button" className="px-4 py-2 text-xs">
+                                    <SecondaryButton onClick={handleReset} type="button" className="flex-1 sm:flex-none justify-center px-4 py-2 text-xs">
                                         Reset
                                     </SecondaryButton>
                                 )}
                             </div>
                         </form>
 
-                        <div className="flex gap-2 w-full sm:w-auto">
+                        <div className="flex flex-col sm:flex-row flex-wrap gap-2 w-full xl:w-auto">
                             {activeTab === 'students' && (
                                 <>
                                     <SecondaryButton
@@ -337,7 +337,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                             setModalType('import');
                                             importForm.reset();
                                         }}
-                                        className="w-full sm:w-auto text-xs px-3 py-1 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800 dark:hover:bg-green-900/50"
+                                        className="w-full sm:w-auto justify-center text-xs px-3 py-1 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800 dark:hover:bg-green-900/50"
                                     >
                                         Import Excel
                                     </SecondaryButton>
@@ -355,7 +355,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                             )}
                             <PrimaryButton
                                 onClick={() => openCreateModal(activeTab.slice(0, -1))} // slice 's' (students -> student)
-                                className="w-full sm:w-auto text-xs"
+                                className="w-full sm:w-auto justify-center text-xs"
                             >
                                 + Tambah {
                                     activeTab === 'students' ? 'Siswa' :
