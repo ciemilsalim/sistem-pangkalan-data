@@ -21,37 +21,40 @@
 
         <div id="card-grid" class="flex flex-wrap gap-4">
             @forelse ($students as $student)
-                <div class="student-card-container break-inside-avoid relative rounded-2xl bg-white border border-gray-200 flex flex-col justify-between overflow-hidden shadow-sm hover:shadow-md transition-shadow" style="width: 53.98mm; height: 85.6mm;">
-                    <!-- Header with Playful Modern Gradient -->
-                    <div class="card-header bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white py-3 px-2 relative overflow-hidden text-center">
-                        <!-- Decorative light circles -->
-                        <div class="absolute -right-3 -top-3 w-10 h-10 bg-white opacity-10 rounded-full"></div>
-                        <div class="absolute -left-4 -bottom-4 w-12 h-12 bg-white opacity-10 rounded-full"></div>
-                        
-                        <p class="font-extrabold text-[12px] tracking-wider uppercase drop-shadow-sm">SIASEK PRESENSI</p>
-                        <p class="text-[9px] text-indigo-100 font-semibold tracking-widest mt-0.5">SMPN 1 BIAU</p>
-                    </div>
+                <div class="student-card-container break-inside-avoid relative rounded-xl bg-white border border-gray-300 flex flex-col overflow-hidden shadow-sm hover:shadow-md transition-shadow" style="width: 53.98mm; height: 85.6mm;">
                     
-                    <!-- QR Code Container -->
-                    <div class="flex-grow flex items-center justify-center p-3 bg-slate-50/50">
-                        <div class="p-2 bg-white rounded-xl shadow-sm border border-purple-100/50">
-                            {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(110)->generate($student->nis . '-' . $student->unique_id) !!}
+                    <!-- Header Portrait (Space for lanyard at top) -->
+                    <div class="bg-gradient-to-b from-indigo-600 to-purple-600 text-white flex flex-col items-center justify-center pt-5 pb-3 px-2 relative shrink-0">
+                        <div class="absolute -left-2 -top-2 w-10 h-10 bg-white opacity-10 rounded-full"></div>
+                        <div class="absolute -right-2 -bottom-2 w-8 h-8 bg-white opacity-10 rounded-full"></div>
+                        <div class="text-center w-full z-10">
+                            <h1 class="font-extrabold text-[12px] tracking-widest uppercase drop-shadow-sm leading-tight">SIASEK</h1>
+                            <p class="text-[8px] text-indigo-100 font-semibold tracking-widest mt-0.5">PRESENSI</p>
                         </div>
                     </div>
                     
-                    <!-- Student Details -->
-                    <div class="px-3 pb-2 pt-1 text-center">
-                        <p class="font-bold text-[13px] text-gray-800 truncate" title="{{ $student->name }}">{{ $student->name }}</p>
-                        <p class="text-[10px] text-gray-500 font-semibold mt-0.5">NIS: {{ $student->nis }}</p>
-                        <div class="mt-1.5 inline-block px-3 py-0.5 bg-purple-50 text-purple-600 rounded-full text-[9px] font-bold border border-purple-100">
+                    <!-- Body (QR Code) -->
+                    <div class="flex-grow flex items-center justify-center bg-slate-50 relative">
+                        <div class="p-1.5 bg-white rounded-xl shadow-sm border border-purple-200 z-10">
+                            {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(95)->generate($student->nis . '-' . $student->unique_id) !!}
+                        </div>
+                        
+                        <!-- Watermark -->
+                        <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] text-[80px] pointer-events-none transform -rotate-12 z-0">
+                            🎓
+                        </div>
+                    </div>
+
+                    <!-- Footer (Student Info) -->
+                    <div class="bg-white flex flex-col items-center justify-center px-2 py-3 text-center border-t border-gray-100 shrink-0">
+                        <p class="font-bold text-[12px] text-gray-800 leading-tight w-full mb-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;" title="{{ $student->name }}">{{ $student->name }}</p>
+                        <p class="font-semibold text-[9px] text-gray-500 mb-1.5">NIS: <span class="text-gray-700 font-bold">{{ $student->nis }}</span></p>
+                        
+                        <div class="inline-block px-3 py-0.5 bg-purple-100 text-purple-700 rounded-md text-[9px] font-bold border border-purple-200">
                             Kelas {{ $student->schoolClass->name ?? '-' }}
                         </div>
                     </div>
                     
-                    <!-- Footer with Developer Credit -->
-                    <div class="bg-slate-100/80 border-t border-slate-100 py-1 text-center text-[8px] text-slate-400 font-medium tracking-wide">
-                        Developed by <span class="text-purple-500 font-bold">Zahradev</span>
-                    </div>
                 </div>
             @empty
                 <p class="text-gray-500">Belum ada data siswa untuk dicetak.</p>

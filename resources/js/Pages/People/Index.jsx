@@ -18,6 +18,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     const [modalType, setModalType] = useState(null); // 'create' or 'edit' or 'delete'
     const [activeEntity, setActiveEntity] = useState(null); // 'student' or 'teacher' or 'parent'
     const [selectedRecord, setSelectedRecord] = useState(null);
+    const [qrFilter, setQrFilter] = useState({ search: '', school_class_id: '' });
 
     // Form Hooks
     const studentForm = useForm({
@@ -340,13 +341,16 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                     >
                                         Import Excel
                                     </SecondaryButton>
-                                    <a
-                                        href={route('people.students.qr')}
-                                        target="_blank"
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setModalType('qr');
+                                            setQrFilter({ search: '', school_class_id: '' });
+                                        }}
                                         className="inline-flex items-center justify-center px-4 py-2 bg-sky-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-sky-700 active:bg-sky-900 focus:outline-none focus:border-sky-900 focus:ring ring-sky-300 disabled:opacity-25 transition ease-in-out duration-150 w-full sm:w-auto"
                                     >
                                         Cetak QR
-                                    </a>
+                                    </button>
                                 </>
                             )}
                             <PrimaryButton
@@ -743,6 +747,55 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                             </DangerButton>
                         </div>
                     </form>
+                </Modal>
+            )}
+
+            {/* Cetak QR Modal */}
+            {modalType === 'qr' && (
+                <Modal show={true} onClose={closeModal}>
+                    <div className="p-6">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
+                            Filter Cetak QR Code
+                        </h3>
+                        <div className="mb-4">
+                            <InputLabel htmlFor="qr_search" value="Cari Nama / NIS" />
+                            <TextInput
+                                id="qr_search"
+                                type="text"
+                                className="mt-1 block w-full"
+                                value={qrFilter.search}
+                                onChange={(e) => setQrFilter({ ...qrFilter, search: e.target.value })}
+                                placeholder="Kosongkan untuk mencetak semua..."
+                            />
+                        </div>
+                        <div className="mb-6">
+                            <InputLabel htmlFor="qr_class" value="Filter Berdasarkan Kelas" />
+                            <select
+                                id="qr_class"
+                                value={qrFilter.school_class_id}
+                                className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                onChange={(e) => setQrFilter({ ...qrFilter, school_class_id: e.target.value })}
+                            >
+                                <option value="">Semua Kelas</option>
+                                {schoolClasses.map((cls) => (
+                                    <option key={cls.id} value={cls.id}>{cls.name} ({cls.level?.name || 'Kurikulum'})</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex justify-end gap-3 border-t border-gray-200 dark:border-gray-700 pt-4">
+                            <SecondaryButton type="button" onClick={closeModal}>
+                                Batal
+                            </SecondaryButton>
+                            <a
+                                href={`${route('people.students.qr')}?search=${encodeURIComponent(qrFilter.search)}&school_class_id=${qrFilter.school_class_id}`}
+                                target="_blank"
+                                onClick={closeModal}
+                                className="inline-flex items-center justify-center px-4 py-2 bg-sky-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-sky-700 active:bg-sky-900 focus:outline-none focus:border-sky-900 focus:ring ring-sky-300 disabled:opacity-25 transition ease-in-out duration-150"
+                            >
+                                Cetak Sekarang
+                            </a>
+                        </div>
+                    </div>
                 </Modal>
             )}
         </AuthenticatedLayout>
