@@ -26,7 +26,7 @@
                     </div>
                     <div style="flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 10px;">
                         <div style="padding: 8px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                            {!! QrCode::size(120)->generate($student->nis . '-' . $student->unique_id) !!}
+                            {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(120)->generate($student->nis . '-' . $student->unique_id) !!}
                         </div>
                     </div>
                     <div style="padding: 10px; border-top: 1px solid #eee;">
