@@ -286,7 +286,16 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                             </div>
                         </form>
 
-                        <div>
+                        <div className="flex gap-2 w-full sm:w-auto">
+                            {activeTab === 'students' && (
+                                <a
+                                    href={route('people.students.qr')}
+                                    target="_blank"
+                                    className="inline-flex items-center justify-center px-4 py-2 bg-sky-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-sky-700 active:bg-sky-900 focus:outline-none focus:border-sky-900 focus:ring ring-sky-300 disabled:opacity-25 transition ease-in-out duration-150 w-full sm:w-auto"
+                                >
+                                    Cetak QR
+                                </a>
+                            )}
                             <PrimaryButton
                                 onClick={() => openCreateModal(activeTab.slice(0, -1))} // slice 's' (students -> student)
                                 className="w-full sm:w-auto text-xs"
