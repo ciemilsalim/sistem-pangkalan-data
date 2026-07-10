@@ -414,7 +414,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
             </div>
 
             {/* Create & Edit Modal */}
-            {modalType && modalType !== 'delete' && (
+            {modalType && modalType !== 'delete' && modalType !== 'qr' && (
                 <Modal show={true} onClose={closeModal}>
                     <form onSubmit={modalType === 'import' ? handleImportSubmit : handleSubmit} className="p-6">
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
