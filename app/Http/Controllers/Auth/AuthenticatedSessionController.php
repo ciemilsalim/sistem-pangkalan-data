@@ -31,14 +31,26 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
-        if (Auth::user()->role !== 'admin') {
+        // Validate if user has permission to access SIPADA (Admin & Management roles)
+        $allowedRoles = [
+            'admin', 
+            'wakasek_kurikulum', 
+            'wakasek_kesiswaan', 
+            'wakasek_sarana', 
+            'kepala_lab', 
+            'kepala_perpustakaan', 
+            'kepala_tata_usaha', 
+            'operator'
+        ];
+
+        if (!Auth::user()->hasAnyRole($allowedRoles)) {
             Auth::guard('web')->logout();
 
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return back()->withErrors([
-                'email' => 'Anda tidak memiliki hak akses sebagai administrator.',
+            return redirect()->route('login')->withErrors([
+                'email' => 'Anda tidak memiliki hak akses untuk masuk ke Sistem Pangkalan Data.',
             ]);
         }
 

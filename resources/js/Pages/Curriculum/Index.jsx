@@ -1028,11 +1028,18 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
     function renderSubjectsTab() {
         return (
             <div>
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Mata Pelajaran</h3>
-                    <PrimaryButton onClick={() => openCreateModal('subject')} className="text-xs">
-                        + Tambah Mata Pelajaran
-                    </PrimaryButton>
+                    <div className="flex gap-2 w-full md:w-auto">
+                        {auth.user.permissions?.includes('manage_cp') && (
+                            <Link href={route('curriculum.capaian-pembelajaran.index')} className="inline-flex items-center px-4 py-2 bg-indigo-50 border border-indigo-200 rounded-md font-semibold text-xs text-indigo-700 uppercase tracking-widest shadow-sm hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 w-full md:w-auto justify-center">
+                                Kelola Capaian Pembelajaran (CP)
+                            </Link>
+                        )}
+                        <PrimaryButton onClick={() => openCreateModal('subject')} className="text-xs w-full md:w-auto justify-center">
+                            + Tambah Mata Pelajaran
+                        </PrimaryButton>
+                    </div>
                 </div>
                 <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">

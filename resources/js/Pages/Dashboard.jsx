@@ -1,8 +1,13 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Dashboard({ stats = {}, charts = {}, announcements = [], upcoming_events = [], lms_stats = {} }) {
+    const { auth } = usePage().props;
+    const user = auth.user;
+    const isAdmin = user.roles?.includes('admin');
+    const hasPermission = (permission) => user.permissions?.includes(permission);
+
     // State to toggle between School Summary and LMS Analytics
     const [activeTab, setActiveTab] = useState('school');
 
@@ -126,6 +131,7 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                     </div>
 
                     {/* Ecosystem Quick Access (Single Sign-On) */}
+                    {(isAdmin || hasPermission('access_sso_lms') || hasPermission('access_sso_attendance')) && (
                     <div className="mb-8">
                         <div className="flex items-center gap-2 mb-4">
                             <span className="flex h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
@@ -135,6 +141,7 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             {/* Card 1: LMS Mokopani */}
+                            {(isAdmin || hasPermission('access_sso_lms')) && (
                             <a
                                 href="/sso/redirect/lms"
                                 target="_blank"
@@ -164,8 +171,10 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                                     </div>
                                 </div>
                             </a>
+                            )}
 
                             {/* Card 2: Aplikasi Absensi */}
+                            {(isAdmin || hasPermission('access_sso_attendance')) && (
                             <a
                                 href="/sso/redirect/absensi"
                                 target="_blank"
@@ -195,8 +204,10 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                                     </div>
                                 </div>
                             </a>
+                            )}
                         </div>
                     </div>
+                    )}
 
                     {/* TAB BAR NAVIGATION */}
                     <div className="flex sm:inline-flex w-full sm:w-auto mb-8 bg-slate-100/80 dark:bg-gray-900/50 p-1.5 rounded-xl border border-gray-200/50 dark:border-gray-800/50 backdrop-blur-sm">

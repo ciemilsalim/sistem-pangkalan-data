@@ -64,6 +64,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/curriculum/subjects/{subject}', [CurriculumController::class, 'updateSubject'])->name('curriculum.subjects.update');
     Route::delete('/curriculum/subjects/{subject}', [CurriculumController::class, 'destroySubject'])->name('curriculum.subjects.destroy');
 
+    // Capaian Pembelajaran
+    Route::middleware('can:manage_cp')->group(function () {
+        Route::get('/curriculum/capaian-pembelajaran', [App\Http\Controllers\LmsCapaianPembelajaranController::class, 'index'])->name('curriculum.capaian-pembelajaran.index');
+        Route::post('/curriculum/capaian-pembelajaran', [App\Http\Controllers\LmsCapaianPembelajaranController::class, 'store'])->name('curriculum.capaian-pembelajaran.store');
+        Route::put('/curriculum/capaian-pembelajaran/{capaianPembelajaran}', [App\Http\Controllers\LmsCapaianPembelajaranController::class, 'update'])->name('curriculum.capaian-pembelajaran.update');
+        Route::delete('/curriculum/capaian-pembelajaran/{capaianPembelajaran}', [App\Http\Controllers\LmsCapaianPembelajaranController::class, 'destroy'])->name('curriculum.capaian-pembelajaran.destroy');
+    });
+
     Route::post('/curriculum/schedules', [CurriculumController::class, 'storeSchedule'])->name('curriculum.schedules.store');
     Route::put('/curriculum/schedules/{schedule}', [CurriculumController::class, 'updateSchedule'])->name('curriculum.schedules.update');
     Route::delete('/curriculum/schedules/{schedule}', [CurriculumController::class, 'destroySchedule'])->name('curriculum.schedules.destroy');

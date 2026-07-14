@@ -79,15 +79,7 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        // Authorization check: Ensure only 'admin' role can access SIPADA
-        if (Auth::user()->role !== 'admin') {
-            Auth::logout();
-            RateLimiter::hit($this->throttleKey());
 
-            throw ValidationException::withMessages([
-                'email' => 'Akses ditolak. Hanya Administrator yang dapat masuk ke SIPADA.',
-            ]);
-        }
 
         RateLimiter::clear($this->throttleKey());
     }

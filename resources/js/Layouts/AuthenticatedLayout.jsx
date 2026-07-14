@@ -88,18 +88,41 @@ export default function AuthenticatedLayout({ header, children }) {
         navigation.push({ name: 'Manajemen Kurikulum', href: route('curriculum.index'), active: route().current('curriculum.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg> });
     }
 
-    navigation = [
-        ...navigation,
-        { name: 'Manajemen Sivitas', href: route('people.index'), active: route().current('people.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg> },
-        { name: 'Kenaikan Kelas', href: route('promotions.index'), active: route().current('promotions.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg> },
-        { name: 'Manajemen Pengumuman', href: route('announcements.index'), active: route().current('announcements.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg> },
-        { name: 'Kalender Akademik', href: route('calendars.index'), active: route().current('calendars.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> },
-        { name: 'Obrolan Ortu', href: route('chat.index'), active: route().current('chat.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg> },
-        { name: 'Pengawasan Chat', href: route('monitoring.chats.index'), active: route().current('monitoring.chats.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg> },
-        { name: 'Audit Akademik', href: route('academic-audit.index'), active: route().current('academic-audit.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 12.408l-1.62-1.62m0 0l-1.62 1.62m1.62-1.62v-3.375" /></svg> },
-        { name: 'Moderasi LMS', href: route('lms-moderation.index'), active: route().current('lms-moderation.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg> },
-        { name: 'Pengaturan', href: route('settings.index'), active: route().current('settings.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> },
-    ];
+    if (isAdmin || hasPermission('manage_students') || hasPermission('manage_teachers') || hasPermission('manage_parents')) {
+        navigation.push({ name: 'Manajemen Sivitas', href: route('people.index'), active: route().current('people.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg> });
+    }
+    
+    if (isAdmin || hasPermission('manage_promotions')) {
+        navigation.push({ name: 'Kenaikan Kelas', href: route('promotions.index'), active: route().current('promotions.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg> });
+    }
+
+    if (isAdmin || hasPermission('manage_announcements')) {
+        navigation.push({ name: 'Manajemen Pengumuman', href: route('announcements.index'), active: route().current('announcements.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg> });
+    }
+
+    if (isAdmin || hasPermission('manage_calendars')) {
+        navigation.push({ name: 'Kalender Akademik', href: route('calendars.index'), active: route().current('calendars.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> });
+    }
+
+    if (isAdmin || hasPermission('manage_chat')) {
+        navigation.push({ name: 'Obrolan Ortu', href: route('chat.index'), active: route().current('chat.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg> });
+    }
+
+    if (isAdmin || hasPermission('monitor_chats')) {
+        navigation.push({ name: 'Pengawasan Chat', href: route('monitoring.chats.index'), active: route().current('monitoring.chats.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg> });
+    }
+
+    if (isAdmin || hasPermission('manage_lms_audit')) {
+        navigation.push({ name: 'Audit Akademik', href: route('academic-audit.index'), active: route().current('academic-audit.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 12.408l-1.62-1.62m0 0l-1.62 1.62m1.62-1.62v-3.375" /></svg> });
+    }
+
+    if (isAdmin || hasPermission('manage_lms_moderation')) {
+        navigation.push({ name: 'Moderasi LMS', href: route('lms-moderation.index'), active: route().current('lms-moderation.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg> });
+    }
+
+    if (isAdmin || hasPermission('manage_settings')) {
+        navigation.push({ name: 'Pengaturan', href: route('settings.index'), active: route().current('settings.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> });
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex text-gray-900 dark:text-gray-100 font-sans transition-colors duration-200">
@@ -252,37 +275,41 @@ export default function AuthenticatedLayout({ header, children }) {
                         <span className="text-[10px] font-semibold leading-none">Dasbor</span>
                     </Link>
 
-                    <Link
-                        href={route('chat.index')}
-                        className={`group flex flex-col items-center justify-center flex-1 h-full transition-colors ${
-                            route().current('chat.*') || route().current('monitoring.chats.*')
-                                ? 'text-indigo-600 dark:text-indigo-400'
-                                : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
-                        }`}
-                    >
-                        <div className={`px-4 py-1 rounded-full mb-1 transition-all duration-300 ${(route().current('chat.*') || route().current('monitoring.chats.*')) ? 'bg-indigo-100 dark:bg-indigo-900/50' : 'bg-transparent group-hover:bg-gray-100 dark:group-hover:bg-gray-800'}`}>
-                            <svg className="w-6 h-6 transition-transform duration-300 group-hover:scale-110 group-active:scale-95" fill="none" stroke="currentColor" strokeWidth={(route().current('chat.*') || route().current('monitoring.chats.*')) ? "2.5" : "2"} viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
-                            </svg>
-                        </div>
-                        <span className="text-[10px] font-semibold leading-none">Obrolan</span>
-                    </Link>
+                    {(isAdmin || hasPermission('manage_chat') || hasPermission('monitor_chats')) && (
+                        <Link
+                            href={route('chat.index')}
+                            className={`group flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+                                route().current('chat.*') || route().current('monitoring.chats.*')
+                                    ? 'text-indigo-600 dark:text-indigo-400'
+                                    : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+                            }`}
+                        >
+                            <div className={`px-4 py-1 rounded-full mb-1 transition-all duration-300 ${(route().current('chat.*') || route().current('monitoring.chats.*')) ? 'bg-indigo-100 dark:bg-indigo-900/50' : 'bg-transparent group-hover:bg-gray-100 dark:group-hover:bg-gray-800'}`}>
+                                <svg className="w-6 h-6 transition-transform duration-300 group-hover:scale-110 group-active:scale-95" fill="none" stroke="currentColor" strokeWidth={(route().current('chat.*') || route().current('monitoring.chats.*')) ? "2.5" : "2"} viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+                                </svg>
+                            </div>
+                            <span className="text-[10px] font-semibold leading-none">Obrolan</span>
+                        </Link>
+                    )}
 
-                    <Link
-                        href={route('academic-audit.index')}
-                        className={`group flex flex-col items-center justify-center flex-1 h-full transition-colors ${
-                            route().current('academic-audit.index')
-                                ? 'text-indigo-600 dark:text-indigo-400'
-                                : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
-                        }`}
-                    >
-                        <div className={`px-4 py-1 rounded-full mb-1 transition-all duration-300 ${route().current('academic-audit.index') ? 'bg-indigo-100 dark:bg-indigo-900/50' : 'bg-transparent group-hover:bg-gray-100 dark:group-hover:bg-gray-800'}`}>
-                            <svg className="w-6 h-6 transition-transform duration-300 group-hover:scale-110 group-active:scale-95" fill="none" stroke="currentColor" strokeWidth={route().current('academic-audit.index') ? "2.5" : "2"} viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 12.408l-1.62-1.62m0 0l-1.62 1.62m1.62-1.62v-3.375" />
-                            </svg>
-                        </div>
-                        <span className="text-[10px] font-semibold leading-none">Audit</span>
-                    </Link>
+                    {(isAdmin || hasPermission('manage_lms_audit')) && (
+                        <Link
+                            href={route('academic-audit.index')}
+                            className={`group flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+                                route().current('academic-audit.index')
+                                    ? 'text-indigo-600 dark:text-indigo-400'
+                                    : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+                            }`}
+                        >
+                            <div className={`px-4 py-1 rounded-full mb-1 transition-all duration-300 ${route().current('academic-audit.index') ? 'bg-indigo-100 dark:bg-indigo-900/50' : 'bg-transparent group-hover:bg-gray-100 dark:group-hover:bg-gray-800'}`}>
+                                <svg className="w-6 h-6 transition-transform duration-300 group-hover:scale-110 group-active:scale-95" fill="none" stroke="currentColor" strokeWidth={route().current('academic-audit.index') ? "2.5" : "2"} viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 12.408l-1.62-1.62m0 0l-1.62 1.62m1.62-1.62v-3.375" />
+                                </svg>
+                            </div>
+                            <span className="text-[10px] font-semibold leading-none">Audit</span>
+                        </Link>
+                    )}
 
                     <button
                         onClick={() => setShowingNavigationDropdown(true)}

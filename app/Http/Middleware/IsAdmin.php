@@ -11,12 +11,22 @@ class IsAdmin
 {
     /**
      * Handle an incoming request.
-     *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || !Auth::user()->hasAnyRole(['admin', 'wakasek_kurikulum'])) {
+        $allowedRoles = [
+            'admin', 
+            'wakasek_kurikulum', 
+            'wakasek_kesiswaan', 
+            'wakasek_sarana', 
+            'kepala_lab', 
+            'kepala_perpustakaan', 
+            'kepala_tata_usaha', 
+            'operator'
+        ];
+
+        if (!Auth::check() || !Auth::user()->hasAnyRole($allowedRoles)) {
             Auth::guard('web')->logout();
 
             $request->session()->invalidate();

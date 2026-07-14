@@ -32,8 +32,14 @@ class SsoController extends Controller
         // 3. Determine the target base URL
         $targetUrl = '';
         if ($app === 'lms') {
+            if (!$user->hasRole('admin') && !$user->hasPermissionTo('access_sso_lms')) {
+                abort(403, 'Anda tidak memiliki hak akses untuk Jalur Cepat LMS Mokopani.');
+            }
             $targetUrl = env('SSO_LMS_URL', 'http://localhost:8002');
         } elseif ($app === 'absensi') {
+            if (!$user->hasRole('admin') && !$user->hasPermissionTo('access_sso_attendance')) {
+                abort(403, 'Anda tidak memiliki hak akses untuk Jalur Cepat Aplikasi Absensi.');
+            }
             $targetUrl = env('SSO_ABSENSI_URL', 'http://localhost:8000');
         } else {
             abort(404, 'Aplikasi tidak dikenal dalam ekosistem.');

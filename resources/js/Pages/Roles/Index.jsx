@@ -87,6 +87,38 @@ export default function RolesIndex({ auth, roles, permissions }) {
         }
     };
 
+    const formatPermission = (permName) => {
+        const labels = {
+            'manage_users': 'Kelola Pengguna',
+            'manage_roles': 'Kelola Hak Akses',
+            'manage_curriculum': 'Kelola Kurikulum',
+            'manage_academic_periods': 'Kelola Periode Akademik',
+            'manage_classes': 'Kelola Kelas',
+            'manage_subjects': 'Kelola Mata Pelajaran',
+            'manage_schedules': 'Kelola Jadwal',
+            'manage_extracurriculars': 'Kelola Ekstrakurikuler',
+            'manage_cp': 'Kelola Capaian Pembelajaran',
+            'manage_promotions': 'Kenaikan Kelas',
+            'manage_students': 'Data Siswa',
+            'manage_teachers': 'Data Guru',
+            'manage_parents': 'Data Wali Murid',
+            'manage_announcements': 'Pengumuman',
+            'manage_calendars': 'Kalender Akademik',
+            'manage_settings': 'Pengaturan Sistem',
+            'manage_lms_audit': 'Audit LMS',
+            'manage_lms_moderation': 'Moderasi LMS',
+            'manage_chat': 'Pusat Pesan',
+            'monitor_chats': 'Pengawasan Obrolan',
+            'access_sso_lms': 'SSO LMS Mokopani',
+            'access_sso_attendance': 'SSO Aplikasi Absensi'
+        };
+        
+        if (labels[permName]) return labels[permName];
+        
+        // Auto format: replace underscore and capitalize
+        return permName.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    };
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -126,14 +158,14 @@ export default function RolesIndex({ auth, roles, permissions }) {
                                             <tr key={role.id}>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="font-medium text-gray-900 dark:text-gray-100">
-                                                        {role.name}
+                                                        {role.name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="flex flex-wrap gap-1">
                                                         {role.permissions.map(p => (
-                                                            <span key={p.id} className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                                                {p.name}
+                                                            <span key={p.id} className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border border-green-200 dark:border-green-800">
+                                                                {formatPermission(p.name)}
                                                             </span>
                                                         ))}
                                                         {role.permissions.length === 0 && (
@@ -229,7 +261,7 @@ export default function RolesIndex({ auth, roles, permissions }) {
                                         onChange={handlePermissionChange}
                                     />
                                     <span className="ms-2 text-sm text-gray-600 dark:text-gray-400">
-                                        {permission.name}
+                                        {formatPermission(permission.name)}
                                     </span>
                                 </label>
                             ))}
