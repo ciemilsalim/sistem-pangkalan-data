@@ -9,7 +9,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
 
-export default function Index({ auth, users, filters }) {
+export default function Index({ auth, users, filters, availableRoles }) {
     const [search, setSearch] = useState(filters.search || '');
     const [roleFilter, setRoleFilter] = useState(filters.role || '');
     
@@ -23,7 +23,7 @@ export default function Index({ auth, users, filters }) {
     const createForm = useForm({
         name: '',
         email: '',
-        role: 'teacher',
+        roles: [],
         password: '',
     });
 
@@ -31,7 +31,7 @@ export default function Index({ auth, users, filters }) {
     const editForm = useForm({
         name: '',
         email: '',
-        role: 'teacher',
+        roles: [],
         password: '', // optional on edit
     });
 
@@ -63,7 +63,7 @@ export default function Index({ auth, users, filters }) {
         editForm.setData({
             name: user.name,
             email: user.email,
-            role: user.role,
+            roles: user.roles ? user.roles.map(r => r.name) : [],
             password: '',
         });
         editForm.clearErrors();
@@ -109,24 +109,41 @@ export default function Index({ auth, users, filters }) {
     };
 
     // Helper to render role badges
-    const renderRoleBadge = (role) => {
+    const renderRoleBadge = (rolesArr) => {
         const badges = {
-            admin: 'bg-red-100 text-red-800 border-red-200',
-            teacher: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-            student: 'bg-green-100 text-green-800 border-green-200',
-            parent: 'bg-purple-100 text-purple-800 border-purple-200',
+            'admin': 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800',
+            'teacher': 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800',
+            'student': 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-800',
+            'parent': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800',
         };
         const labels = {
-            admin: 'Administrator',
-            teacher: 'Guru',
-            student: 'Siswa',
-            parent: 'Wali Murid',
+            'admin': 'Admin',
+            'teacher': 'Guru',
+            'student': 'Siswa',
+            'parent': 'Wali Murid',
+            'wakasek_kurikulum': 'Wakasek Kurikulum'
         };
 
+        const formatRoleName = (roleStr) => {
+            if (labels[roleStr]) return labels[roleStr];
+            return roleStr.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        };
+
+        if (!rolesArr || rolesArr.length === 0) {
+            return <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700">-</span>;
+        }
+
         return (
-            <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${badges[role] || 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700'}`}>
-                {labels[role] || role}
-            </span>
+            <div className="flex flex-wrap gap-1">
+                {rolesArr.map(roleObj => {
+                    const role = typeof roleObj === 'string' ? roleObj : roleObj.name;
+                    return (
+                        <span key={role} className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${badges[role] || 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700'}`}>
+                            {formatRoleName(role)}
+                        </span>
+                    );
+                })}
+            </div>
         );
     };
 
@@ -143,42 +160,6 @@ export default function Index({ auth, users, filters }) {
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     
-                    {/* Flash Message */}
-                    {usePageProps().flash?.message && (
-                        <div className="mb-6 rounded-md bg-green-50 p-4 border border-green-200">
-                            <div className="flex">
-                                <div className="flex-shrink-0">
-                                    <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div className="ml-3">
-                                    <p className="text-sm font-medium text-green-800">
-                                        {usePageProps().flash.message}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Global Error Message (e.g. self delete error) */}
-                    {usePageProps().errors?.error && (
-                        <div className="mb-6 rounded-md bg-red-50 p-4 border border-red-200">
-                            <div className="flex">
-                                <div className="flex-shrink-0">
-                                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div className="ml-3">
-                                    <p className="text-sm font-medium text-red-800">
-                                        {usePageProps().errors.error}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
                     {/* Filter and Create Header */}
                     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                         <form onSubmit={handleSearchSubmit} className="flex flex-wrap items-center gap-3">
@@ -197,14 +178,13 @@ export default function Index({ auth, users, filters }) {
                                 <select
                                     id="role-filter"
                                     value={roleFilter}
-                                    className="block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                    className="block w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
                                     onChange={(e) => setRoleFilter(e.target.value)}
                                 >
                                     <option value="">Semua Peran</option>
-                                    <option value="admin">Administrator</option>
-                                    <option value="teacher">Guru</option>
-                                    <option value="student">Siswa</option>
-                                    <option value="parent">Wali Murid</option>
+                                    {availableRoles && availableRoles.map(r => (
+                                        <option key={r.id} value={r.name}>{r.name}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="flex gap-2">
@@ -272,8 +252,8 @@ export default function Index({ auth, users, filters }) {
                                                 <td className="whitespace-nowrap px-6 py-4">
                                                     <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
                                                 </td>
-                                                <td className="whitespace-nowrap px-6 py-4">
-                                                    {renderRoleBadge(user.role)}
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    {renderRoleBadge(user.roles)}
                                                 </td>
                                                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                                     {user.last_seen_at ? new Date(user.last_seen_at).toLocaleString('id-ID') : '-'}
@@ -381,20 +361,32 @@ export default function Index({ auth, users, filters }) {
                     </div>
 
                     <div className="mb-4">
-                        <InputLabel htmlFor="create_role" value="Peran / Hak Akses" />
-                        <select
-                            id="create_role"
-                            value={createForm.data.role}
-                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
-                            onChange={(e) => createForm.setData('role', e.target.value)}
-                            required
-                        >
-                            <option value="admin">Administrator</option>
-                            <option value="teacher">Guru</option>
-                            <option value="student">Siswa</option>
-                            <option value="parent">Wali Murid</option>
-                        </select>
-                        <InputError message={createForm.errors.role} className="mt-2" />
+                        <InputLabel value="Peran / Hak Akses (Bisa pilih lebih dari satu)" />
+                        <div className="mt-2 grid grid-cols-2 gap-2">
+                            {availableRoles && availableRoles.map(role => (
+                                <label key={role.id} className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                        value={role.name}
+                                        checked={createForm.data.roles.includes(role.name)}
+                                        onChange={(e) => {
+                                            const checked = e.target.checked;
+                                            const value = e.target.value;
+                                            if (checked) {
+                                                createForm.setData('roles', [...createForm.data.roles, value]);
+                                            } else {
+                                                createForm.setData('roles', createForm.data.roles.filter(r => r !== value));
+                                            }
+                                        }}
+                                    />
+                                    <span className="ms-2 text-sm text-gray-600 dark:text-gray-400 capitalize">
+                                        {role.name.replace('_', ' ')}
+                                    </span>
+                                </label>
+                            ))}
+                        </div>
+                        <InputError message={createForm.errors.roles} className="mt-2" />
                     </div>
 
                     <div className="mb-6">
@@ -453,20 +445,32 @@ export default function Index({ auth, users, filters }) {
                     </div>
 
                     <div className="mb-4">
-                        <InputLabel htmlFor="edit_role" value="Peran / Hak Akses" />
-                        <select
-                            id="edit_role"
-                            value={editForm.data.role}
-                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
-                            onChange={(e) => editForm.setData('role', e.target.value)}
-                            required
-                        >
-                            <option value="admin">Administrator</option>
-                            <option value="teacher">Guru</option>
-                            <option value="student">Siswa</option>
-                            <option value="parent">Wali Murid</option>
-                        </select>
-                        <InputError message={editForm.errors.role} className="mt-2" />
+                        <InputLabel value="Peran / Hak Akses (Bisa pilih lebih dari satu)" />
+                        <div className="mt-2 grid grid-cols-2 gap-2">
+                            {availableRoles && availableRoles.map(role => (
+                                <label key={role.id} className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        className="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                        value={role.name}
+                                        checked={editForm.data.roles.includes(role.name)}
+                                        onChange={(e) => {
+                                            const checked = e.target.checked;
+                                            const value = e.target.value;
+                                            if (checked) {
+                                                editForm.setData('roles', [...editForm.data.roles, value]);
+                                            } else {
+                                                editForm.setData('roles', editForm.data.roles.filter(r => r !== value));
+                                            }
+                                        }}
+                                    />
+                                    <span className="ms-2 text-sm text-gray-600 dark:text-gray-400 capitalize">
+                                        {role.name.replace('_', ' ')}
+                                    </span>
+                                </label>
+                            ))}
+                        </div>
+                        <InputError message={editForm.errors.roles} className="mt-2" />
                     </div>
 
                     <div className="mb-6">

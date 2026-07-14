@@ -13,6 +13,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AcademicAuditController;
 use App\Http\Controllers\LmsModerationController;
 use App\Http\Controllers\AcademicPeriodController;
+use App\Http\Controllers\RolePermissionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,6 +29,12 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Role & Permission Management
+    Route::get('/roles', [RolePermissionController::class, 'index'])->name('roles.index');
+    Route::post('/roles', [RolePermissionController::class, 'storeRole'])->name('roles.store');
+    Route::put('/roles/{role}', [RolePermissionController::class, 'updateRole'])->name('roles.update');
+    Route::delete('/roles/{role}', [RolePermissionController::class, 'destroyRole'])->name('roles.destroy');
 
     Route::resource('users', UserController::class);
 

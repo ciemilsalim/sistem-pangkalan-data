@@ -32,7 +32,10 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? array_merge($request->user()->toArray(), [
+                    'roles' => $request->user()->getRoleNames(),
+                    'permissions' => $request->user()->getAllPermissions()->pluck('name'),
+                ]) : null,
             ],
             'activeSemesterId' => session('active_semester_id') ?? \App\Models\Semester::where('is_active', true)->value('id'),
             'semestersList' => \App\Models\Semester::with('academicYear')->orderByDesc('id')->get()->map(function ($s) {

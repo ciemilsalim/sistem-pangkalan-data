@@ -17,7 +17,7 @@ class UserController extends Controller
      */
     public function index(Request $request): Response
     {
-        $query = User::query();
+        $query = User::with('roles');
 
         // Search by name or email
         if ($request->filled('search')) {
@@ -40,6 +40,7 @@ class UserController extends Controller
         return Inertia::render('Users/Index', [
             'users' => $users,
             'filters' => $request->only(['search', 'role']),
+            'availableRoles' => \Spatie\Permission\Models\Role::all(),
         ]);
     }
 
@@ -51,16 +52,17 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'role' => 'required|string|in:admin,teacher,student,parent',
+            'roles' => 'required|array',
             'password' => ['required', Rules\Password::defaults()],
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'role' => $request->role,
             'password' => Hash::make($request->password),
         ]);
+
+        $user->syncRoles($request->roles);
 
         return redirect()->route('users.index')->with('message', 'Pengguna berhasil ditambahkan.');
     }
@@ -73,7 +75,7 @@ class UserController extends Controller
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'role' => 'required|string|in:admin,teacher,student,parent',
+            'roles' => 'required|array',
         ];
 
         // Password is optional on update
@@ -85,13 +87,13 @@ class UserController extends Controller
 
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->role = $request->role;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
 
         $user->save();
+        $user->syncRoles($request->roles);
 
         return redirect()->route('users.index')->with('message', 'Pengguna berhasil diperbarui.');
     }
