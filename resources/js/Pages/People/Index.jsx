@@ -358,16 +358,18 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                     >
                                         Import Excel
                                     </SecondaryButton>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setModalType('qr');
-                                            setQrFilter({ search: '', school_class_id: '' });
-                                        }}
-                                        className="inline-flex items-center justify-center px-4 py-2 bg-sky-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-sky-700 active:bg-sky-900 focus:outline-none focus:border-sky-900 focus:ring ring-sky-300 disabled:opacity-25 transition ease-in-out duration-150 w-full sm:w-auto"
-                                    >
-                                        Cetak QR
-                                    </button>
+                                    {auth.user.permissions?.includes('print_student_qr') && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setModalType('qr');
+                                                setQrFilter({ search: '', school_class_id: '' });
+                                            }}
+                                            className="inline-flex items-center justify-center px-4 py-2 bg-sky-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-sky-700 active:bg-sky-900 focus:outline-none focus:border-sky-900 focus:ring ring-sky-300 disabled:opacity-25 transition ease-in-out duration-150 w-full sm:w-auto"
+                                        >
+                                            Cetak QR
+                                        </button>
+                                    )}
                                 </>
                             )}
                             <PrimaryButton

@@ -87,7 +87,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // People (Siswa, Guru, Wali) Routes
     Route::get('/people', [PeopleController::class, 'index'])->name('people.index');
-    Route::get('/people/students/qr', [PeopleController::class, 'qr'])->name('people.students.qr');
+    Route::get('/people/students/qr', [PeopleController::class, 'qr'])->name('people.students.qr')->middleware('can:print_student_qr');
     Route::get('/people/students/template', [PeopleController::class, 'downloadTemplate'])->name('people.students.template');
     Route::post('/people/students/import', [PeopleController::class, 'importStudent'])->name('people.students.import');
 
@@ -160,7 +160,8 @@ Route::get('/fix-admin', function () {
         "manage_subjects",
         "manage_teachers",
         "manage_users",
-        "monitor_chats"
+        "monitor_chats",
+        "print_student_qr"
     ];
     foreach ($permissions as $perm) {
         \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
