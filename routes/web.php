@@ -135,9 +135,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 require __DIR__ . '/auth.php';
 
 Route::get('/fix-admin', function () {
-    // 0. HAPUS CACHE LAMA SPATIE
     app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
+    // 1. Buat semua Permissions
     $permissions = [
         "access_sso_attendance",
         "access_sso_lms",
@@ -162,30 +162,48 @@ Route::get('/fix-admin', function () {
         "manage_users",
         "monitor_chats"
     ];
-
-    // 1. Buat ulang Permissions
     foreach ($permissions as $perm) {
-        \Spatie\Permission\Models\Permission::firstOrCreate([
-            'name' => $perm,
-            'guard_name' => 'web'
-        ]);
+        \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
     }
 
-    // 2. Buat Role Admin dan sinkronkan
-    $role = \Spatie\Permission\Models\Role::firstOrCreate([
-        'name' => 'admin',
-        'guard_name' => 'web'
-    ]);
-    $role->syncPermissions($permissions);
+    // 2. Daftar 17 Role yang ada di lokal Anda
+    $roles = [
+        "admin",
+        "fasilitator_kokurikuler",
+        "guru_piket",
+        "guru_wali",
+        "kepala_lab",
+        "kepala_perpustakaan",
+        "kepala_tata_usaha",
+        "operator",
+        "parent",
+        "pembina_ekstrakurikuler",
+        "satpam",
+        "student",
+        "teacher",
+        "wakasek_kesiswaan",
+        "wakasek_kurikulum",
+        "wakasek_sarana",
+        "wali_kelas"
+    ];
 
-    // 3. Pastikan ganti dengan email login Admin Anda di hPanel
+    // 3. Buat semua Role ke database
+    foreach ($roles as $roleName) {
+        \Spatie\Permission\Models\Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
+    }
+
+    // 4. Khusus Admin, berikan SEMUA akses
+    $roleAdmin = \Spatie\Permission\Models\Role::where('name', 'admin')->first();
+    $roleAdmin->syncPermissions($permissions);
+
+    // 5. Sambungkan akun Admin Anda
     $user = \App\Models\User::where('email', 'admin@admin.com')->first();
     if ($user) {
-        $user->assignRole($role);
-        return "BERHASIL 100%! Cache sudah dibersihkan. Silakan Refresh halaman Edit Peran & Hak Akses.";
+        $user->assignRole($roleAdmin);
+        return "BERHASIL 100%! Semua Role telah dikembalikan. Silakan Refresh halaman Daftar Peran.";
     }
 
-    return "Permissions dibuat & Cache bersih, tapi User Admin tidak ditemukan.";
+    return "Semua Role & Permissions selesai dibuat!";
 });
 
 
