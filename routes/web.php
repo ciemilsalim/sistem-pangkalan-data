@@ -136,7 +136,7 @@ require __DIR__ . '/auth.php';
 
 Route::get('/fix-admin', function () {
     // Ganti email di bawah dengan email admin Anda yang sebenarnya
-    $user = \App\Models\User::where('email', 'admin@email.com')->first();
+    $user = \App\Models\User::where('email', 'admin@admin.com')->first();
 
     if (!$user) {
         return "User tidak ditemukan. Cek kembali emailnya.";
