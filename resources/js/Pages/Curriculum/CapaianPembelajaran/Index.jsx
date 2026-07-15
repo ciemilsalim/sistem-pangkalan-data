@@ -29,12 +29,14 @@ export default function CapaianPembelajaranIndex({ auth, capaianPembelajarans, s
     useEffect(() => {
         if (isCreating && form.data.subject_id) {
             const nextNumber = nextCpNumbers[form.data.subject_id] || 1;
-            const generatedKode = `CP.${nextNumber}`;
+            const selectedSubject = subjects.find(s => s.id == form.data.subject_id);
+            const prefix = selectedSubject?.code ? `${selectedSubject.code} ` : '';
+            const generatedKode = `${prefix}CP.${nextNumber}`;
             if (form.data.kode !== generatedKode) {
                 form.setData('kode', generatedKode);
             }
         }
-    }, [form.data.subject_id, isCreating]);
+    }, [form.data.subject_id, isCreating, subjects, nextCpNumbers]);
 
     const handleSearch = (e) => {
         e.preventDefault();
