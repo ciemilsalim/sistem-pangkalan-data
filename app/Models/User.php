@@ -25,6 +25,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role', // TAMBAHKAN BARIS INI
+        'ai_provider',
+        'ai_api_key',
     ];
 
     /**
@@ -35,6 +37,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'ai_api_key', // Hide the key from API responses
     ];
 
     /**
@@ -46,6 +49,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'last_seen_at' => 'datetime', // Tambahkan baris ini
+        'ai_api_key' => 'encrypted', // Encrypt the API key in database
     ];
 
     /**
