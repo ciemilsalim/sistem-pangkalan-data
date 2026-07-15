@@ -43,23 +43,23 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Curriculum Routes
     Route::get('/curriculum', [CurriculumController::class, 'index'])->name('curriculum.index');
-    
+
     Route::post('/curriculum/academic-years', [CurriculumController::class, 'storeAcademicYear'])->name('curriculum.academic-years.store');
     Route::put('/curriculum/academic-years/{academicYear}', [CurriculumController::class, 'updateAcademicYear'])->name('curriculum.academic-years.update');
     Route::delete('/curriculum/academic-years/{academicYear}', [CurriculumController::class, 'destroyAcademicYear'])->name('curriculum.academic-years.destroy');
-    
+
     Route::post('/curriculum/semesters', [CurriculumController::class, 'storeSemester'])->name('curriculum.semesters.store');
     Route::put('/curriculum/semesters/{semester}', [CurriculumController::class, 'updateSemester'])->name('curriculum.semesters.update');
     Route::delete('/curriculum/semesters/{semester}', [CurriculumController::class, 'destroySemester'])->name('curriculum.semesters.destroy');
-    
+
     Route::post('/curriculum/levels', [CurriculumController::class, 'storeLevel'])->name('curriculum.levels.store');
     Route::put('/curriculum/levels/{level}', [CurriculumController::class, 'updateLevel'])->name('curriculum.levels.update');
     Route::delete('/curriculum/levels/{level}', [CurriculumController::class, 'destroyLevel'])->name('curriculum.levels.destroy');
-    
+
     Route::post('/curriculum/classes', [CurriculumController::class, 'storeSchoolClass'])->name('curriculum.classes.store');
     Route::put('/curriculum/classes/{schoolClass}', [CurriculumController::class, 'updateSchoolClass'])->name('curriculum.classes.update');
     Route::delete('/curriculum/classes/{schoolClass}', [CurriculumController::class, 'destroySchoolClass'])->name('curriculum.classes.destroy');
-    
+
     Route::post('/curriculum/subjects', [CurriculumController::class, 'storeSubject'])->name('curriculum.subjects.store');
     Route::put('/curriculum/subjects/{subject}', [CurriculumController::class, 'updateSubject'])->name('curriculum.subjects.update');
     Route::delete('/curriculum/subjects/{subject}', [CurriculumController::class, 'destroySubject'])->name('curriculum.subjects.destroy');
@@ -90,15 +90,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/people/students/qr', [PeopleController::class, 'qr'])->name('people.students.qr');
     Route::get('/people/students/template', [PeopleController::class, 'downloadTemplate'])->name('people.students.template');
     Route::post('/people/students/import', [PeopleController::class, 'importStudent'])->name('people.students.import');
-    
+
     Route::post('/people/students', [PeopleController::class, 'storeStudent'])->name('people.students.store');
     Route::put('/people/students/{student}', [PeopleController::class, 'updateStudent'])->name('people.students.update');
     Route::delete('/people/students/{student}', [PeopleController::class, 'destroyStudent'])->name('people.students.destroy');
-    
+
     Route::post('/people/teachers', [PeopleController::class, 'storeTeacher'])->name('people.teachers.store');
     Route::put('/people/teachers/{teacher}', [PeopleController::class, 'updateTeacher'])->name('people.teachers.update');
     Route::delete('/people/teachers/{teacher}', [PeopleController::class, 'destroyTeacher'])->name('people.teachers.destroy');
-    
+
     Route::post('/people/parents', [PeopleController::class, 'storeParent'])->name('people.parents.store');
     Route::put('/people/parents/{parent}', [PeopleController::class, 'updateParent'])->name('people.parents.update');
     Route::delete('/people/parents/{parent}', [PeopleController::class, 'destroyParent'])->name('people.parents.destroy');
@@ -132,4 +132,22 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('/monitoring/chats/{conversation}', [ChatMonitoringController::class, 'destroyConversation'])->name('monitoring.chats.destroy_conversation');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
+
+Route::get('/fix-admin', function () {
+    // Ganti email di bawah dengan email admin Anda yang sebenarnya
+    $user = \App\Models\User::where('email', 'admin@email.com')->first();
+
+    if (!$user) {
+        return "User tidak ditemukan. Cek kembali emailnya.";
+    }
+
+    // Buat role admin jika belum ada di database server
+    $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
+
+    // Berikan hak akses admin ke user tersebut
+    $user->assignRole($role);
+
+    return "Berhasil! Hak akses Admin telah diberikan ke " . $user->name . ". Silakan login kembali.";
+});
+
