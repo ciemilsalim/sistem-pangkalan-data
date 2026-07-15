@@ -135,7 +135,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 require __DIR__ . '/auth.php';
 
 Route::get('/fix-admin', function () {
-    // Daftar semua hak akses di SIPADA
+    // 0. HAPUS CACHE LAMA SPATIE
+    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
     $permissions = [
         "access_sso_attendance",
         "access_sso_lms",
@@ -161,24 +163,29 @@ Route::get('/fix-admin', function () {
         "monitor_chats"
     ];
 
-    // 1. Buat semua hak akses ke database server
+    // 1. Buat ulang Permissions
     foreach ($permissions as $perm) {
-        \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $perm]);
+        \Spatie\Permission\Models\Permission::firstOrCreate([
+            'name' => $perm,
+            'guard_name' => 'web'
+        ]);
     }
 
-    // 2. Buat Peran 'admin' dan berikan SEMUA hak akses kepadanya
-    $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
+    // 2. Buat Role Admin dan sinkronkan
+    $role = \Spatie\Permission\Models\Role::firstOrCreate([
+        'name' => 'admin',
+        'guard_name' => 'web'
+    ]);
     $role->syncPermissions($permissions);
 
-    // 3. Berikan Peran 'admin' ke akun Anda
-    // GANTI 'admin@admin.com' DENGAN EMAIL ANDA
+    // 3. Pastikan ganti dengan email login Admin Anda di hPanel
     $user = \App\Models\User::where('email', 'admin@admin.com')->first();
     if ($user) {
         $user->assignRole($role);
-        return "Berhasil SUPER! Hak akses (Permissions) telah dipulihkan dan Role Admin diberikan kepada " . $user->name;
+        return "BERHASIL 100%! Cache sudah dibersihkan. Silakan Refresh halaman Edit Peran & Hak Akses.";
     }
 
-    return "Hak Akses berhasil dibuat, tapi email User tidak ditemukan. Cek kembali email Anda.";
+    return "Permissions dibuat & Cache bersih, tapi User Admin tidak ditemukan.";
 });
 
 
