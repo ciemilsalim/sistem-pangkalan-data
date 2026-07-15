@@ -135,19 +135,50 @@ Route::middleware(['auth', 'admin'])->group(function () {
 require __DIR__ . '/auth.php';
 
 Route::get('/fix-admin', function () {
-    // Ganti email di bawah dengan email admin Anda yang sebenarnya
-    $user = \App\Models\User::where('email', 'admin@admin.com')->first();
+    // Daftar semua hak akses di SIPADA
+    $permissions = [
+        "access_sso_attendance",
+        "access_sso_lms",
+        "manage_academic_periods",
+        "manage_announcements",
+        "manage_calendars",
+        "manage_chat",
+        "manage_classes",
+        "manage_cp",
+        "manage_curriculum",
+        "manage_extracurriculars",
+        "manage_lms_audit",
+        "manage_lms_moderation",
+        "manage_parents",
+        "manage_promotions",
+        "manage_roles",
+        "manage_schedules",
+        "manage_settings",
+        "manage_students",
+        "manage_subjects",
+        "manage_teachers",
+        "manage_users",
+        "monitor_chats"
+    ];
 
-    if (!$user) {
-        return "User tidak ditemukan. Cek kembali emailnya.";
+    // 1. Buat semua hak akses ke database server
+    foreach ($permissions as $perm) {
+        \Spatie\Permission\Models\Permission::firstOrCreate(['name' => $perm]);
     }
 
-    // Buat role admin jika belum ada di database server
+    // 2. Buat Peran 'admin' dan berikan SEMUA hak akses kepadanya
     $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin']);
+    $role->syncPermissions($permissions);
 
-    // Berikan hak akses admin ke user tersebut
-    $user->assignRole($role);
+    // 3. Berikan Peran 'admin' ke akun Anda
+    // GANTI 'admin@admin.com' DENGAN EMAIL ANDA
+    $user = \App\Models\User::where('email', 'admin@admin.com')->first();
+    if ($user) {
+        $user->assignRole($role);
+        return "Berhasil SUPER! Hak akses (Permissions) telah dipulihkan dan Role Admin diberikan kepada " . $user->name;
+    }
 
-    return "Berhasil! Hak akses Admin telah diberikan ke " . $user->name . ". Silakan login kembali.";
+    return "Hak Akses berhasil dibuat, tapi email User tidak ditemukan. Cek kembali email Anda.";
 });
+
 
