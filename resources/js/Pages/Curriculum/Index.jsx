@@ -674,8 +674,6 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                         <option value="3">Rabu</option>
                                         <option value="4">Kamis</option>
                                         <option value="5">Jumat</option>
-                                        <option value="6">Sabtu</option>
-                                        <option value="7">Minggu</option>
                                     </select>
                                     <InputError message={scheduleForm.errors.day_of_week} className="mt-2" />
                                 </div>

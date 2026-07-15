@@ -16,8 +16,13 @@ class CalendarController extends Controller
     public function index(Request $request): Response
     {
         $search = $request->input('search', '');
-        
+        $activeSemesterId = session('active_semester_id') ?? \App\Models\Semester::where('is_active', true)->value('id');
+
         $query = Calendar::query();
+        
+        if ($activeSemesterId) {
+            $query->where('semester_id', $activeSemesterId);
+        }
         
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -56,6 +61,8 @@ class CalendarController extends Controller
         ]);
 
         Calendar::create([
+            'academic_year_id' => session('active_academic_year_id') ?? \App\Models\AcademicYear::where('is_active', true)->value('id'),
+            'semester_id' => session('active_semester_id') ?? \App\Models\Semester::where('is_active', true)->value('id'),
             'title' => $request->title,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
@@ -82,6 +89,8 @@ class CalendarController extends Controller
         ]);
 
         $calendar->update([
+            'academic_year_id' => session('active_academic_year_id') ?? \App\Models\AcademicYear::where('is_active', true)->value('id'),
+            'semester_id' => session('active_semester_id') ?? \App\Models\Semester::where('is_active', true)->value('id'),
             'title' => $request->title,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
