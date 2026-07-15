@@ -286,7 +286,7 @@ export default function Index({ auth, calendars, filters }) {
                                                             ) : null}
                                                             {!cal.is_holiday && !cal.is_self_study ? (
                                                                 <span className="inline-flex items-center rounded bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-600 border border-indigo-500">
-                                                                    Kegiatan Sekolah
+                                                                    Efektif Sekolah (Kegiatan)
                                                                 </span>
                                                             ) : null}
                                                         </div>
@@ -369,32 +369,28 @@ export default function Index({ auth, calendars, filters }) {
                             <InputError message={calendarForm.errors.description} className="mt-2" />
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
-                            <label className="flex items-center cursor-pointer p-2 rounded hover:bg-white dark:bg-gray-800 transition">
-                                <input
-                                    type="checkbox"
-                                    className="rounded border-gray-300 dark:border-gray-600 text-red-600 shadow-sm focus:ring-red-500 h-4 w-4"
-                                    checked={calendarForm.data.is_holiday}
-                                    onChange={(e) => calendarForm.setData('is_holiday', e.target.checked)}
-                                />
-                                <div className="ml-3">
-                                    <span className="text-sm font-bold text-red-700">Hari Libur Sekolah</span>
-                                    <span className="block text-xs text-gray-500 dark:text-gray-400">Sekolah libur & siswa tidak masuk.</span>
-                                </div>
-                            </label>
-
-                            <label className="flex items-center cursor-pointer p-2 rounded hover:bg-white dark:bg-gray-800 transition">
-                                <input
-                                    type="checkbox"
-                                    className="rounded border-gray-300 dark:border-gray-600 text-amber-600 shadow-sm focus:ring-amber-500 h-4 w-4"
-                                    checked={calendarForm.data.is_self_study}
-                                    onChange={(e) => calendarForm.setData('is_self_study', e.target.checked)}
-                                />
-                                <div className="ml-3">
-                                    <span className="text-sm font-bold text-amber-700">Belajar Mandiri</span>
-                                    <span className="block text-xs text-gray-500 dark:text-gray-400">Siswa belajar di rumah/daring.</span>
-                                </div>
-                            </label>
+                        <div className="mb-6 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <InputLabel htmlFor="cal_category" value="Kategori Event" className="mb-2" />
+                            <select
+                                id="cal_category"
+                                className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                value={
+                                    calendarForm.data.is_holiday ? 'libur' :
+                                    calendarForm.data.is_self_study ? 'mandiri' : 'efektif'
+                                }
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    calendarForm.setData({
+                                        ...calendarForm.data,
+                                        is_holiday: val === 'libur',
+                                        is_self_study: val === 'mandiri'
+                                    });
+                                }}
+                            >
+                                <option value="efektif">Efektif Sekolah (Siswa tetap masuk, misal: Ulang Tahun Sekolah, dsb)</option>
+                                <option value="libur">Hari Libur Sekolah (Sekolah libur & siswa tidak masuk)</option>
+                                <option value="mandiri">Belajar Mandiri (Siswa belajar dari rumah/daring)</option>
+                            </select>
                         </div>
 
                         <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 mt-6">

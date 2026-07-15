@@ -33,12 +33,18 @@ class CurriculumController extends Controller
         // Fetch teachers list for class homeroom selection (id and name only)
         $teachers = Teacher::select('id', 'name', 'nip')->orderBy('name')->get();
 
-        // Fetch schedules eager loading related assignment data
+        $activeSemesterId = session('active_semester_id') ?? \App\Models\Semester::where('is_active', true)->value('id');
+
+        // Fetch schedules eager loading related assignment data, filtered by active semester
         $schedules = Schedule::with([
             'teachingAssignment.schoolClass',
             'teachingAssignment.subject',
             'teachingAssignment.teacher'
-        ])->orderBy('day_of_week')
+        ])
+          ->when($activeSemesterId, function ($query, $activeSemesterId) {
+              return $query->where('semester_id', $activeSemesterId);
+          })
+          ->orderBy('day_of_week')
           ->orderBy('start_time')
           ->get();
 
