@@ -45,17 +45,27 @@ class PeopleController extends Controller
 
         // Load data depending on active tab or load all paginated safely
         if ($tab === 'students') {
+            $studentStatus = $request->input('student_status', 'aktif');
             $query = Student::with(['user', 'schoolClass', 'parents']);
+            
+            if ($studentStatus === 'aktif') {
+                $query->where('status', 'aktif');
+            } else {
+                $query->whereIn('status', ['lulus', 'pindah', 'keluar']);
+            }
+
             if (!empty($search)) {
-                $query->where('name', 'like', "%{$search}%")
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
                       ->orWhere('nis', 'like', "%{$search}%")
-                      ->orWhereHas('user', function ($q) use ($search) {
-                          $q->where('email', 'like', "%{$search}%");
+                      ->orWhereHas('user', function ($uq) use ($search) {
+                          $uq->where('email', 'like', "%{$search}%");
                       });
+                });
             }
             $students = $query->orderBy('name')->paginate(10)->withQueryString();
         } else {
-            $students = Student::with(['user', 'schoolClass'])->orderBy('name')->limit(10)->get();
+            $students = Student::with(['user', 'schoolClass'])->where('status', 'aktif')->orderBy('name')->limit(10)->get();
         }
 
         if ($tab === 'teachers') {
@@ -96,7 +106,8 @@ class PeopleController extends Controller
             'subjectsList' => $subjectsList,
             'filters' => [
                 'tab' => $tab,
-                'search' => $search
+                'search' => $search,
+                'student_status' => $request->input('student_status', 'aktif')
             ],
             'flash' => [
                 'message' => session('message'),

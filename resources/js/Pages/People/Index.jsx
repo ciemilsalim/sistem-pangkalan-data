@@ -12,6 +12,7 @@ import DangerButton from '@/Components/DangerButton';
 export default function Index({ auth, students, teachers, parents, schoolClasses, parentsList, studentsList, subjectsList, filters }) {
     const activeTab = filters.tab || 'students';
     const [search, setSearch] = useState(filters.search || '');
+    const [studentStatus, setStudentStatus] = useState(filters.student_status || 'aktif');
     const pageProps = usePage().props;
 
     // Modal States
@@ -55,7 +56,8 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     const handleTabSwitch = (newTab) => {
         router.get(route('people.index'), {
             tab: newTab,
-            search: '' // clear search when switching tabs
+            search: '', // clear search when switching tabs
+            student_status: studentStatus
         }, {
             preserveState: true,
             replace: true
@@ -67,7 +69,8 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         e.preventDefault();
         router.get(route('people.index'), {
             tab: activeTab,
-            search: search
+            search: search,
+            student_status: studentStatus
         }, {
             preserveState: true,
             replace: true
@@ -77,8 +80,10 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     // Reset Filters
     const handleReset = () => {
         setSearch('');
+        setStudentStatus('aktif');
         router.get(route('people.index'), {
-            tab: activeTab
+            tab: activeTab,
+            student_status: 'aktif'
         }, {
             preserveState: true,
             replace: true
@@ -316,6 +321,18 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                     onChange={(e) => setSearch(e.target.value)}
                                 />
                             </div>
+                            {activeTab === 'students' && (
+                                <div className="w-full sm:w-48">
+                                    <select
+                                        className="block w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                        value={studentStatus}
+                                        onChange={(e) => setStudentStatus(e.target.value)}
+                                    >
+                                        <option value="aktif">Status: Aktif</option>
+                                        <option value="tidak_aktif">Status: Lulus / Pindah</option>
+                                    </select>
+                                </div>
+                            )}
                             <div className="flex gap-2 w-full sm:w-auto">
                                 <PrimaryButton type="submit" className="flex-1 sm:flex-none justify-center px-4 py-2 text-xs">
                                     Cari
@@ -831,6 +848,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Siswa</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">NIS</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Kelas</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Email Akun</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Wali Murid</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
@@ -847,6 +865,17 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">{student.name}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-semibold">{student.nis}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-950 font-bold">{student.school_class?.name || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                            {student.status === 'aktif' ? (
+                                                <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">Aktif</span>
+                                            ) : student.status === 'lulus' ? (
+                                                <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">Lulus</span>
+                                            ) : student.status === 'pindah' ? (
+                                                <span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">Pindah</span>
+                                            ) : (
+                                                <span className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">{student.status || '-'}</span>
+                                            )}
+                                        </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{student.user?.email || '-'}</td>
                                         <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                                             {student.parents && student.parents.length > 0 ? (
