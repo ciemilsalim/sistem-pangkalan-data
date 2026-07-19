@@ -14,6 +14,7 @@ use App\Models\Extracurricular;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -246,10 +247,25 @@ class CurriculumController extends Controller
 
     public function storeSchoolClass(Request $request): RedirectResponse
     {
+        $activeSemesterId = session('active_semester_id') ?? \App\Models\Semester::where('is_active', true)->value('id');
+        $activeAcademicYearId = session('active_academic_year_id') ?? \App\Models\Semester::where('is_active', true)->value('academic_year_id');
+
         $request->validate([
-            'name' => 'required|string|max:255|unique:school_classes,name',
+            'name' => [
+                'required', 'string', 'max:255',
+                Rule::unique('school_classes', 'name')->where(function ($query) use ($activeAcademicYearId, $activeSemesterId) {
+                    return $query->where('academic_year_id', $activeAcademicYearId)
+                                 ->where('semester_id', $activeSemesterId);
+                }),
+            ],
             'level_id' => 'required|exists:levels,id',
-            'teacher_id' => 'nullable|exists:teachers,id',
+            'teacher_id' => [
+                'nullable', 'exists:teachers,id',
+                Rule::unique('school_classes', 'teacher_id')->where(function ($query) use ($activeAcademicYearId, $activeSemesterId) {
+                    return $query->where('academic_year_id', $activeAcademicYearId)
+                                 ->where('semester_id', $activeSemesterId);
+                }),
+            ],
         ]);
 
         SchoolClass::create([
@@ -263,10 +279,25 @@ class CurriculumController extends Controller
 
     public function updateSchoolClass(Request $request, SchoolClass $schoolClass): RedirectResponse
     {
+        $activeSemesterId = session('active_semester_id') ?? \App\Models\Semester::where('is_active', true)->value('id');
+        $activeAcademicYearId = session('active_academic_year_id') ?? \App\Models\Semester::where('is_active', true)->value('academic_year_id');
+
         $request->validate([
-            'name' => 'required|string|max:255|unique:school_classes,name,' . $schoolClass->id,
+            'name' => [
+                'required', 'string', 'max:255',
+                Rule::unique('school_classes', 'name')->ignore($schoolClass->id)->where(function ($query) use ($activeAcademicYearId, $activeSemesterId) {
+                    return $query->where('academic_year_id', $activeAcademicYearId)
+                                 ->where('semester_id', $activeSemesterId);
+                }),
+            ],
             'level_id' => 'required|exists:levels,id',
-            'teacher_id' => 'nullable|exists:teachers,id',
+            'teacher_id' => [
+                'nullable', 'exists:teachers,id',
+                Rule::unique('school_classes', 'teacher_id')->ignore($schoolClass->id)->where(function ($query) use ($activeAcademicYearId, $activeSemesterId) {
+                    return $query->where('academic_year_id', $activeAcademicYearId)
+                                 ->where('semester_id', $activeSemesterId);
+                }),
+            ],
         ]);
 
         $schoolClass->update([
@@ -433,8 +464,17 @@ class CurriculumController extends Controller
 
     public function storeExtracurricular(Request $request): RedirectResponse
     {
+        $activeSemesterId = session('active_semester_id') ?? \App\Models\Semester::where('is_active', true)->value('id');
+        $activeAcademicYearId = session('active_academic_year_id') ?? \App\Models\Semester::where('is_active', true)->value('academic_year_id');
+
         $request->validate([
-            'name' => 'required|string|max:255|unique:extracurriculars,name',
+            'name' => [
+                'required', 'string', 'max:255',
+                Rule::unique('extracurriculars', 'name')->where(function ($query) use ($activeAcademicYearId, $activeSemesterId) {
+                    return $query->where('academic_year_id', $activeAcademicYearId)
+                                 ->where('semester_id', $activeSemesterId);
+                }),
+            ],
             'description' => 'nullable|string',
             'teacher_id' => 'nullable|exists:teachers,id',
             'student_ids' => 'nullable|array',
@@ -458,8 +498,17 @@ class CurriculumController extends Controller
 
     public function updateExtracurricular(Request $request, Extracurricular $extracurricular): RedirectResponse
     {
+        $activeSemesterId = session('active_semester_id') ?? \App\Models\Semester::where('is_active', true)->value('id');
+        $activeAcademicYearId = session('active_academic_year_id') ?? \App\Models\Semester::where('is_active', true)->value('academic_year_id');
+
         $request->validate([
-            'name' => 'required|string|max:255|unique:extracurriculars,name,' . $extracurricular->id,
+            'name' => [
+                'required', 'string', 'max:255',
+                Rule::unique('extracurriculars', 'name')->ignore($extracurricular->id)->where(function ($query) use ($activeAcademicYearId, $activeSemesterId) {
+                    return $query->where('academic_year_id', $activeAcademicYearId)
+                                 ->where('semester_id', $activeSemesterId);
+                }),
+            ],
             'description' => 'nullable|string',
             'teacher_id' => 'nullable|exists:teachers,id',
             'student_ids' => 'nullable|array',
