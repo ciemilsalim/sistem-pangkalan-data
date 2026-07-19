@@ -15,8 +15,10 @@ class PromotionController extends Controller
 {
     public function index(Request $request)
     {
-        $schoolClasses = SchoolClass::with('level')->orderBy('level_id')->orderBy('name')->get();
+        $schoolClasses = SchoolClass::with(['level', 'academicYear'])->orderBy('academic_year_id', 'desc')->orderBy('level_id')->orderBy('name')->get();
+        $activeAcademicYearId = session('active_academic_year_id') ?? Semester::where('is_active', true)->value('academic_year_id');
         return Inertia::render('Curriculum/Promotions/Index', [
+            'activeAcademicYearId' => $activeAcademicYearId,
             'schoolClasses' => $schoolClasses,
         ]);
     }

@@ -5,7 +5,7 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import axios from 'axios';
 
-export default function PromotionsIndex({ auth, schoolClasses }) {
+export default function PromotionsIndex({ auth, schoolClasses, activeAcademicYearId }) {
     const [originClassId, setOriginClassId] = useState('');
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -111,7 +111,7 @@ export default function PromotionsIndex({ auth, schoolClasses }) {
                                     <option value="">-- Pilih Kelas --</option>
                                     {schoolClasses.map(cls => (
                                         <option key={cls.id} value={cls.id}>
-                                            {cls.name} {cls.level ? `(Tingkat ${cls.level.name})` : ''}
+                                            {cls.name} {cls.level ? `(Tingkat ${cls.level.name})` : ''} {cls.academic_year ? `- ${cls.academic_year.name}` : ''}
                                         </option>
                                     ))}
                                 </select>
@@ -211,10 +211,10 @@ export default function PromotionsIndex({ auth, schoolClasses }) {
                                                             >
                                                                 <option value="">-- Pilih Kelas Tujuan --</option>
                                                                 {schoolClasses
-                                                                    .filter(cls => cls.id.toString() !== originClassId)
+                                                                    .filter(cls => cls.id.toString() !== originClassId && cls.academic_year_id === activeAcademicYearId)
                                                                     .map(cls => (
                                                                     <option key={cls.id} value={cls.id}>
-                                                                        {cls.name} {cls.level ? `(Tingkat ${cls.level.name})` : ''}
+                                                                        {cls.name} {cls.level ? `(Tingkat ${cls.level.name})` : ''} {cls.academic_year ? `- ${cls.academic_year.name}` : ''}
                                                                     </option>
                                                                 ))}
                                                             </select>
