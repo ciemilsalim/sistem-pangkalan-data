@@ -13,6 +13,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     const activeTab = filters.tab || 'students';
     const [search, setSearch] = useState(filters.search || '');
     const [studentStatus, setStudentStatus] = useState(filters.student_status || 'aktif');
+    const [schoolClassId, setSchoolClassId] = useState(filters.school_class_id || '');
     const pageProps = usePage().props;
 
     // Modal States
@@ -57,7 +58,8 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         router.get(route('people.index'), {
             tab: newTab,
             search: '', // clear search when switching tabs
-            student_status: studentStatus
+            student_status: studentStatus,
+            school_class_id: schoolClassId
         }, {
             preserveState: true,
             replace: true
@@ -70,7 +72,8 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         router.get(route('people.index'), {
             tab: activeTab,
             search: search,
-            student_status: studentStatus
+            student_status: studentStatus,
+            school_class_id: schoolClassId
         }, {
             preserveState: true,
             replace: true
@@ -81,9 +84,11 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     const handleReset = () => {
         setSearch('');
         setStudentStatus('aktif');
+        setSchoolClassId('');
         router.get(route('people.index'), {
             tab: activeTab,
-            student_status: 'aktif'
+            student_status: 'aktif',
+            school_class_id: ''
         }, {
             preserveState: true,
             replace: true
@@ -322,30 +327,48 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                 />
                             </div>
                             {activeTab === 'students' && (
-                                <div className="w-full sm:w-48">
-                                    <select
-                                        className="block w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                        value={studentStatus}
-                                        onChange={(e) => setStudentStatus(e.target.value)}
-                                    >
-                                        <option value="aktif">Status: Aktif</option>
-                                        <option value="tidak_aktif">Status: Lulus / Pindah</option>
-                                    </select>
-                                </div>
+                                <>
+                                    <div className="w-full sm:w-48">
+                                        <select
+                                            className="block w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                            value={schoolClassId}
+                                            onChange={(e) => setSchoolClassId(e.target.value)}
+                                        >
+                                            <option value="">Semua Kelas</option>
+                                            {schoolClasses.map((cls) => (
+                                                <option key={cls.id} value={cls.id}>{cls.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="w-full sm:w-48">
+                                        <select
+                                            className="block w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                            value={studentStatus}
+                                            onChange={(e) => setStudentStatus(e.target.value)}
+                                        >
+                                            <option value="aktif">Status: Aktif</option>
+                                            <option value="tidak_aktif">Status: Lulus / Pindah</option>
+                                        </select>
+                                    </div>
+                                </>
                             )}
                             <div className="flex gap-2 w-full sm:w-auto">
-                                <PrimaryButton type="submit" className="flex-1 sm:flex-none justify-center px-4 py-2 text-xs">
-                                    Cari
+                                <PrimaryButton type="submit" className="flex-1 sm:flex-none justify-center px-4 py-2 text-xs" title="Cari">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                    </svg>
                                 </PrimaryButton>
                                 {(filters.search || search) && (
-                                    <SecondaryButton onClick={handleReset} type="button" className="flex-1 sm:flex-none justify-center px-4 py-2 text-xs">
-                                        Reset
+                                    <SecondaryButton onClick={handleReset} type="button" className="flex-1 sm:flex-none justify-center px-4 py-2 text-xs" title="Reset Filter">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-gray-500">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                        </svg>
                                     </SecondaryButton>
                                 )}
                             </div>
                         </form>
 
-                        <div className="flex flex-col sm:flex-row flex-wrap gap-2 w-full xl:w-auto">
+                        <div className="flex flex-col sm:flex-row flex-wrap gap-2 w-full xl:w-auto mt-4 xl:mt-0">
                             {activeTab === 'students' && (
                                 <>
                                     <SecondaryButton
@@ -355,8 +378,11 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                             importForm.reset();
                                         }}
                                         className="w-full sm:w-auto justify-center text-xs px-3 py-1 bg-green-50 text-green-700 hover:bg-green-100 border border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800 dark:hover:bg-green-900/50"
+                                        title="Import Excel"
                                     >
-                                        Import Excel
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                        </svg>
                                     </SecondaryButton>
                                     {auth.user.permissions?.includes('print_student_qr') && (
                                         <button
@@ -366,8 +392,12 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                                 setQrFilter({ search: '', school_class_id: '' });
                                             }}
                                             className="inline-flex items-center justify-center px-4 py-2 bg-sky-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-sky-700 active:bg-sky-900 focus:outline-none focus:border-sky-900 focus:ring ring-sky-300 disabled:opacity-25 transition ease-in-out duration-150 w-full sm:w-auto"
+                                            title="Cetak QR"
                                         >
-                                            Cetak QR
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z" />
+                                            </svg>
                                         </button>
                                     )}
                                 </>
@@ -375,12 +405,15 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                             <PrimaryButton
                                 onClick={() => openCreateModal(activeTab.slice(0, -1))} // slice 's' (students -> student)
                                 className="w-full sm:w-auto justify-center text-xs"
-                            >
-                                + Tambah {
+                                title={`Tambah ${
                                     activeTab === 'students' ? 'Siswa' :
                                     activeTab === 'teachers' ? 'Guru' :
                                     'Wali Murid'
-                                }
+                                }`}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
                             </PrimaryButton>
                         </div>
                     </div>
@@ -746,17 +779,27 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                             </>
                         )}
 
-                        <div className="mt-6 flex justify-end border-t pt-4 border-gray-200 dark:border-gray-700">
-                            <SecondaryButton type="button" onClick={closeModal}>
-                                Batal
+                        <div className="mt-6 flex justify-end gap-3 border-t pt-4 border-gray-200 dark:border-gray-700">
+                            <SecondaryButton type="button" onClick={closeModal} title="Batal" className="px-4 py-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
                             </SecondaryButton>
-                            <PrimaryButton className="ml-3" disabled={
+                            <PrimaryButton className="px-4 py-2" title={modalType === 'import' ? 'Import Data' : 'Simpan Data'} disabled={
                                 modalType === 'import' ? importForm.processing :
                                 activeEntity === 'student' ? studentForm.processing :
                                 activeEntity === 'teacher' ? teacherForm.processing :
                                 parentForm.processing
                             }>
-                                {modalType === 'import' ? 'Import' : 'Simpan Data'}
+                                {modalType === 'import' ? (
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                    </svg>
+                                ) : (
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                    </svg>
+                                )}
                             </PrimaryButton>
                         </div>
                     </form>
@@ -773,11 +816,15 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                             Tindakan ini akan menghapus data profil akademik beserta **akun login terkait** dari sistem secara permanen.
                         </p>
                         <div className="flex justify-end gap-3 border-t border-gray-100 pt-4">
-                            <SecondaryButton type="button" onClick={closeModal}>
-                                Batal
+                            <SecondaryButton type="button" onClick={closeModal} title="Batal" className="px-4 py-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
                             </SecondaryButton>
-                            <DangerButton type="submit">
-                                Hapus Permanen
+                            <DangerButton type="submit" title="Hapus Permanen" className="px-4 py-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
                             </DangerButton>
                         </div>
                     </form>
@@ -817,16 +864,22 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                             </select>
                         </div>
                         <div className="flex justify-end gap-3 border-t border-gray-200 dark:border-gray-700 pt-4">
-                            <SecondaryButton type="button" onClick={closeModal}>
-                                Batal
+                            <SecondaryButton type="button" onClick={closeModal} title="Batal" className="px-4 py-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
                             </SecondaryButton>
                             <a
                                 href={`${route('people.students.qr')}?search=${encodeURIComponent(qrFilter.search)}&school_class_id=${qrFilter.school_class_id}`}
                                 target="_blank"
                                 onClick={closeModal}
                                 className="inline-flex items-center justify-center px-4 py-2 bg-sky-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-sky-700 active:bg-sky-900 focus:outline-none focus:border-sky-900 focus:ring ring-sky-300 disabled:opacity-25 transition ease-in-out duration-150"
+                                title="Cetak Sekarang"
                             >
-                                Cetak Sekarang
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z" />
+                                </svg>
                             </a>
                         </div>
                     </div>
@@ -891,8 +944,17 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('student', student)} className="text-indigo-600 hover:text-indigo-600 mr-4">Edit</button>
-                                            <button onClick={() => openDeleteModal('student', student)} className="text-red-600 hover:text-red-900">Hapus</button>
+                                            <button onClick={() => openEditModal('student', student)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
+                                                </svg>
+                                            </button>
+                                            <button onClick={() => openDeleteModal('student', student)} className="text-red-600 hover:text-red-900" title="Hapus">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -947,8 +1009,17 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">{teacher.phone_number || '-'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{teacher.user?.email || '-'}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('teacher', teacher)} className="text-indigo-600 hover:text-indigo-600 mr-4">Edit</button>
-                                            <button onClick={() => openDeleteModal('teacher', teacher)} className="text-red-600 hover:text-red-900">Hapus</button>
+                                            <button onClick={() => openEditModal('teacher', teacher)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
+                                                </svg>
+                                            </button>
+                                            <button onClick={() => openDeleteModal('teacher', teacher)} className="text-red-600 hover:text-red-900" title="Hapus">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -1001,8 +1072,17 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('parent', parent)} className="text-indigo-600 hover:text-indigo-600 mr-4">Edit</button>
-                                            <button onClick={() => openDeleteModal('parent', parent)} className="text-red-600 hover:text-red-900">Hapus</button>
+                                            <button onClick={() => openEditModal('parent', parent)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
+                                                </svg>
+                                            </button>
+                                            <button onClick={() => openDeleteModal('parent', parent)} className="text-red-600 hover:text-red-900" title="Hapus">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>
+                                            </button>
                                         </td>
                                     </tr>
                                 ))

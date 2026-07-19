@@ -46,12 +46,17 @@ class PeopleController extends Controller
         // Load data depending on active tab or load all paginated safely
         if ($tab === 'students') {
             $studentStatus = $request->input('student_status', 'aktif');
+            $schoolClassId = $request->input('school_class_id', '');
             $query = Student::with(['user', 'schoolClass', 'parents']);
             
             if ($studentStatus === 'aktif') {
                 $query->where('status', 'aktif');
             } else {
                 $query->whereIn('status', ['lulus', 'pindah', 'keluar']);
+            }
+
+            if (!empty($schoolClassId)) {
+                $query->where('school_class_id', $schoolClassId);
             }
 
             if (!empty($search)) {
@@ -107,7 +112,8 @@ class PeopleController extends Controller
             'filters' => [
                 'tab' => $tab,
                 'search' => $search,
-                'student_status' => $request->input('student_status', 'aktif')
+                'student_status' => $request->input('student_status', 'aktif'),
+                'school_class_id' => $request->input('school_class_id', '')
             ],
             'flash' => [
                 'message' => session('message'),
