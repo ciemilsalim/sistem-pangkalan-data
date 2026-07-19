@@ -26,8 +26,9 @@ class PeopleController extends Controller
         $tab = $request->input('tab', 'students');
         $search = $request->input('search', '');
 
-        // Fetch School Classes for student dropdown selection
-        $schoolClasses = SchoolClass::orderBy('name')->get();
+        // Fetch School Classes for student dropdown selection (only active academic year)
+        $activeAcademicYearId = session('active_academic_year_id') ?? \App\Models\Semester::where('is_active', true)->value('academic_year_id');
+        $schoolClasses = SchoolClass::where('academic_year_id', $activeAcademicYearId)->orderBy('name')->get();
 
         // Fetch all parents for student creation dropdown (id and name only)
         $parentsList = ParentModel::select('id', 'name')->orderBy('name')->get();
