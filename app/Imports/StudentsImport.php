@@ -24,9 +24,15 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
         $className = isset($row['kelas']) ? $row['kelas'] : null;
         $schoolClassId = null;
 
-        // Jika kelas disediakan, cari ID kelas berdasarkan namanya
+        $activeSemesterId = session('active_semester_id') ?? \App\Models\Semester::where('is_active', true)->value('id');
+        $activeAcademicYearId = session('active_academic_year_id') ?? \App\Models\Semester::where('is_active', true)->value('academic_year_id');
+
+        // Jika kelas disediakan, cari ID kelas berdasarkan namanya dan tahun ajaran aktif
         if ($className) {
-            $schoolClass = SchoolClass::where('name', $className)->first();
+            $schoolClass = SchoolClass::where('name', $className)
+                                      ->where('academic_year_id', $activeAcademicYearId)
+                                      ->where('semester_id', $activeSemesterId)
+                                      ->first();
             if ($schoolClass) {
                 $schoolClassId = $schoolClass->id;
             }
