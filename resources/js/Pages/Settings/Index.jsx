@@ -357,8 +357,10 @@ export default function Index({ auth, settings }) {
 
                         {/* SUBMIT PANEL */}
                         <div className="flex items-center justify-end bg-gray-50 dark:bg-gray-900/50 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                            <PrimaryButton type="submit" disabled={processing} className="px-6 py-2.5">
-                                Simpan Semua Pengaturan
+                            <PrimaryButton type="submit" disabled={processing} className="px-6 py-2.5" title="Simpan Semua Pengaturan">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />`r`n                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 21v-8H7v8" />`r`n                                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 3v5h8" />
+                                </svg>
                             </PrimaryButton>
                         </div>
                     </form>

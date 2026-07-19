@@ -24,16 +24,24 @@ class CurriculumController extends Controller
      */
     public function index(): Response
     {
+        $activeAcademicYearId = session('active_academic_year_id') ?? AcademicYear::where('is_active', true)->value('id');
+        $activeSemesterId = session('active_semester_id') ?? Semester::where('is_active', true)->value('id');
+
         $academicYears = AcademicYear::with('semesters')->orderBy('name', 'desc')->get();
         $semesters = Semester::with('academicYear')->orderBy('name')->get();
         $levels = Level::orderBy('name')->get();
-        $schoolClasses = SchoolClass::with(['level', 'homeroomTeacher'])->orderBy('name')->get();
+        
+        $schoolClasses = SchoolClass::with(['level', 'homeroomTeacher'])
+            ->when($activeAcademicYearId, function ($query, $activeAcademicYearId) {
+                return $query->where('academic_year_id', $activeAcademicYearId);
+            })
+            ->orderBy('name')
+            ->get();
+            
         $subjects = Subject::orderBy('name')->get();
         
         // Fetch teachers list for class homeroom selection (id and name only)
         $teachers = Teacher::select('id', 'name', 'nip')->orderBy('name')->get();
-
-        $activeSemesterId = session('active_semester_id') ?? \App\Models\Semester::where('is_active', true)->value('id');
 
         // Fetch schedules eager loading related assignment data, filtered by active semester
         $schedules = Schedule::with([
@@ -48,8 +56,13 @@ class CurriculumController extends Controller
           ->orderBy('start_time')
           ->get();
 
-        // Fetch extracurriculars with coach and students
-        $extracurriculars = Extracurricular::with(['coach', 'students'])->orderBy('name')->get();
+        // Fetch extracurriculars with coach and students, filtered by active academic year
+        $extracurriculars = Extracurricular::with(['coach', 'students'])
+            ->when($activeAcademicYearId, function ($query, $activeAcademicYearId) {
+                return $query->where('academic_year_id', $activeAcademicYearId);
+            })
+            ->orderBy('name')
+            ->get();
 
         // Fetch students list for extracurricular member selection (id, name, and nis)
         $studentsList = Student::select('id', 'name', 'nis')->orderBy('name')->get();

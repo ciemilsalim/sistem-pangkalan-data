@@ -6,6 +6,7 @@ import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
 import TextInput from '@/Components/TextInput';
 
 export default function RolesIndex({ auth, roles, permissions }) {
@@ -133,8 +134,10 @@ export default function RolesIndex({ auth, roles, permissions }) {
                             
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-lg font-medium">Daftar Peran (Roles)</h3>
-                                <PrimaryButton onClick={openCreateModal}>
-                                    + Tambah Peran
+                                <PrimaryButton onClick={openCreateModal} title="Tambah Peran">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
                                 </PrimaryButton>
                             </div>
 
@@ -177,15 +180,22 @@ export default function RolesIndex({ auth, roles, permissions }) {
                                                     <button
                                                         onClick={() => openEditModal(role)}
                                                         className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mr-3"
+                                                        title="Edit"
                                                     >
-                                                        Edit
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
+                                                        </svg>
                                                     </button>
                                                     {role.name !== 'admin' && (
                                                         <button
                                                             onClick={() => confirmRoleDeletion(role)}
                                                             className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                                            title="Hapus"
                                                         >
-                                                            Hapus
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                            </svg>
                                                         </button>
                                                     )}
                                                 </td>
@@ -220,9 +230,15 @@ export default function RolesIndex({ auth, roles, permissions }) {
                     </div>
 
                     <div className="mt-6 flex justify-end">
-                        <SecondaryButton type="button" onClick={closeModal}>Batal</SecondaryButton>
-                        <PrimaryButton type="submit" className="ms-3" disabled={createForm.processing}>
-                            Simpan
+                        <SecondaryButton type="button" onClick={closeModal} title="Batal">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </SecondaryButton>
+                        <PrimaryButton type="submit" className="ms-3" disabled={createForm.processing} title="Simpan">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />`r`n                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 21v-8H7v8" />`r`n                                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 3v5h8" />
+                            </svg>
                         </PrimaryButton>
                     </div>
                 </form>
@@ -270,9 +286,15 @@ export default function RolesIndex({ auth, roles, permissions }) {
                     </div>
 
                     <div className="mt-6 flex justify-end">
-                        <SecondaryButton type="button" onClick={closeModal}>Batal</SecondaryButton>
-                        <PrimaryButton type="submit" className="ms-3" disabled={editForm.processing}>
-                            Simpan Perubahan
+                        <SecondaryButton type="button" onClick={closeModal} title="Batal">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </SecondaryButton>
+                        <PrimaryButton type="submit" className="ms-3" disabled={editForm.processing} title="Simpan Perubahan">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />`r`n                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 21v-8H7v8" />`r`n                                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 3v5h8" />
+                            </svg>
                         </PrimaryButton>
                     </div>
                 </form>
@@ -288,10 +310,16 @@ export default function RolesIndex({ auth, roles, permissions }) {
                         Pengguna yang memiliki peran ini mungkin kehilangan akses ke beberapa fitur.
                     </p>
                     <div className="mt-6 flex justify-end">
-                        <SecondaryButton type="button" onClick={closeModal}>Batal</SecondaryButton>
-                        <PrimaryButton type="submit" className="ms-3 bg-red-600 hover:bg-red-500" disabled={false}>
-                            Hapus Peran
-                        </PrimaryButton>
+                        <SecondaryButton type="button" onClick={closeModal} title="Batal">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </SecondaryButton>
+                        <DangerButton type="submit" className="ms-3" disabled={false} title="Hapus Peran">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                            </svg>
+                        </DangerButton>
                     </div>
                 </form>
             </Modal>
