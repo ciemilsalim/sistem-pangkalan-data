@@ -34,6 +34,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         email: '',
         password: '',
         parent_ids: [],
+        status: 'aktif',
     });
 
     const teacherForm = useForm({
@@ -196,6 +197,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                 email: record.user?.email || '',
                 password: '', // optional on update
                 parent_ids: linkedParentIds,
+                status: record.status || 'aktif',
             });
             studentForm.clearErrors();
         } else if (entityType === 'teacher') {
@@ -398,7 +400,8 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                             onChange={(e) => setStudentStatus(e.target.value)}
                                         >
                                             <option value="aktif">Status: Aktif</option>
-                                            <option value="tidak_aktif">Status: Lulus / Pindah</option>
+                                            <option value="lulus_pindah">Status: Lulus / Pindah</option>
+                                            <option value="berhenti">Status: Berhenti / Keluar / Tidak Aktif</option>
                                         </select>
                                     </div>
                                 </>

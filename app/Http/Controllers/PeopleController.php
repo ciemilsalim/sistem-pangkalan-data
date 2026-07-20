@@ -53,8 +53,13 @@ class PeopleController extends Controller
             
             if ($studentStatus === 'aktif') {
                 $query->where('status', 'aktif');
+            } elseif ($studentStatus === 'lulus_pindah') {
+                $query->whereIn('status', ['lulus', 'pindah']);
+            } elseif ($studentStatus === 'berhenti') {
+                $query->where('status', 'keluar');
             } else {
-                $query->whereIn('status', ['lulus', 'pindah', 'keluar']);
+                // If somehow it's something else, fall back to aktif
+                $query->where('status', 'aktif');
             }
 
             if (!empty($schoolClassId)) {
@@ -204,6 +209,7 @@ class PeopleController extends Controller
             'nis' => 'required|string|max:50|unique:students,nis,' . $student->id,
             'school_class_id' => 'required|exists:school_classes,id',
             'email' => 'required|string|email|max:255|unique:users,email,' . $student->user_id,
+            'status' => 'required|in:aktif,lulus,pindah,keluar',
             'parent_ids' => 'nullable|array',
             'parent_ids.*' => 'exists:parents,id',
         ]);
@@ -220,6 +226,7 @@ class PeopleController extends Controller
                 'name' => $request->name,
                 'nis' => $request->nis,
                 'school_class_id' => $request->school_class_id,
+                'status' => $request->status,
             ]);
 
             // Update User login details
@@ -227,6 +234,10 @@ class PeopleController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
             ];
+
+            if ($request->status !== 'aktif') {
+                $userData['is_active'] = false;
+            }
             if ($request->filled('password')) {
                 $userData['password'] = Hash::make($request->password);
             }
