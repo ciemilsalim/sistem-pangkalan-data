@@ -656,6 +656,23 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                     </div>
                                     <InputError message={studentForm.errors.parent_ids} className="mt-2" />
                                 </div>
+                                {modalType === 'edit' && (
+                                    <div className="mb-4">
+                                        <InputLabel htmlFor="status" value="Status Siswa" />
+                                        <select
+                                            id="status"
+                                            value={studentForm.data.status}
+                                            onChange={(e) => studentForm.setData('status', e.target.value)}
+                                            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
+                                        >
+                                            <option value="aktif">Aktif</option>
+                                            <option value="lulus">Lulus</option>
+                                            <option value="pindah">Pindah Sekolah</option>
+                                            <option value="keluar">Berhenti / Keluar</option>
+                                        </select>
+                                        <InputError message={studentForm.errors.status} className="mt-2" />
+                                    </div>
+                                )}
                             </>
                         )}
 
