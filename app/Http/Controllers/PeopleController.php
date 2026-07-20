@@ -25,6 +25,7 @@ class PeopleController extends Controller
     {
         $tab = $request->input('tab', 'students');
         $search = $request->input('search', '');
+        $perPage = $request->input('per_page', 10);
 
         // Fetch School Classes for student dropdown selection (only active academic year)
         $activeAcademicYearId = session('active_academic_year_id') ?? \App\Models\Semester::where('is_active', true)->value('academic_year_id');
@@ -69,7 +70,7 @@ class PeopleController extends Controller
                       });
                 });
             }
-            $students = $query->orderBy('name')->paginate(10)->withQueryString();
+            $students = $query->orderBy('name')->paginate($perPage)->withQueryString();
         } else {
             $students = Student::with(['user', 'schoolClass'])->where('status', 'aktif')->orderBy('name')->limit(10)->get();
         }
@@ -83,7 +84,7 @@ class PeopleController extends Controller
                           $q->where('email', 'like', "%{$search}%");
                       });
             }
-            $teachers = $query->orderBy('name')->paginate(10)->withQueryString();
+            $teachers = $query->orderBy('name')->paginate($perPage)->withQueryString();
         } else {
             $teachers = Teacher::with(['user', 'subjects'])->orderBy('name')->limit(10)->get();
         }
@@ -97,7 +98,7 @@ class PeopleController extends Controller
                           $q->where('email', 'like', "%{$search}%");
                       });
             }
-            $parents = $query->orderBy('name')->paginate(10)->withQueryString();
+            $parents = $query->orderBy('name')->paginate($perPage)->withQueryString();
         } else {
             $parents = ParentModel::with(['user'])->orderBy('name')->limit(10)->get();
         }
@@ -113,6 +114,7 @@ class PeopleController extends Controller
             'filters' => [
                 'tab' => $tab,
                 'search' => $search,
+                'per_page' => $perPage,
                 'student_status' => $request->input('student_status', 'aktif'),
                 'school_class_id' => $request->input('school_class_id', '')
             ],
@@ -486,5 +488,55 @@ class PeopleController extends Controller
         $students = $query->orderBy('name')->get();
 
         return view('admin.students.qr', compact('students'));
+    }
+
+    /**
+     * Remove multiple resources from storage.
+     */
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'type' => 'required|in:students,teachers,parents',
+        ]);
+
+        $ids = $request->input('ids');
+        $type = $request->input('type');
+        $userIds = [];
+
+        DB::transaction(function () use ($ids, $type, &$userIds) {
+            if ($type === 'students') {
+                $students = Student::whereIn('id', $ids)->get();
+                foreach ($students as $student) {
+                    if ($student->user_id) $userIds[] = $student->user_id;
+                    $student->parents()->detach(); // Pivot table cleanup
+                    $student->delete();
+                }
+            } elseif ($type === 'teachers') {
+                $teachers = Teacher::whereIn('id', $ids)->get();
+                foreach ($teachers as $teacher) {
+                    if ($teacher->user_id) $userIds[] = $teacher->user_id;
+                    $teacher->subjects()->detach(); // Pivot table cleanup
+                    $teacher->delete();
+                }
+            } elseif ($type === 'parents') {
+                $parents = ParentModel::whereIn('id', $ids)->get();
+                foreach ($parents as $parent) {
+                    if ($parent->user_id) $userIds[] = $parent->user_id;
+                    $parent->students()->detach(); // Pivot table cleanup
+                    $parent->delete();
+                }
+            }
+
+            // Prevent deleting oneself just in case
+            $userIds = array_diff($userIds, [auth()->id()]);
+
+            if (count($userIds) > 0) {
+                User::whereIn('id', $userIds)->delete();
+            }
+        });
+
+        $typeLabel = $type === 'students' ? 'Siswa' : ($type === 'teachers' ? 'Guru' : 'Wali Murid');
+        return redirect()->route('people.index', ['tab' => $type])->with('message', count($ids) . ' ' . $typeLabel . ' berhasil dihapus.');
     }
 }

@@ -14,9 +14,13 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     const [search, setSearch] = useState(filters.search || '');
     const [studentStatus, setStudentStatus] = useState(filters.student_status || 'aktif');
     const [schoolClassId, setSchoolClassId] = useState(filters.school_class_id || '');
+    const [perPage, setPerPage] = useState(filters.per_page || '10');
+    const [selectedItems, setSelectedItems] = useState([]);
     const pageProps = usePage().props;
 
     // Modal States
+    const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+    const [deleteConfirmationText, setDeleteConfirmationText] = useState('');
     const [modalType, setModalType] = useState(null); // 'create' or 'edit' or 'delete'
     const [activeEntity, setActiveEntity] = useState(null); // 'student' or 'teacher' or 'parent'
     const [selectedRecord, setSelectedRecord] = useState(null);
@@ -55,9 +59,11 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
 
     // Handle Tab Switch (reloads page via Inertia with new tab param)
     const handleTabSwitch = (newTab) => {
+        setSelectedItems([]); // Clear selection when switching tabs
         router.get(route('people.index'), {
             tab: newTab,
             search: '', // clear search when switching tabs
+            per_page: perPage,
             student_status: studentStatus,
             school_class_id: schoolClassId
         }, {
@@ -68,10 +74,11 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
 
     // Handle Search Submit
     const handleSearchSubmit = (e) => {
-        e.preventDefault();
+        if(e) e.preventDefault();
         router.get(route('people.index'), {
             tab: activeTab,
             search: search,
+            per_page: perPage,
             student_status: studentStatus,
             school_class_id: schoolClassId
         }, {
@@ -85,6 +92,8 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         setSearch('');
         setStudentStatus('aktif');
         setSchoolClassId('');
+        setPerPage('10');
+        setSelectedItems([]);
         router.get(route('people.index'), {
             tab: activeTab,
             student_status: 'aktif',
@@ -92,6 +101,48 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         }, {
             preserveState: true,
             replace: true
+        });
+    };
+
+    const handlePerPageChange = (e) => {
+        const newPerPage = e.target.value;
+        setPerPage(newPerPage);
+        router.get(route('people.index'), {
+            tab: activeTab,
+            search: search,
+            per_page: newPerPage,
+            student_status: studentStatus,
+            school_class_id: schoolClassId
+        }, { preserveState: true, replace: true });
+    };
+
+    const handleSelectAll = (e, items) => {
+        if (e.target.checked) {
+            setSelectedItems(items.map(i => i.id));
+        } else {
+            setSelectedItems([]);
+        }
+    };
+
+    const handleSelectItem = (e, id) => {
+        if (e.target.checked) {
+            setSelectedItems([...selectedItems, id]);
+        } else {
+            setSelectedItems(selectedItems.filter(itemId => itemId !== id));
+        }
+    };
+
+    const handleBulkDeleteSubmit = (e) => {
+        e.preventDefault();
+        if (deleteConfirmationText !== 'DELETE') return;
+        
+        router.delete(route('people.bulkDestroy'), {
+            data: { ids: selectedItems, type: activeTab },
+            onSuccess: () => {
+                setIsBulkDeleteOpen(false);
+                setSelectedItems([]);
+                setDeleteConfirmationText('');
+            }
         });
     };
 
@@ -1105,14 +1156,20 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                     <Link
                         href={paginator.prev_page_url || '#'}
                         className={`relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 ${!paginator.prev_page_url && 'pointer-events-none opacity-50'}`}
+                        title="Sebelumnya"
                     >
-                        Sebelumnya
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                        </svg>
                     </Link>
                     <Link
                         href={paginator.next_page_url || '#'}
                         className={`relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900/50 ${!paginator.next_page_url && 'pointer-events-none opacity-50'}`}
+                        title="Berikutnya"
                     >
-                        Berikutnya
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                        </svg>
                     </Link>
                 </div>
                 <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
@@ -1127,7 +1184,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                 <Link
                                     key={index}
                                     href={link.url || '#'}
-                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                    dangerouslySetInnerHTML={{ __html: link.label.includes('Previous') ? '&laquo;' : (link.label.includes('Next') ? '&raquo;' : link.label) }}
                                     className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold border ${
                                         link.active
                                             ? 'z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 border-indigo-500'

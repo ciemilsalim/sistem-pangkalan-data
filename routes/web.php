@@ -87,6 +87,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/academic-promotions/process', [App\Http\Controllers\PromotionController::class, 'process'])->name('promotions.process');
 
     // People (Siswa, Guru, Wali) Routes
+    Route::delete('/people/bulk', [PeopleController::class, 'bulkDestroy'])->name('people.bulkDestroy');
     Route::get('/people', [PeopleController::class, 'index'])->name('people.index');
     Route::get('/people/students/qr', [PeopleController::class, 'qr'])->name('people.students.qr')->middleware('can:print_student_qr');
     Route::get('/people/students/template', [PeopleController::class, 'downloadTemplate'])->name('people.students.template');
