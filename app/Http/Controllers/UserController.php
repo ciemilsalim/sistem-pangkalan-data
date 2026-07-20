@@ -17,6 +17,16 @@ class UserController extends Controller
      */
     public function index(Request $request): Response
     {
+        // Auto-sync peran dari kolom 'role' ke Spatie (mengatasi data lama/import)
+        $usersToFix = User::whereNotNull('role')->get();
+        foreach ($usersToFix as $u) {
+            if ($u->role && !$u->hasRole($u->role)) {
+                try {
+                    $u->assignRole($u->role);
+                } catch (\Exception $e) {}
+            }
+        }
+
         $query = User::with('roles');
 
         // Search by name or email
@@ -30,7 +40,9 @@ class UserController extends Controller
 
         // Filter by role
         if ($request->filled('role')) {
-            $query->where('role', $request->input('role'));
+            $query->whereHas('roles', function ($q) use ($request) {
+                $q->where('name', $request->input('role'));
+            });
         }
 
         $users = $query->orderBy('name')
