@@ -45,13 +45,15 @@ class UserController extends Controller
             });
         }
 
+        $perPage = $request->input('per_page', 10);
+
         $users = $query->orderBy('name')
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString();
 
         return Inertia::render('Users/Index', [
             'users' => $users,
-            'filters' => $request->only(['search', 'role']),
+            'filters' => $request->only(['search', 'role', 'per_page']),
             'availableRoles' => \Spatie\Permission\Models\Role::all(),
         ]);
     }
@@ -125,5 +127,29 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('users.index')->with('message', 'Pengguna berhasil dihapus.');
+    }
+
+    /**
+     * Remove multiple resources from storage.
+     */
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:users,id',
+        ]);
+
+        $ids = $request->input('ids');
+
+        // Prevent deleting oneself
+        if (in_array(auth()->id(), $ids)) {
+            return redirect()->route('users.index')->withErrors([
+                'error' => 'Anda tidak dapat menghapus akun Anda sendiri dalam penghapusan massal.',
+            ]);
+        }
+
+        User::whereIn('id', $ids)->delete();
+
+        return redirect()->route('users.index')->with('message', count($ids) . ' pengguna berhasil dihapus.');
     }
 }

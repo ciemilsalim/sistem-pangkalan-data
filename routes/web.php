@@ -36,6 +36,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/roles/{role}', [RolePermissionController::class, 'updateRole'])->name('roles.update');
     Route::delete('/roles/{role}', [RolePermissionController::class, 'destroyRole'])->name('roles.destroy');
 
+    Route::delete('users/bulk', [UserController::class, 'bulkDestroy'])->name('users.bulkDestroy');
     Route::resource('users', UserController::class);
 
     // Academic Period Switch
