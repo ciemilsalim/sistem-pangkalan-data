@@ -40,7 +40,8 @@ class AuthenticatedSessionController extends Controller
             'kepala_lab', 
             'kepala_perpustakaan', 
             'kepala_tata_usaha', 
-            'operator'
+            'operator',
+            'teacher'
         ];
 
         if (!Auth::user()->hasAnyRole($allowedRoles)) {
