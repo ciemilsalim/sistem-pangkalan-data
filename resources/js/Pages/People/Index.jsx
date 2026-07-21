@@ -274,10 +274,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                     onSuccess: () => closeModal()
                 });
             } else {
-                studentForm.transform((data) => ({
-                    ...data,
-                    _method: 'put',
-                })).post(route('people.students.update', selectedRecord.id), {
+                studentForm.post(route('people.students.update', selectedRecord.id), {
                     onSuccess: () => closeModal()
                 });
             }

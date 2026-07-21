@@ -99,7 +99,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/people/students/import', [PeopleController::class, 'importStudent'])->name('people.students.import');
 
     Route::post('/people/students', [PeopleController::class, 'storeStudent'])->name('people.students.store');
-    Route::put('/people/students/{student}', [PeopleController::class, 'updateStudent'])->name('people.students.update');
+    Route::post('/people/students/{student}', [PeopleController::class, 'updateStudent'])->name('people.students.update');
     Route::delete('/people/students/{student}', [PeopleController::class, 'destroyStudent'])->name('people.students.destroy');
 
     Route::post('/people/teachers', [PeopleController::class, 'storeTeacher'])->name('people.teachers.store');
