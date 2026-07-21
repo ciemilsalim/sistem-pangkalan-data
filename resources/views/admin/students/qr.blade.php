@@ -60,53 +60,40 @@
 
         <div id="card-grid" class="flex flex-wrap gap-6 justify-start">
             @forelse ($students as $student)
-                <div class="student-card-container break-inside-avoid relative rounded-2xl bg-white border border-gray-200/90 flex flex-col justify-between overflow-hidden shadow-lg hover:shadow-xl transition duration-300" style="width: 53.98mm; height: 85.6mm;">
+                <div class="student-card-container break-inside-avoid relative rounded-xl bg-white border-[3px] border-[#8b5cf6] flex flex-col justify-between overflow-hidden shadow-lg hover:shadow-xl transition duration-300" style="width: 53.98mm; height: 85.6mm; box-sizing: border-box;">
                     
+                    <!-- Inner white border effect -->
+                    <div class="absolute inset-0 border-[2px] border-white rounded-[9px] z-20 pointer-events-none"></div>
                     <!-- Decorative Background & Wave Header -->
                     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-white">
-                        <!-- Concentric lines pattern matching mockup -->
-                        <svg class="absolute top-[30%] -left-12 w-32 h-32 text-blue-900/10" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5">
-                            <circle cx="50" cy="50" r="45" />
-                            <circle cx="50" cy="50" r="35" />
-                            <circle cx="50" cy="50" r="25" />
-                            <circle cx="50" cy="50" r="15" />
-                        </svg>
-                        <svg class="absolute top-[30%] -right-12 w-32 h-32 text-blue-900/10" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5">
-                            <circle cx="50" cy="50" r="45" />
-                            <circle cx="50" cy="50" r="35" />
-                            <circle cx="50" cy="50" r="25" />
-                            <circle cx="50" cy="50" r="15" />
-                        </svg>
-
-                        <!-- Top dark blue wave decoration -->
-                        <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="absolute top-0 left-0 w-full h-[22%] text-[#0b3370] fill-current">
-                            <path d="M0,0 L100,0 L100,60 Q80,100 50,65 T0,85 Z"></path>
-                        </svg>
-                        <!-- Wave accent overlay -->
-                        <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="absolute top-[1.5%] left-0 w-full h-[22%] text-blue-400/20 fill-none stroke-current stroke-[2px]">
-                            <path d="M0,0 L100,0 L100,60 Q80,100 50,65 T0,85 Z"></path>
-                        </svg>
-                    </div>
-
-                    <!-- Header Text and School Logo -->
-                    <div class="relative pt-3.5 px-3.5 text-center z-10 shrink-0">
-                        @if($schoolLogo)
-                            <img src="{{ $schoolLogo }}" class="absolute top-[8px] left-[12px] w-8 h-8 object-contain drop-shadow z-20" alt="Logo Sekolah">
-                        @endif
-                        
-                        <!-- KARTU SISWA Text -->
-                        <div class="absolute top-[28px] left-1/2 -translate-x-1/2 z-10 shrink-0 whitespace-nowrap">
-                            <h2 class="text-[12px] font-black tracking-[0.15em] uppercase text-white drop-shadow-md">KARTU SISWA</h2>
+                        <!-- Top dark blue layered ribbon -->
+                        <div class="absolute top-0 left-0 w-full h-[28%] z-0 drop-shadow-md">
+                            <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="w-full h-full">
+                                <!-- Base dark blue shape -->
+                                <path d="M0,0 L100,0 L100,100 C80,100 70,35 45,35 L0,35 Z" fill="#0b3370" />
+                                <!-- White strokes for layered effect -->
+                                <path d="M0,27 L45,27 C70,27 80,88 100,88" fill="none" stroke="white" stroke-width="2.5" />
+                                <path d="M0,16 L45,16 C70,16 80,72 100,72" fill="none" stroke="white" stroke-width="2.5" />
+                            </svg>
                         </div>
                     </div>
 
-                    <!-- School Name Text -->
-                    <div class="absolute top-[56px] left-0 right-0 text-center z-10">
-                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-[#0b3370] drop-shadow-sm">{{ $schoolName }}</span>
+                    <!-- Header Text and School Logo -->
+                    <div class="absolute top-[32px] left-0 w-full flex items-center px-3.5 z-10">
+                        @if($schoolLogo)
+                            <div class="w-11 h-11 shrink-0">
+                                <img src="{{ $schoolLogo }}" class="w-full h-full object-contain drop-shadow-sm" alt="Logo Sekolah">
+                            </div>
+                        @endif
+                        
+                        <div class="flex-1 flex flex-col items-center pr-2">
+                            <h2 class="text-[14px] font-black tracking-wide uppercase text-[#0b3370]">KARTU SISWA</h2>
+                            <span class="text-[9.5px] font-extrabold uppercase tracking-widest text-[#0b3370] mt-0.5">{{ $schoolName }}</span>
+                        </div>
                     </div>
 
                     <!-- Student Photo -->
-                    <div class="absolute top-[76px] left-1/2 -translate-x-1/2 z-10 shrink-0">
+                    <div class="absolute top-[82px] left-1/2 -translate-x-1/2 z-10 shrink-0">
                         <div class="w-[72px] h-[88px] rounded-xl overflow-hidden border-4 border-white shadow-[0_4px_8px_rgba(0,0,0,0.12)] bg-slate-50 flex items-center justify-center">
                             @php
                                 $photoPath = null;
@@ -136,7 +123,7 @@
                     </div>
 
                     <!-- Student Information Box -->
-                    <div class="absolute top-[174px] left-1/2 -translate-x-1/2 w-[90%] z-10 flex flex-col justify-center">
+                    <div class="absolute top-[178px] left-1/2 -translate-x-1/2 w-[90%] z-10 flex flex-col justify-center">
                         <div class="bg-[#0b3370] text-white p-2.5 rounded-xl border border-blue-900 flex flex-col gap-1.5 shadow-md text-[9.5px] leading-tight select-none text-center">
                             <div class="font-black truncate uppercase tracking-wide text-white text-[11px]" title="{{ $student->name }}">{{ $student->name }}</div>
                             <div class="font-black font-mono text-white">{{ $student->nis }}</div>
