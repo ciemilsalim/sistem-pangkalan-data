@@ -16,8 +16,8 @@ class DocumentController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $isWakasek = $user->hasRole('Wakasek Kurikulum') || $user->hasRole('Admin');
-        $isGuru = $user->hasRole('Guru');
+        $isWakasek = $user->hasRole('wakasek_kurikulum') || $user->hasRole('admin');
+        $isGuru = $user->hasRole('teacher');
 
         $activeAcademicYearId = session('active_academic_year_id') ?? Semester::where('is_active', true)->value('academic_year_id');
 
