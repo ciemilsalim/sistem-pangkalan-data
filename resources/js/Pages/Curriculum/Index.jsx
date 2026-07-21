@@ -10,7 +10,18 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
 
 export default function Index({ auth, academicYears, semesters, levels, schoolClasses, subjects, teachers, schedules, extracurriculars, studentsList }) {
-    const [activeTab, setActiveTab] = useState('academicYears');
+    const hasRole = (role) => auth.user.roles?.includes(role);
+    const hasPermission = (permission) => auth.user.permissions?.includes(permission);
+    const isAdmin = hasRole('admin');
+    const canManageCurriculum = isAdmin || hasPermission('manage_curriculum');
+    const canManageCp = isAdmin || hasPermission('manage_cp');
+
+    const [activeTab, setActiveTab] = useState(() => {
+        if (!canManageCurriculum && canManageCp) {
+            return 'subjects';
+        }
+        return 'academicYears';
+    });
     const pageProps = usePage().props;
 
     // Entity Modals States
@@ -836,11 +847,13 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             <div>
                 <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Tahun Akademik</h3>
-                    <PrimaryButton onClick={() => openCreateModal('academicYear')} className="text-xs" title="Tambah Tahun Akademik">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
-                    </PrimaryButton>
+                    {canManageCurriculum && (
+                        <PrimaryButton onClick={() => openCreateModal('academicYear')} className="text-xs" title="Tambah Tahun Akademik">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                        </PrimaryButton>
+                    )}
                 </div>
                 <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -848,7 +861,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                             <tr>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tahun Akademik</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
-                                <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
+                                {canManageCurriculum && <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>}
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
@@ -867,19 +880,21 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                                 <span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700">Tidak Aktif</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('academicYear', ay)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
-                                                </svg>
-                                            </button>
-                                            <button onClick={() => openDeleteModal('academicYear', ay)} className="text-red-600 hover:text-red-900" title="Hapus">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                </svg>
-                                            </button>
-                                        </td>
+                                        {canManageCurriculum && (
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button onClick={() => openEditModal('academicYear', ay)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
+                                                    </svg>
+                                                </button>
+                                                <button onClick={() => openDeleteModal('academicYear', ay)} className="text-red-600 hover:text-red-900" title="Hapus">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             )}
@@ -896,7 +911,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             <div>
                 <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Semester</h3>
-                    {academicYears.length === 0 ? (
+                    {canManageCurriculum && (academicYears.length === 0 ? (
                         <p className="text-xs text-red-500 font-semibold">Tambahkan Tahun Akademik terlebih dahulu sebelum membuat Semester.</p>
                     ) : (
                         <PrimaryButton onClick={() => openCreateModal('semester')} className="text-xs" title="Tambah Semester">
@@ -904,7 +919,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
                         </PrimaryButton>
-                    )}
+                    ))}
                 </div>
                 <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -913,7 +928,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Semester</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tahun Akademik</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
-                                <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
+                                {canManageCurriculum && <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>}
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
@@ -933,19 +948,21 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                                 <span className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700">Tidak Aktif</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('semester', sem)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
-                                                </svg>
-                                            </button>
-                                            <button onClick={() => openDeleteModal('semester', sem)} className="text-red-600 hover:text-red-900" title="Hapus">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                </svg>
-                                            </button>
-                                        </td>
+                                        {canManageCurriculum && (
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button onClick={() => openEditModal('semester', sem)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
+                                                    </svg>
+                                                </button>
+                                                <button onClick={() => openDeleteModal('semester', sem)} className="text-red-600 hover:text-red-900" title="Hapus">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             )}
@@ -962,18 +979,20 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             <div>
                 <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Tingkat Kelas</h3>
-                    <PrimaryButton onClick={() => openCreateModal('level')} className="text-xs" title="Tambah Tingkat Kelas">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                        </svg>
-                    </PrimaryButton>
+                    {canManageCurriculum && (
+                        <PrimaryButton onClick={() => openCreateModal('level')} className="text-xs" title="Tambah Tingkat Kelas">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                        </PrimaryButton>
+                    )}
                 </div>
                 <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tingkat</th>
-                                <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
+                                {canManageCurriculum && <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>}
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
@@ -985,19 +1004,21 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 levels.map((lvl) => (
                                     <tr key={lvl.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">{lvl.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('level', lvl)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
-                                                </svg>
-                                            </button>
-                                            <button onClick={() => openDeleteModal('level', lvl)} className="text-red-600 hover:text-red-900" title="Hapus">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                </svg>
-                                            </button>
-                                        </td>
+                                        {canManageCurriculum && (
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button onClick={() => openEditModal('level', lvl)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
+                                                    </svg>
+                                                </button>
+                                                <button onClick={() => openDeleteModal('level', lvl)} className="text-red-600 hover:text-red-900" title="Hapus">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             )}
@@ -1014,7 +1035,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             <div>
                 <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Kelas</h3>
-                    {levels.length === 0 ? (
+                    {canManageCurriculum && (levels.length === 0 ? (
                         <p className="text-xs text-red-500 font-semibold">Tambahkan Tingkat Kelas terlebih dahulu sebelum membuat Kelas.</p>
                     ) : (
                         <PrimaryButton onClick={() => openCreateModal('schoolClass')} className="text-xs" title="Tambah Kelas">
@@ -1022,7 +1043,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
                         </PrimaryButton>
-                    )}
+                    ))}
                 </div>
                 <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -1031,7 +1052,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nama Kelas</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tingkat</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Wali Kelas</th>
-                                <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
+                                {canManageCurriculum && <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>}
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
@@ -1051,19 +1072,21 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                                 <span className="text-gray-400 font-normal italic">Belum ditentukan</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('schoolClass', cls)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
-                                                </svg>
-                                            </button>
-                                            <button onClick={() => openDeleteModal('schoolClass', cls)} className="text-red-600 hover:text-red-900" title="Hapus">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                </svg>
-                                            </button>
-                                        </td>
+                                        {canManageCurriculum && (
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button onClick={() => openEditModal('schoolClass', cls)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
+                                                    </svg>
+                                                </button>
+                                                <button onClick={() => openDeleteModal('schoolClass', cls)} className="text-red-600 hover:text-red-900" title="Hapus">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             )}
@@ -1081,16 +1104,18 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                 <div className="mb-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Mata Pelajaran</h3>
                     <div className="flex gap-2 w-full md:w-auto">
-                        {auth.user.permissions?.includes('manage_cp') && (
+                        {canManageCp && (
                             <Link href={route('curriculum.capaian-pembelajaran.index')} className="inline-flex items-center px-4 py-2 bg-indigo-50 border border-indigo-200 rounded-md font-semibold text-xs text-indigo-700 uppercase tracking-widest shadow-sm hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 w-full md:w-auto justify-center">
                                 Kelola Capaian Pembelajaran (CP)
                             </Link>
                         )}
-                        <PrimaryButton onClick={() => openCreateModal('subject')} className="text-xs w-full md:w-auto justify-center" title="Tambah Mata Pelajaran">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
-                        </PrimaryButton>
+                        {canManageCurriculum && (
+                            <PrimaryButton onClick={() => openCreateModal('subject')} className="text-xs w-full md:w-auto justify-center" title="Tambah Mata Pelajaran">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                            </PrimaryButton>
+                        )}
                     </div>
                 </div>
                 <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
@@ -1100,7 +1125,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Kode</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nama Mata Pelajaran</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Deskripsi</th>
-                                <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
+                                {canManageCurriculum && <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>}
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
@@ -1114,19 +1139,21 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-600">{sub.code}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">{sub.name}</td>
                                         <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{sub.description || '-'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('subject', sub)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
-                                                </svg>
-                                            </button>
-                                            <button onClick={() => openDeleteModal('subject', sub)} className="text-red-600 hover:text-red-900" title="Hapus">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                </svg>
-                                            </button>
-                                        </td>
+                                        {canManageCurriculum && (
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button onClick={() => openEditModal('subject', sub)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
+                                                    </svg>
+                                                </button>
+                                                <button onClick={() => openDeleteModal('subject', sub)} className="text-red-600 hover:text-red-900" title="Hapus">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             )}
@@ -1156,7 +1183,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             <div>
                 <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Jadwal Pelajaran</h3>
-                    {schoolClasses.length === 0 || subjects.length === 0 || teachers.length === 0 ? (
+                    {canManageCurriculum && (schoolClasses.length === 0 || subjects.length === 0 || teachers.length === 0 ? (
                         <p className="text-xs text-red-500 font-semibold bg-red-50 p-2 border border-red-200 rounded">
                             Pastikan data Kelas, Mata Pelajaran, dan Guru sudah tersedia sebelum membuat jadwal.
                         </p>
@@ -1166,7 +1193,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
                         </PrimaryButton>
-                    )}
+                    ))}
                 </div>
                 <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -1177,7 +1204,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Kelas</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Mata Pelajaran</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Guru Pengampu</th>
-                                <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
+                                {canManageCurriculum && <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>}
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
@@ -1200,19 +1227,21 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 font-semibold">
                                                 {sch.teaching_assignment?.teacher?.name || '-'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <button onClick={() => openEditModal('schedule', sch)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
-                                                    </svg>
-                                                </button>
-                                                <button onClick={() => openDeleteModal('schedule', sch)} className="text-red-600 hover:text-red-900" title="Hapus">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                    </svg>
-                                                </button>
-                                            </td>
+                                            {canManageCurriculum && (
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                    <button onClick={() => openEditModal('schedule', sch)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
+                                                        </svg>
+                                                    </button>
+                                                    <button onClick={() => openDeleteModal('schedule', sch)} className="text-red-600 hover:text-red-900" title="Hapus">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                        </svg>
+                                                    </button>
+                                                </td>
+                                            )}
                                         </tr>
                                     );
                                 })
@@ -1230,11 +1259,13 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             <div>
                 <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Kegiatan Ekstrakurikuler</h3>
+                    {canManageCurriculum && (
                         <PrimaryButton onClick={() => openCreateModal('extracurricular')} className="text-xs" title="Tambah Ekstrakurikuler">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
                         </PrimaryButton>
+                    )}
                 </div>
                 <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -1244,7 +1275,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Guru Pembina</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Jumlah Anggota</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Deskripsi</th>
-                                <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
+                                {canManageCurriculum && <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>}
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
@@ -1267,19 +1298,21 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                             {extra.students ? extra.students.length : 0} Siswa
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{extra.description || '-'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <button onClick={() => openEditModal('extracurricular', extra)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
-                                                </svg>
-                                            </button>
-                                            <button onClick={() => openDeleteModal('extracurricular', extra)} className="text-red-600 hover:text-red-900" title="Hapus">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                </svg>
-                                            </button>
-                                        </td>
+                                        {canManageCurriculum && (
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button onClick={() => openEditModal('extracurricular', extra)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
+                                                    </svg>
+                                                </button>
+                                                <button onClick={() => openDeleteModal('extracurricular', extra)} className="text-red-600 hover:text-red-900" title="Hapus">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             )}

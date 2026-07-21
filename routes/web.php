@@ -45,25 +45,28 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Curriculum Routes
     Route::get('/curriculum', [CurriculumController::class, 'index'])->name('curriculum.index');
 
-    Route::post('/curriculum/academic-years', [CurriculumController::class, 'storeAcademicYear'])->name('curriculum.academic-years.store');
-    Route::put('/curriculum/academic-years/{academicYear}', [CurriculumController::class, 'updateAcademicYear'])->name('curriculum.academic-years.update');
-    Route::delete('/curriculum/academic-years/{academicYear}', [CurriculumController::class, 'destroyAcademicYear'])->name('curriculum.academic-years.destroy');
+    // Curriculum Management Routes (restricted)
+    Route::middleware('can:manage_curriculum')->group(function () {
+        Route::post('/curriculum/academic-years', [CurriculumController::class, 'storeAcademicYear'])->name('curriculum.academic-years.store');
+        Route::put('/curriculum/academic-years/{academicYear}', [CurriculumController::class, 'updateAcademicYear'])->name('curriculum.academic-years.update');
+        Route::delete('/curriculum/academic-years/{academicYear}', [CurriculumController::class, 'destroyAcademicYear'])->name('curriculum.academic-years.destroy');
 
-    Route::post('/curriculum/semesters', [CurriculumController::class, 'storeSemester'])->name('curriculum.semesters.store');
-    Route::put('/curriculum/semesters/{semester}', [CurriculumController::class, 'updateSemester'])->name('curriculum.semesters.update');
-    Route::delete('/curriculum/semesters/{semester}', [CurriculumController::class, 'destroySemester'])->name('curriculum.semesters.destroy');
+        Route::post('/curriculum/semesters', [CurriculumController::class, 'storeSemester'])->name('curriculum.semesters.store');
+        Route::put('/curriculum/semesters/{semester}', [CurriculumController::class, 'updateSemester'])->name('curriculum.semesters.update');
+        Route::delete('/curriculum/semesters/{semester}', [CurriculumController::class, 'destroySemester'])->name('curriculum.semesters.destroy');
 
-    Route::post('/curriculum/levels', [CurriculumController::class, 'storeLevel'])->name('curriculum.levels.store');
-    Route::put('/curriculum/levels/{level}', [CurriculumController::class, 'updateLevel'])->name('curriculum.levels.update');
-    Route::delete('/curriculum/levels/{level}', [CurriculumController::class, 'destroyLevel'])->name('curriculum.levels.destroy');
+        Route::post('/curriculum/levels', [CurriculumController::class, 'storeLevel'])->name('curriculum.levels.store');
+        Route::put('/curriculum/levels/{level}', [CurriculumController::class, 'updateLevel'])->name('curriculum.levels.update');
+        Route::delete('/curriculum/levels/{level}', [CurriculumController::class, 'destroyLevel'])->name('curriculum.levels.destroy');
 
-    Route::post('/curriculum/classes', [CurriculumController::class, 'storeSchoolClass'])->name('curriculum.classes.store');
-    Route::put('/curriculum/classes/{schoolClass}', [CurriculumController::class, 'updateSchoolClass'])->name('curriculum.classes.update');
-    Route::delete('/curriculum/classes/{schoolClass}', [CurriculumController::class, 'destroySchoolClass'])->name('curriculum.classes.destroy');
+        Route::post('/curriculum/classes', [CurriculumController::class, 'storeSchoolClass'])->name('curriculum.classes.store');
+        Route::put('/curriculum/classes/{schoolClass}', [CurriculumController::class, 'updateSchoolClass'])->name('curriculum.classes.update');
+        Route::delete('/curriculum/classes/{schoolClass}', [CurriculumController::class, 'destroySchoolClass'])->name('curriculum.classes.destroy');
 
-    Route::post('/curriculum/subjects', [CurriculumController::class, 'storeSubject'])->name('curriculum.subjects.store');
-    Route::put('/curriculum/subjects/{subject}', [CurriculumController::class, 'updateSubject'])->name('curriculum.subjects.update');
-    Route::delete('/curriculum/subjects/{subject}', [CurriculumController::class, 'destroySubject'])->name('curriculum.subjects.destroy');
+        Route::post('/curriculum/subjects', [CurriculumController::class, 'storeSubject'])->name('curriculum.subjects.store');
+        Route::put('/curriculum/subjects/{subject}', [CurriculumController::class, 'updateSubject'])->name('curriculum.subjects.update');
+        Route::delete('/curriculum/subjects/{subject}', [CurriculumController::class, 'destroySubject'])->name('curriculum.subjects.destroy');
+    });
 
     // Capaian Pembelajaran
     Route::middleware('can:manage_cp')->group(function () {
@@ -73,13 +76,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::delete('/curriculum/capaian-pembelajaran/{capaianPembelajaran}', [App\Http\Controllers\LmsCapaianPembelajaranController::class, 'destroy'])->name('curriculum.capaian-pembelajaran.destroy');
     });
 
-    Route::post('/curriculum/schedules', [CurriculumController::class, 'storeSchedule'])->name('curriculum.schedules.store');
-    Route::put('/curriculum/schedules/{schedule}', [CurriculumController::class, 'updateSchedule'])->name('curriculum.schedules.update');
-    Route::delete('/curriculum/schedules/{schedule}', [CurriculumController::class, 'destroySchedule'])->name('curriculum.schedules.destroy');
+    Route::middleware('can:manage_curriculum')->group(function () {
+        Route::post('/curriculum/schedules', [CurriculumController::class, 'storeSchedule'])->name('curriculum.schedules.store');
+        Route::put('/curriculum/schedules/{schedule}', [CurriculumController::class, 'updateSchedule'])->name('curriculum.schedules.update');
+        Route::delete('/curriculum/schedules/{schedule}', [CurriculumController::class, 'destroySchedule'])->name('curriculum.schedules.destroy');
 
-    Route::post('/curriculum/extracurriculars', [CurriculumController::class, 'storeExtracurricular'])->name('curriculum.extracurriculars.store');
-    Route::put('/curriculum/extracurriculars/{extracurricular}', [CurriculumController::class, 'updateExtracurricular'])->name('curriculum.extracurriculars.update');
-    Route::delete('/curriculum/extracurriculars/{extracurricular}', [CurriculumController::class, 'destroyExtracurricular'])->name('curriculum.extracurriculars.destroy');
+        Route::post('/curriculum/extracurriculars', [CurriculumController::class, 'storeExtracurricular'])->name('curriculum.extracurriculars.store');
+        Route::put('/curriculum/extracurriculars/{extracurricular}', [CurriculumController::class, 'updateExtracurricular'])->name('curriculum.extracurriculars.update');
+        Route::delete('/curriculum/extracurriculars/{extracurricular}', [CurriculumController::class, 'destroyExtracurricular'])->name('curriculum.extracurriculars.destroy');
+    });
 
     // Promotions
     Route::get('/academic-promotions', [App\Http\Controllers\PromotionController::class, 'index'])->name('promotions.index');
