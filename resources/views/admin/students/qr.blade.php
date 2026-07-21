@@ -129,21 +129,25 @@
                     <!-- Student Information Box -->
                     <div class="absolute top-[178px] left-1/2 -translate-x-1/2 w-[90%] z-10 flex flex-col justify-center">
                         <div class="bg-[#0b3370] text-white p-2.5 rounded-xl border border-blue-900 flex flex-col gap-1.5 shadow-md text-[9.5px] leading-tight select-none text-center">
-                            <div class="font-black truncate uppercase tracking-wide text-white text-[11px]" title="{{ $student->name }}">{{ $student->name }}</div>
+                            <div class="student-name font-black uppercase tracking-wide text-white text-[11px] whitespace-nowrap text-center overflow-hidden" title="{{ $student->name }}">{{ $student->name }}</div>
                             <div class="font-black font-mono text-white">{{ $student->nis }}</div>
-                            @if($student->learning_email)
-                            <div class="font-black font-mono truncate text-blue-100">{{ $student->learning_email }}</div>
-                            @endif
                         </div>
                     </div>
 
                     <!-- Footer (Google Logo & QR Code) -->
                     <div class="absolute bottom-[10px] left-[14px] right-[14px] flex items-end justify-between z-10">
-                        <!-- Google Logo: Loaded dynamically from upload only, no fallbacks -->
-                        <div class="flex items-center">
-                            @if($googleLogo)
-                                <img src="{{ $googleLogo }}" class="h-9 max-w-[100px] object-contain object-left" alt="Google for Education">
+                        <!-- Left Side: Email & Google Logo -->
+                        <div class="flex flex-col items-start justify-end min-w-0">
+                            @if($student->learning_email)
+                                <div class="student-email font-black font-mono text-[8px] whitespace-nowrap text-left overflow-hidden w-full max-w-[100px] mb-0.5 leading-none" style="color: rgba(0, 0, 0, 0.9);">
+                                    {{ $student->learning_email }}
+                                </div>
                             @endif
+                            <div class="flex items-center">
+                                @if($googleLogo)
+                                    <img src="{{ $googleLogo }}" class="h-9 max-w-[100px] object-contain object-left" alt="Google for Education">
+                                @endif
+                            </div>
                         </div>
 
                         <!-- QR Code -->
@@ -158,5 +162,39 @@
             @endforelse
         </div>
     </div>
+
+    <script>
+        function adjustFontSizes() {
+            // Adjust Student Names
+            document.querySelectorAll('.student-name').forEach(el => {
+                let fontSize = 11; // initial font size in px
+                el.style.fontSize = fontSize + 'px';
+                // Reduce font size if text overflows its container
+                while (el.scrollWidth > el.clientWidth && fontSize > 6) {
+                    fontSize -= 0.5;
+                    el.style.fontSize = fontSize + 'px';
+                }
+            });
+
+            // Adjust Student Emails
+            document.querySelectorAll('.student-email').forEach(el => {
+                let fontSize = 8; // max font size in px
+                el.style.fontSize = fontSize + 'px';
+                // Reduce font size if text overflows its container (max width 100px)
+                while (el.scrollWidth > el.clientWidth && fontSize > 4) {
+                    fontSize -= 0.5;
+                    el.style.fontSize = fontSize + 'px';
+                }
+            });
+        }
+
+        // Run on load and immediately
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', adjustFontSizes);
+        } else {
+            adjustFontSizes();
+        }
+        window.addEventListener('load', adjustFontSizes);
+    </script>
 </body>
 </html>
