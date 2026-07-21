@@ -132,6 +132,16 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/monitoring/chats/{conversation}', [ChatMonitoringController::class, 'show'])->name('monitoring.chats.show');
     Route::delete('/monitoring/chats/messages/{message}', [ChatMonitoringController::class, 'destroyMessage'])->name('monitoring.chats.destroy_message');
     Route::delete('/monitoring/chats/{conversation}', [ChatMonitoringController::class, 'destroyConversation'])->name('monitoring.chats.destroy_conversation');
+
+    // Arsip / Berkas
+    Route::get('/documents', [\App\Http\Controllers\DocumentController::class, 'index'])->name('documents.index');
+    Route::post('/documents', [\App\Http\Controllers\DocumentController::class, 'store'])->name('documents.store');
+    Route::get('/documents/{document}', [\App\Http\Controllers\DocumentController::class, 'show'])->name('documents.show');
+    Route::put('/documents/{document}', [\App\Http\Controllers\DocumentController::class, 'update'])->name('documents.update');
+    Route::delete('/documents/{document}', [\App\Http\Controllers\DocumentController::class, 'destroy'])->name('documents.destroy');
+    Route::post('/documents/{document}/submit', [\App\Http\Controllers\DocumentController::class, 'submit'])->name('documents.submit');
+    Route::post('/document-submissions/{submission}/review', [\App\Http\Controllers\DocumentController::class, 'review'])->name('documents.review');
+    Route::get('/document-submissions/{submission}/download', [\App\Http\Controllers\DocumentController::class, 'download'])->name('documents.download');
 });
 
 require __DIR__ . '/auth.php';
@@ -207,16 +217,6 @@ Route::get('/fix-admin', function () {
     }
 
     return "Semua Role & Permissions selesai dibuat!";
-
-    // Arsip / Berkas
-    Route::get('/documents', [\App\Http\Controllers\DocumentController::class, 'index'])->name('documents.index');
-    Route::post('/documents', [\App\Http\Controllers\DocumentController::class, 'store'])->name('documents.store');
-    Route::get('/documents/{document}', [\App\Http\Controllers\DocumentController::class, 'show'])->name('documents.show');
-    Route::put('/documents/{document}', [\App\Http\Controllers\DocumentController::class, 'update'])->name('documents.update');
-    Route::delete('/documents/{document}', [\App\Http\Controllers\DocumentController::class, 'destroy'])->name('documents.destroy');
-    Route::post('/documents/{document}/submit', [\App\Http\Controllers\DocumentController::class, 'submit'])->name('documents.submit');
-    Route::post('/document-submissions/{submission}/review', [\App\Http\Controllers\DocumentController::class, 'review'])->name('documents.review');
-    Route::get('/document-submissions/{submission}/download', [\App\Http\Controllers\DocumentController::class, 'download'])->name('documents.download');
 });
 
 
