@@ -94,9 +94,9 @@
                             <img src="{{ $schoolLogo }}" class="absolute top-[8px] left-[12px] w-8 h-8 object-contain drop-shadow z-20" alt="Logo Sekolah">
                         @endif
                         
-                        <!-- KARTU SISWA Box: White background, purple border, dark blue text for maximum contrast & visibility -->
-                        <div class="absolute top-[28px] left-1/2 -translate-x-1/2 border-2 border-[#8b5cf6] bg-white px-4 py-0.5 rounded shadow-sm z-10 shrink-0">
-                            <h2 class="text-[10px] font-extrabold tracking-widest uppercase text-[#0b3370]">KARTU SISWA</h2>
+                        <!-- KARTU SISWA Text -->
+                        <div class="absolute top-[28px] left-1/2 -translate-x-1/2 z-10 shrink-0 whitespace-nowrap">
+                            <h2 class="text-[12px] font-black tracking-[0.15em] uppercase text-white drop-shadow-md">KARTU SISWA</h2>
                         </div>
                     </div>
 
@@ -137,27 +137,12 @@
 
                     <!-- Student Information Box -->
                     <div class="absolute top-[174px] left-1/2 -translate-x-1/2 w-[90%] z-10 flex flex-col justify-center">
-                        <div class="bg-[#0b3370] text-white p-2.5 rounded-xl border border-blue-900 flex flex-col gap-1.5 shadow-md text-[8.5px] leading-tight select-none">
-                            <div class="flex">
-                                <span class="w-[84px] text-blue-200/90 font-bold tracking-wider uppercase">Nama</span>
-                                <span class="mr-2 text-blue-400 font-bold">:</span>
-                                <span class="font-black truncate flex-1 uppercase tracking-wide text-white" title="{{ $student->name }}">{{ $student->name }}</span>
-                            </div>
-                            <div class="flex">
-                                <span class="w-[84px] text-blue-200/90 font-bold tracking-wider uppercase">NISN</span>
-                                <span class="mr-2 text-blue-400 font-bold">:</span>
-                                <span class="font-black font-mono flex-1 text-white">{{ $student->nis }}</span>
-                            </div>
-                            <div class="flex">
-                                <span class="w-[84px] text-blue-200/90 font-bold tracking-wider uppercase">Kelas</span>
-                                <span class="mr-2 text-blue-400 font-bold">:</span>
-                                <span class="font-black flex-1 uppercase text-white">{{ $student->schoolClass->name ?? '-' }}</span>
-                            </div>
-                            <div class="flex">
-                                <span class="w-[84px] text-blue-200/90 font-bold tracking-wider uppercase">Akun Email Belajar</span>
-                                <span class="mr-2 text-blue-400 font-bold">:</span>
-                                <span class="font-black font-mono flex-1 truncate text-blue-100">{{ $student->learning_email ?? '' }}</span>
-                            </div>
+                        <div class="bg-[#0b3370] text-white p-2.5 rounded-xl border border-blue-900 flex flex-col gap-1.5 shadow-md text-[9.5px] leading-tight select-none text-center">
+                            <div class="font-black truncate uppercase tracking-wide text-white text-[11px]" title="{{ $student->name }}">{{ $student->name }}</div>
+                            <div class="font-black font-mono text-white">{{ $student->nis }}</div>
+                            @if($student->learning_email)
+                            <div class="font-black font-mono truncate text-blue-100">{{ $student->learning_email }}</div>
+                            @endif
                         </div>
                     </div>
 
