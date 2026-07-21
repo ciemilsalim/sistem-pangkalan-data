@@ -66,16 +66,20 @@
                     <div class="absolute inset-0 border-[2px] border-white rounded-[9px] z-20 pointer-events-none"></div>
                     <!-- Decorative Background & Wave Header -->
                     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-white">
-                        <!-- Top dark blue layered ribbon -->
-                        <div class="absolute top-0 left-0 w-full h-[28%] z-0 drop-shadow-md">
-                            <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="w-full h-full">
-                                <!-- Base dark blue shape -->
-                                <path d="M0,0 L100,0 L100,100 C80,100 70,35 45,35 L0,35 Z" fill="#0b3370" />
-                                <!-- White strokes for layered effect -->
-                                <path d="M0,27 L45,27 C70,27 80,88 100,88" fill="none" stroke="white" stroke-width="2.5" />
-                                <path d="M0,16 L45,16 C70,16 80,72 100,72" fill="none" stroke="white" stroke-width="2.5" />
-                            </svg>
-                        </div>
+                        @if(isset($cardBackground) && $cardBackground)
+                            <img src="{{ $cardBackground }}" class="absolute inset-0 w-full h-full object-cover z-0" alt="Card Background">
+                        @else
+                            <!-- Top dark blue layered ribbon (Default) -->
+                            <div class="absolute top-0 left-0 w-full h-[28%] z-0 drop-shadow-md">
+                                <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="w-full h-full">
+                                    <!-- Base dark blue shape -->
+                                    <path d="M0,0 L100,0 L100,100 C80,100 70,35 45,35 L0,35 Z" fill="#0b3370" />
+                                    <!-- White strokes for layered effect -->
+                                    <path d="M0,27 L45,27 C70,27 80,88 100,88" fill="none" stroke="white" stroke-width="2.5" />
+                                    <path d="M0,16 L45,16 C70,16 80,72 100,72" fill="none" stroke="white" stroke-width="2.5" />
+                                </svg>
+                            </div>
+                        @endif
                     </div>
 
                     <!-- Header Text and School Logo -->

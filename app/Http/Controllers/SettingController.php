@@ -35,6 +35,7 @@ class SettingController extends Controller
             'dark_mode' => 'off',
             'school_logo' => '',
             'google_education_logo' => '',
+            'student_card_background' => '',
         ];
 
         $settings = array_merge($defaultKeys, $settings);
@@ -46,6 +47,10 @@ class SettingController extends Controller
 
         $settings['google_education_logo_url'] = $settings['google_education_logo'] 
             ? asset('storage/' . $settings['google_education_logo']) 
+            : null;
+
+        $settings['student_card_background_url'] = $settings['student_card_background']
+            ? asset('storage/' . $settings['student_card_background'])
             : null;
 
         return Inertia::render('Settings/Index', [
@@ -77,6 +82,7 @@ class SettingController extends Controller
             'dark_mode' => 'required|string|in:on,off',
             'school_logo' => 'nullable|image|max:2048',
             'google_education_logo' => 'nullable|image|max:2048',
+            'student_card_background' => 'nullable|image|max:4096',
         ]);
 
         $settingsData = $request->only([
@@ -132,6 +138,20 @@ class SettingController extends Controller
             Setting::updateOrCreate(
                 ['key' => 'school_logo'],
                 ['value' => $logoPath]
+            );
+        }
+
+        // Handle student card background upload
+        if ($request->hasFile('student_card_background')) {
+            $oldBg = Setting::where('key', 'student_card_background')->value('value');
+            if ($oldBg) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldBg);
+            }
+            
+            $bgPath = $request->file('student_card_background')->store('backgrounds', 'public');
+            Setting::updateOrCreate(
+                ['key' => 'student_card_background'],
+                ['value' => $bgPath]
             );
         }
 

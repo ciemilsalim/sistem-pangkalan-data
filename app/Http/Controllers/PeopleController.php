@@ -513,8 +513,12 @@ class PeopleController extends Controller
         $googleLogo = isset($settings['google_education_logo']) 
             ? asset('storage/' . $settings['google_education_logo']) 
             : null;
+            
+        $cardBackground = isset($settings['student_card_background'])
+            ? asset('storage/' . $settings['student_card_background'])
+            : null;
 
-        return view('admin.students.qr', compact('students', 'schoolName', 'schoolLogo', 'googleLogo'));
+        return view('admin.students.qr', compact('students', 'schoolName', 'schoolLogo', 'googleLogo', 'cardBackground'));
     }
 
     /**

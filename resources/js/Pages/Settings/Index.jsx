@@ -26,11 +26,13 @@ export default function Index({ auth, settings }) {
         dark_mode: settings.dark_mode || 'off',
         school_logo: null,
         google_education_logo: null,
+        student_card_background: null,
         _method: 'PUT',
     });
 
     const [logoPreview, setLogoPreview] = useState(null);
     const [googleLogoPreview, setGoogleLogoPreview] = useState(null);
+    const [cardBgPreview, setCardBgPreview] = useState(null);
 
     useEffect(() => {
         if (!data.google_education_logo) {
@@ -56,6 +58,18 @@ export default function Index({ auth, settings }) {
         // free memory when ever this component is unmounted or logo is changed
         return () => URL.revokeObjectURL(objectUrl);
     }, [data.school_logo]);
+
+    useEffect(() => {
+        if (!data.student_card_background) {
+            setCardBgPreview(null);
+            return;
+        }
+
+        const objectUrl = URL.createObjectURL(data.student_card_background);
+        setCardBgPreview(objectUrl);
+
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [data.student_card_background]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -261,6 +275,60 @@ export default function Index({ auth, settings }) {
                                         </div>
                                         <InputError message={errors.google_education_logo} className="mt-2" />
                                     </div>
+                                    
+                                    {/* Background Kartu Siswa */}
+                                    <div>
+                                        <InputLabel htmlFor="student_card_background" value="Background Kartu Siswa" className="mb-2" />
+                                        <div className="flex flex-col gap-4">
+                                            {/* Preview */}
+                                            <div className="relative h-40 w-full md:w-64 flex-shrink-0 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center justify-center transition-colors">
+                                                {cardBgPreview ? (
+                                                    <img
+                                                        src={cardBgPreview}
+                                                        alt="Preview Background Kartu"
+                                                        className="h-full w-full object-cover"
+                                                    />
+                                                ) : settings.student_card_background_url ? (
+                                                    <img
+                                                        src={settings.student_card_background_url}
+                                                        alt="Background Kartu Siswa"
+                                                        className="h-full w-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <svg className="h-10 w-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                )}
+                                            </div>
+
+                                            {/* Upload Controls */}
+                                            <div className="flex flex-col gap-1.5 items-start">
+                                                <input
+                                                    id="student_card_background"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={(e) => {
+                                                        if (e.target.files?.[0]) {
+                                                            setData('student_card_background', e.target.files[0]);
+                                                        }
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => document.getElementById('student_card_background').click()}
+                                                    className="inline-flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 cursor-pointer"
+                                                >
+                                                    Pilih File Background
+                                                </button>
+                                                <p className="text-xs text-gray-400 dark:text-gray-500">
+                                                    Disarankan: Lebar 638px x Tinggi 1011px (Format: PNG/JPG)
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <InputError message={errors.student_card_background} className="mt-2" />
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
