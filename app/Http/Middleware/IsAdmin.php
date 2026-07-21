@@ -23,7 +23,8 @@ class IsAdmin
             'kepala_lab', 
             'kepala_perpustakaan', 
             'kepala_tata_usaha', 
-            'operator'
+            'operator',
+            'teacher'
         ];
 
         if (!Auth::check() || !Auth::user()->hasAnyRole($allowedRoles)) {
