@@ -486,7 +486,7 @@ class PeopleController extends Controller
      */
     public function qr(Request $request)
     {
-        $query = Student::with('schoolClass');
+        $query = Student::with(['schoolClass', 'user']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -502,7 +502,19 @@ class PeopleController extends Controller
 
         $students = $query->orderBy('name')->get();
 
-        return view('admin.students.qr', compact('students'));
+        // Get school settings for custom card header
+        $settings = \App\Models\Setting::pluck('value', 'key')->all();
+        $schoolName = $settings['school_name'] ?? 'SMP NEGERI 1 BIAU';
+        
+        $schoolLogo = isset($settings['school_logo']) 
+            ? asset('storage/' . $settings['school_logo']) 
+            : null;
+            
+        $googleLogo = isset($settings['google_education_logo']) 
+            ? asset('storage/' . $settings['google_education_logo']) 
+            : null;
+
+        return view('admin.students.qr', compact('students', 'schoolName', 'schoolLogo', 'googleLogo'));
     }
 
     /**

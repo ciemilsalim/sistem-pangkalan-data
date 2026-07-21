@@ -25,10 +25,24 @@ export default function Index({ auth, settings }) {
         send_absent_notification: settings.send_absent_notification || 'off',
         dark_mode: settings.dark_mode || 'off',
         school_logo: null,
+        google_education_logo: null,
         _method: 'PUT',
     });
 
     const [logoPreview, setLogoPreview] = useState(null);
+    const [googleLogoPreview, setGoogleLogoPreview] = useState(null);
+
+    useEffect(() => {
+        if (!data.google_education_logo) {
+            setGoogleLogoPreview(null);
+            return;
+        }
+
+        const objectUrl = URL.createObjectURL(data.google_education_logo);
+        setGoogleLogoPreview(objectUrl);
+
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [data.google_education_logo]);
 
     useEffect(() => {
         if (!data.school_logo) {
@@ -141,56 +155,112 @@ export default function Index({ auth, settings }) {
                                     </div>
                                 </div>
 
-                                <div className="border-t border-gray-100 dark:border-gray-700/50 pt-4 mt-4">
-                                    <InputLabel htmlFor="school_logo" value="Logo Sekolah" className="mb-2" />
-                                    <div className="flex items-center gap-6">
-                                        {/* Logo Preview */}
-                                        <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center justify-center transition-colors">
-                                            {logoPreview ? (
-                                                <img
-                                                    src={logoPreview}
-                                                    alt="Preview Logo"
-                                                    className="h-full w-full object-contain p-1.5"
-                                                />
-                                            ) : settings.school_logo_url ? (
-                                                <img
-                                                    src={settings.school_logo_url}
-                                                    alt="Logo Sekolah"
-                                                    className="h-full w-full object-contain p-1.5"
-                                                />
-                                            ) : (
-                                                <svg className="h-10 w-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                                </svg>
-                                            )}
-                                        </div>
+                                <div className="border-t border-gray-100 dark:border-gray-700/50 pt-4 mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Logo Sekolah */}
+                                    <div>
+                                        <InputLabel htmlFor="school_logo" value="Logo Sekolah" className="mb-2" />
+                                        <div className="flex items-center gap-6">
+                                            {/* Logo Preview */}
+                                            <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center justify-center transition-colors">
+                                                {logoPreview ? (
+                                                    <img
+                                                        src={logoPreview}
+                                                        alt="Preview Logo"
+                                                        className="h-full w-full object-contain p-1.5"
+                                                    />
+                                                ) : settings.school_logo_url ? (
+                                                    <img
+                                                        src={settings.school_logo_url}
+                                                        alt="Logo Sekolah"
+                                                        className="h-full w-full object-contain p-1.5"
+                                                    />
+                                                ) : (
+                                                    <svg className="h-10 w-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                                    </svg>
+                                                )}
+                                            </div>
 
-                                        {/* Upload Controls */}
-                                        <div className="flex flex-col gap-1.5">
-                                            <input
-                                                id="school_logo"
-                                                type="file"
-                                                accept="image/*"
-                                                className="hidden"
-                                                onChange={(e) => {
-                                                    if (e.target.files?.[0]) {
-                                                        setData('school_logo', e.target.files[0]);
-                                                    }
-                                                }}
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => document.getElementById('school_logo').click()}
-                                                className="inline-flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 cursor-pointer"
-                                            >
-                                                Pilih File Logo
-                                            </button>
-                                            <p className="text-xs text-gray-400 dark:text-gray-500">
-                                                Dukungan format: PNG, JPG, JPEG (Maks. 2MB)
-                                            </p>
+                                            {/* Upload Controls */}
+                                            <div className="flex flex-col gap-1.5">
+                                                <input
+                                                    id="school_logo"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={(e) => {
+                                                        if (e.target.files?.[0]) {
+                                                            setData('school_logo', e.target.files[0]);
+                                                        }
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => document.getElementById('school_logo').click()}
+                                                    className="inline-flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 cursor-pointer"
+                                                >
+                                                    Pilih File Logo
+                                                </button>
+                                                <p className="text-xs text-gray-400 dark:text-gray-500">
+                                                    Format: PNG, JPG, JPEG (Maks. 2MB)
+                                                </p>
+                                            </div>
                                         </div>
+                                        <InputError message={errors.school_logo} className="mt-2" />
                                     </div>
-                                    <InputError message={errors.school_logo} className="mt-2" />
+
+                                    {/* Logo Google for Education */}
+                                    <div>
+                                        <InputLabel htmlFor="google_education_logo" value="Logo Google for Education" className="mb-2" />
+                                        <div className="flex items-center gap-6">
+                                            {/* Logo Preview */}
+                                            <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center justify-center transition-colors">
+                                                {googleLogoPreview ? (
+                                                    <img
+                                                        src={googleLogoPreview}
+                                                        alt="Preview Google Logo"
+                                                        className="h-full w-full object-contain p-1.5"
+                                                    />
+                                                ) : settings.google_education_logo_url ? (
+                                                    <img
+                                                        src={settings.google_education_logo_url}
+                                                        alt="Logo Google for Education"
+                                                        className="h-full w-full object-contain p-1.5"
+                                                    />
+                                                ) : (
+                                                    <svg className="h-10 w-10 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                                    </svg>
+                                                )}
+                                            </div>
+
+                                            {/* Upload Controls */}
+                                            <div className="flex flex-col gap-1.5">
+                                                <input
+                                                    id="google_education_logo"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="hidden"
+                                                    onChange={(e) => {
+                                                        if (e.target.files?.[0]) {
+                                                            setData('google_education_logo', e.target.files[0]);
+                                                        }
+                                                    }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => document.getElementById('google_education_logo').click()}
+                                                    className="inline-flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 cursor-pointer"
+                                                >
+                                                    Pilih File Logo Google
+                                                </button>
+                                                <p className="text-xs text-gray-400 dark:text-gray-500">
+                                                    Format: PNG, JPG, JPEG (Maks. 2MB)
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <InputError message={errors.google_education_logo} className="mt-2" />
+                                    </div>
                                 </div>
                             </div>
                         </div>

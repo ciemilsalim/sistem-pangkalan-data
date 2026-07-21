@@ -34,6 +34,7 @@ class SettingController extends Controller
             'send_absent_notification' => 'off',
             'dark_mode' => 'off',
             'school_logo' => '',
+            'google_education_logo' => '',
         ];
 
         $settings = array_merge($defaultKeys, $settings);
@@ -41,6 +42,10 @@ class SettingController extends Controller
         // Add logo URL if logo exists
         $settings['school_logo_url'] = $settings['school_logo'] 
             ? asset('storage/' . $settings['school_logo']) 
+            : null;
+
+        $settings['google_education_logo_url'] = $settings['google_education_logo'] 
+            ? asset('storage/' . $settings['google_education_logo']) 
             : null;
 
         return Inertia::render('Settings/Index', [
@@ -71,6 +76,7 @@ class SettingController extends Controller
             'send_absent_notification' => 'required|string|in:on,off',
             'dark_mode' => 'required|string|in:on,off',
             'school_logo' => 'nullable|image|max:2048',
+            'google_education_logo' => 'nullable|image|max:2048',
         ]);
 
         $settingsData = $request->only([
@@ -98,6 +104,20 @@ class SettingController extends Controller
             Setting::updateOrCreate(
                 ['key' => $key],
                 ['value' => $value]
+            );
+        }
+
+        // Handle Google Education logo upload
+        if ($request->hasFile('google_education_logo')) {
+            $oldGoogleLogo = Setting::where('key', 'google_education_logo')->value('value');
+            if ($oldGoogleLogo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldGoogleLogo);
+            }
+            
+            $googleLogoPath = $request->file('google_education_logo')->store('school_logos', 'public');
+            Setting::updateOrCreate(
+                ['key' => 'google_education_logo'],
+                ['value' => $googleLogoPath]
             );
         }
 
