@@ -144,6 +144,7 @@ class PeopleController extends Controller
             'password' => ['required', Rules\Password::defaults()],
             'parent_ids' => 'nullable|array',
             'parent_ids.*' => 'exists:parents,id',
+            'photo' => 'nullable|image|max:2048',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -163,6 +164,11 @@ class PeopleController extends Controller
                 'learning_email' => $request->learning_email,
                 'school_class_id' => $request->school_class_id,
             ]);
+
+            if ($request->hasFile('photo')) {
+                $photoPath = $request->file('photo')->store('student_photos', 'public');
+                $student->update(['photo' => $photoPath]);
+            }
 
             // Sync parents if provided
             if ($request->filled('parent_ids')) {
@@ -215,6 +221,7 @@ class PeopleController extends Controller
             'status' => 'required|in:aktif,lulus,pindah,keluar',
             'parent_ids' => 'nullable|array',
             'parent_ids.*' => 'exists:parents,id',
+            'photo' => 'nullable|image|max:2048',
         ]);
 
         if ($request->filled('password')) {
@@ -232,6 +239,14 @@ class PeopleController extends Controller
                 'school_class_id' => $request->school_class_id,
                 'status' => $request->status,
             ]);
+
+            if ($request->hasFile('photo')) {
+                if ($student->photo) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($student->photo);
+                }
+                $photoPath = $request->file('photo')->store('student_photos', 'public');
+                $student->update(['photo' => $photoPath]);
+            }
 
             // Update User login details
             $userData = [

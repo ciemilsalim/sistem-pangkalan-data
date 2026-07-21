@@ -36,6 +36,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         password: '',
         parent_ids: [],
         status: 'aktif',
+        photo: null,
     });
 
     const teacherForm = useForm({
@@ -164,6 +165,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                     email: '',
                     password: '',
                     parent_ids: [],
+                    photo: null,
                 });
             }
             studentForm.clearErrors();
@@ -201,6 +203,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                 password: '', // optional on update
                 parent_ids: linkedParentIds,
                 status: record.status || 'aktif',
+                photo: null,
             });
             studentForm.clearErrors();
         } else if (entityType === 'teacher') {
@@ -271,7 +274,10 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                     onSuccess: () => closeModal()
                 });
             } else {
-                studentForm.put(route('people.students.update', selectedRecord.id), {
+                studentForm.transform((data) => ({
+                    ...data,
+                    _method: 'put',
+                })).post(route('people.students.update', selectedRecord.id), {
                     onSuccess: () => closeModal()
                 });
             }
@@ -577,6 +583,24 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                         required
                                     />
                                     <InputError message={studentForm.errors.name} className="mt-2" />
+                                </div>
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="stud_photo" value="Foto Siswa (Opsional)" />
+                                    <input
+                                        id="stud_photo"
+                                        type="file"
+                                        accept="image/*"
+                                        className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                                        onChange={(e) => studentForm.setData('photo', e.target.files[0])}
+                                    />
+                                    {selectedRecord?.photo && !studentForm.data.photo && (
+                                        <div className="mt-2">
+                                            <p className="text-xs text-gray-500 mb-1">Foto saat ini:</p>
+                                            <img src={`/storage/${selectedRecord.photo}`} alt="Current Photo" className="h-16 w-16 object-cover rounded" />
+                                        </div>
+                                    )}
+                                    <p className="text-xs text-gray-400 mt-1">Gunakan foto potrait/vertikal agar pas di cetakan kartu.</p>
+                                    <InputError message={studentForm.errors.photo} className="mt-2" />
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div>
