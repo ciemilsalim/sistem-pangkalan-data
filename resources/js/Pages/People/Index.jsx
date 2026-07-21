@@ -1,6 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, router, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Modal from '@/Components/Modal';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
@@ -26,6 +26,20 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [qrFilter, setQrFilter] = useState({ search: '', school_class_id: '' });
     const [parentSearchTerm, setParentSearchTerm] = useState('');
+    const [studentPhotoPreview, setStudentPhotoPreview] = useState(null);
+
+    useEffect(() => {
+        if (!studentForm.data.photo) {
+            setStudentPhotoPreview(null);
+            return;
+        }
+        if (!(studentForm.data.photo instanceof File)) {
+            return;
+        }
+        const objectUrl = URL.createObjectURL(studentForm.data.photo);
+        setStudentPhotoPreview(objectUrl);
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [studentForm.data.photo]);
 
     // Form Hooks
     const studentForm = useForm({
@@ -577,159 +591,182 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
 
                         {/* STUDENT FORM FIELDS */}
                         {activeEntity === 'student' && modalType !== 'import' && (
-                            <>
-                                <div className="mb-4">
-                                    <InputLabel htmlFor="stud_name" value="Nama Lengkap Siswa" />
-                                    <TextInput
-                                        id="stud_name"
-                                        type="text"
-                                        className="mt-1 block w-full"
-                                        value={studentForm.data.name}
-                                        onChange={(e) => studentForm.setData('name', e.target.value)}
-                                        required
-                                    />
-                                    <InputError message={studentForm.errors.name} className="mt-2" />
-                                </div>
-                                <div className="mb-4">
-                                    <InputLabel htmlFor="stud_photo" value="Foto Siswa (Opsional)" />
-                                    <input
-                                        id="stud_photo"
-                                        type="file"
-                                        accept="image/*"
-                                        className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-                                        onChange={(e) => studentForm.setData('photo', e.target.files[0])}
-                                    />
-                                    {selectedRecord?.photo && !studentForm.data.photo && (
-                                        <div className="mt-2">
-                                            <p className="text-xs text-gray-500 mb-1">Foto saat ini:</p>
-                                            <img src={`/storage/${selectedRecord.photo}`} alt="Current Photo" className="h-16 w-16 object-cover rounded" />
-                                        </div>
-                                    )}
-                                    <p className="text-xs text-gray-400 mt-1">Gunakan foto potrait/vertikal agar pas di cetakan kartu.</p>
-                                    <InputError message={studentForm.errors.photo} className="mt-2" />
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                                {/* Left Column: Identity & Credentials */}
+                                <div className="space-y-4">
                                     <div>
-                                        <InputLabel htmlFor="stud_nis" value="NIS (Nomor Induk Siswa)" />
+                                        <InputLabel htmlFor="stud_name" value="Nama Lengkap Siswa" />
                                         <TextInput
-                                            id="stud_nis"
+                                            id="stud_name"
                                             type="text"
                                             className="mt-1 block w-full"
-                                            value={studentForm.data.nis}
-                                            onChange={(e) => studentForm.setData('nis', e.target.value)}
+                                            value={studentForm.data.name}
+                                            onChange={(e) => studentForm.setData('name', e.target.value)}
                                             required
                                         />
-                                        <InputError message={studentForm.errors.nis} className="mt-2" />
+                                        <InputError message={studentForm.errors.name} className="mt-2" />
                                     </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <InputLabel htmlFor="stud_nis" value="NIS" />
+                                            <TextInput
+                                                id="stud_nis"
+                                                type="text"
+                                                className="mt-1 block w-full"
+                                                value={studentForm.data.nis}
+                                                onChange={(e) => studentForm.setData('nis', e.target.value)}
+                                                required
+                                            />
+                                            <InputError message={studentForm.errors.nis} className="mt-2" />
+                                        </div>
+                                        <div>
+                                            <InputLabel htmlFor="stud_class" value="Kelas" />
+                                            <select
+                                                id="stud_class"
+                                                value={studentForm.data.school_class_id}
+                                                className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                                onChange={(e) => studentForm.setData('school_class_id', e.target.value)}
+                                                required
+                                            >
+                                                {schoolClasses.map((cls) => (
+                                                    <option key={cls.id} value={cls.id}>{cls.name} ({cls.level?.name || 'Kurikulum'})</option>
+                                                ))}
+                                            </select>
+                                            <InputError message={studentForm.errors.school_class_id} className="mt-2" />
+                                        </div>
+                                    </div>
+
                                     <div>
-                                        <InputLabel htmlFor="stud_class" value="Kelas" />
-                                        <select
-                                            id="stud_class"
-                                            value={studentForm.data.school_class_id}
-                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
-                                            onChange={(e) => studentForm.setData('school_class_id', e.target.value)}
+                                        <InputLabel htmlFor="stud_email" value="Email Login Akun" />
+                                        <TextInput
+                                            id="stud_email"
+                                            type="email"
+                                            className="mt-1 block w-full"
+                                            value={studentForm.data.email}
+                                            onChange={(e) => studentForm.setData('email', e.target.value)}
                                             required
-                                        >
-                                            {schoolClasses.map((cls) => (
-                                                <option key={cls.id} value={cls.id}>{cls.name} ({cls.level?.name || 'Kurikulum'})</option>
-                                            ))}
-                                        </select>
-                                        <InputError message={studentForm.errors.school_class_id} className="mt-2" />
+                                            placeholder="email@sekolah.com"
+                                        />
+                                        <InputError message={studentForm.errors.email} className="mt-2" />
                                     </div>
+
+                                    <div>
+                                        <InputLabel htmlFor="stud_pass" value={modalType === 'create' ? "Password Login" : "Ubah Password (Kosongkan jika tidak diubah)"} />
+                                        <TextInput
+                                            id="stud_pass"
+                                            type="password"
+                                            className="mt-1 block w-full"
+                                            value={studentForm.data.password}
+                                            onChange={(e) => studentForm.setData('password', e.target.value)}
+                                            required={modalType === 'create'}
+                                            placeholder={modalType === 'edit' ? "Password Baru (Opsional)" : ""}
+                                        />
+                                        <InputError message={studentForm.errors.password} className="mt-2" />
+                                    </div>
+
+                                    {modalType === 'edit' && (
+                                        <div>
+                                            <InputLabel htmlFor="status" value="Status Siswa" />
+                                            <select
+                                                id="status"
+                                                value={studentForm.data.status}
+                                                onChange={(e) => studentForm.setData('status', e.target.value)}
+                                                className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
+                                            >
+                                                <option value="aktif">Aktif</option>
+                                                <option value="lulus">Lulus</option>
+                                                <option value="pindah">Pindah</option>
+                                                <option value="keluar">Keluar</option>
+                                            </select>
+                                            <InputError message={studentForm.errors.status} className="mt-2" />
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="mb-4">
-                                    <InputLabel htmlFor="stud_email" value="Email Login Akun" />
-                                    <TextInput
-                                        id="stud_email"
-                                        type="email"
-                                        className="mt-1 block w-full"
-                                        value={studentForm.data.email}
-                                        onChange={(e) => studentForm.setData('email', e.target.value)}
-                                        required
-                                        placeholder="email@sekolah.com"
-                                    />
-                                    <InputError message={studentForm.errors.email} className="mt-2" />
-                                </div>
-                                <div className="mb-4">
-                                    <InputLabel htmlFor="stud_learning_email" value="Email Belajar (Opsional)" />
-                                    <TextInput
-                                        id="stud_learning_email"
-                                        type="email"
-                                        className="mt-1 block w-full"
-                                        value={studentForm.data.learning_email}
-                                        onChange={(e) => studentForm.setData('learning_email', e.target.value)}
-                                        placeholder="nama@belajar.id"
-                                    />
-                                    <InputError message={studentForm.errors.learning_email} className="mt-2" />
-                                </div>
-                                <div className="mb-4">
-                                    <InputLabel htmlFor="stud_pass" value={modalType === 'create' ? "Password Login" : "Ubah Password (Kosongkan jika tidak diubah)"} />
-                                    <TextInput
-                                        id="stud_pass"
-                                        type="password"
-                                        className="mt-1 block w-full"
-                                        value={studentForm.data.password}
-                                        onChange={(e) => studentForm.setData('password', e.target.value)}
-                                        required={modalType === 'create'}
-                                        placeholder={modalType === 'edit' ? "Password Baru (Opsional)" : ""}
-                                    />
-                                    <InputError message={studentForm.errors.password} className="mt-2" />
-                                </div>
-                                <div className="mb-4">
-                                    <InputLabel value="Hubungkan dengan Wali Murid (Pilih satu atau lebih)" />
-                                    <TextInput
-                                        type="text"
-                                        placeholder="Cari nama wali murid..."
-                                        className="mt-1 mb-2 block w-full text-sm"
-                                        value={parentSearchTerm}
-                                        onChange={(e) => setParentSearchTerm(e.target.value)}
-                                    />
-                                    <div className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm max-h-32 overflow-y-auto p-2 bg-white dark:bg-gray-800">
-                                        {parentsList.length === 0 ? (
-                                            <span className="text-sm text-gray-400 italic">Belum ada data wali murid.</span>
-                                        ) : (
-                                            parentsList.filter(parent => parent.name.toLowerCase().includes(parentSearchTerm.toLowerCase())).length === 0 ? (
-                                                <span className="text-sm text-gray-400 italic">Wali murid tidak ditemukan.</span>
+
+                                {/* Right Column: Photo, Learning Email, Parent Association */}
+                                <div className="space-y-4">
+                                    <div>
+                                        <InputLabel htmlFor="stud_photo" value="Foto Siswa (Opsional)" />
+                                        <div className="mt-1 flex items-center gap-4">
+                                            {/* Photo Preview Container */}
+                                            <div className="w-16 h-20 bg-gray-100 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center flex-shrink-0">
+                                                {studentPhotoPreview ? (
+                                                    <img src={studentPhotoPreview} alt="Preview" className="w-full h-full object-cover" />
+                                                ) : selectedRecord?.photo ? (
+                                                    <img src={`/storage/${selectedRecord.photo}`} alt="Current" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                    </svg>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <input
+                                                    id="stud_photo"
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                                                    onChange={(e) => studentForm.setData('photo', e.target.files[0])}
+                                                />
+                                                <p className="text-[10px] text-gray-400 mt-1">Saran: foto portret vertikal.</p>
+                                            </div>
+                                        </div>
+                                        <InputError message={studentForm.errors.photo} className="mt-2" />
+                                    </div>
+
+                                    <div>
+                                        <InputLabel htmlFor="stud_learning_email" value="Email Belajar (Opsional)" />
+                                        <TextInput
+                                            id="stud_learning_email"
+                                            type="email"
+                                            className="mt-1 block w-full"
+                                            value={studentForm.data.learning_email}
+                                            onChange={(e) => studentForm.setData('learning_email', e.target.value)}
+                                            placeholder="nama@belajar.id"
+                                        />
+                                        <InputError message={studentForm.errors.learning_email} className="mt-2" />
+                                    </div>
+
+                                    <div>
+                                        <InputLabel value="Hubungkan dengan Wali Murid (Pilih satu atau lebih)" />
+                                        <TextInput
+                                            type="text"
+                                            placeholder="Cari nama wali murid..."
+                                            className="mt-1 mb-2 block w-full text-sm"
+                                            value={parentSearchTerm}
+                                            onChange={(e) => setParentSearchTerm(e.target.value)}
+                                        />
+                                        <div className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm max-h-32 overflow-y-auto p-2 bg-white dark:bg-gray-800">
+                                            {parentsList.length === 0 ? (
+                                                <span className="text-sm text-gray-400 italic">Belum ada data wali murid.</span>
                                             ) : (
-                                                parentsList.filter(parent => parent.name.toLowerCase().includes(parentSearchTerm.toLowerCase())).map((parent) => (
-                                                    <label key={parent.id} className="flex items-center mb-1.5 cursor-pointer">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                                                            checked={studentForm.data.parent_ids.includes(parent.id)}
-                                                            onChange={(e) => {
-                                                                const newIds = e.target.checked
-                                                                    ? [...studentForm.data.parent_ids, parent.id]
-                                                                    : studentForm.data.parent_ids.filter(id => id !== parent.id);
-                                                                studentForm.setData('parent_ids', newIds);
-                                                            }}
-                                                        />
-                                                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{parent.name}</span>
-                                                    </label>
-                                                ))
-                                            )
-                                        )}
+                                                parentsList.filter(parent => parent.name.toLowerCase().includes(parentSearchTerm.toLowerCase())).length === 0 ? (
+                                                    <span className="text-sm text-gray-400 italic">Wali murid tidak ditemukan.</span>
+                                                ) : (
+                                                    parentsList.filter(parent => parent.name.toLowerCase().includes(parentSearchTerm.toLowerCase())).map((parent) => (
+                                                        <label key={parent.id} className="flex items-center mb-1.5 cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                                                checked={studentForm.data.parent_ids.includes(parent.id)}
+                                                                onChange={(e) => {
+                                                                    const newIds = e.target.checked
+                                                                        ? [...studentForm.data.parent_ids, parent.id]
+                                                                        : studentForm.data.parent_ids.filter(id => id !== parent.id);
+                                                                    studentForm.setData('parent_ids', newIds);
+                                                                }}
+                                                            />
+                                                            <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{parent.name}</span>
+                                                        </label>
+                                                    ))
+                                                )
+                                            )}
+                                        </div>
+                                        <InputError message={studentForm.errors.parent_ids} className="mt-2" />
                                     </div>
-                                    <InputError message={studentForm.errors.parent_ids} className="mt-2" />
                                 </div>
-                                {modalType === 'edit' && (
-                                    <div className="mb-4">
-                                        <InputLabel htmlFor="status" value="Status Siswa" />
-                                        <select
-                                            id="status"
-                                            value={studentForm.data.status}
-                                            onChange={(e) => studentForm.setData('status', e.target.value)}
-                                            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
-                                        >
-                                            <option value="aktif">Aktif</option>
-                                            <option value="lulus">Lulus</option>
-                                            <option value="pindah">Pindah</option>
-                                            <option value="keluar">Keluar</option>
-                                        </select>
-                                        <InputError message={studentForm.errors.status} className="mt-2" />
-                                    </div>
-                                )}
-                            </>
+                            </div>
                         )}
 
                         {/* TEACHER FORM FIELDS */}
