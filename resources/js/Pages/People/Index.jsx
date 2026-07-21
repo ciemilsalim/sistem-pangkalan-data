@@ -30,6 +30,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     const studentForm = useForm({
         name: '',
         nis: '',
+        learning_email: '',
         school_class_id: '',
         email: '',
         password: '',
@@ -158,6 +159,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                 studentForm.setData({
                     name: '',
                     nis: '',
+                    learning_email: '',
                     school_class_id: schoolClasses[0].id.toString(),
                     email: '',
                     password: '',
@@ -193,6 +195,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
             studentForm.setData({
                 name: record.name,
                 nis: record.nis,
+                learning_email: record.learning_email || '',
                 school_class_id: record.school_class_id.toString(),
                 email: record.user?.email || '',
                 password: '', // optional on update
@@ -618,6 +621,18 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                     <InputError message={studentForm.errors.email} className="mt-2" />
                                 </div>
                                 <div className="mb-4">
+                                    <InputLabel htmlFor="stud_learning_email" value="Email Belajar (Opsional)" />
+                                    <TextInput
+                                        id="stud_learning_email"
+                                        type="email"
+                                        className="mt-1 block w-full"
+                                        value={studentForm.data.learning_email}
+                                        onChange={(e) => studentForm.setData('learning_email', e.target.value)}
+                                        placeholder="nama@belajar.id"
+                                    />
+                                    <InputError message={studentForm.errors.learning_email} className="mt-2" />
+                                </div>
+                                <div className="mb-4">
                                     <InputLabel htmlFor="stud_pass" value={modalType === 'create' ? "Password Login" : "Ubah Password (Kosongkan jika tidak diubah)"} />
                                     <TextInput
                                         id="stud_pass"
@@ -976,6 +991,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Kelas</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Email Akun</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Email Belajar</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Wali Murid</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                             </tr>
@@ -983,7 +999,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             {students.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data siswa ditemukan.</td>
+                                    <td colSpan="7" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data siswa ditemukan.</td>
                                 </tr>
                             ) : (
                                 students.data.map((student) => (
@@ -1005,6 +1021,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{student.user?.email || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-semibold text-indigo-600 dark:text-indigo-400">{student.learning_email || '-'}</td>
                                         <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                                             {student.parents && student.parents.length > 0 ? (
                                                 <div className="flex flex-wrap gap-1">

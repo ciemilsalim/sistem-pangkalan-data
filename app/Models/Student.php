@@ -18,6 +18,7 @@ class Student extends Model
         'user_id',
         'name',
         'nis',
+        'learning_email',
         'school_class_id',
         'unique_id',
         'photo',

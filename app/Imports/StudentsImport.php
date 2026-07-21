@@ -56,6 +56,7 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
             'user_id'         => $user->id,
             'name'            => $row['nama'],
             'nis'             => $nis,
+            'learning_email'  => isset($row['email_belajar']) ? $row['email_belajar'] : null,
             'school_class_id' => $schoolClassId,
             'unique_id'       => (string) Str::uuid(),
         ]);
@@ -72,6 +73,7 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
             'nama'  => 'required|string|max:255',
             'nis'   => 'required|unique:students,nis',
             'kelas' => 'nullable|string', // Kelas opsional
+            'email_belajar' => 'nullable|string|email|max:255|unique:students,learning_email',
         ];
     }
 }

@@ -138,6 +138,7 @@ class PeopleController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'nis' => 'required|string|max:50|unique:students,nis',
+            'learning_email' => 'nullable|string|email|max:255|unique:students,learning_email',
             'school_class_id' => 'required|exists:school_classes,id',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => ['required', Rules\Password::defaults()],
@@ -159,6 +160,7 @@ class PeopleController extends Controller
                 'user_id' => $user->id,
                 'name' => $request->name,
                 'nis' => $request->nis,
+                'learning_email' => $request->learning_email,
                 'school_class_id' => $request->school_class_id,
             ]);
 
@@ -207,6 +209,7 @@ class PeopleController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'nis' => 'required|string|max:50|unique:students,nis,' . $student->id,
+            'learning_email' => 'nullable|string|email|max:255|unique:students,learning_email,' . $student->id,
             'school_class_id' => 'required|exists:school_classes,id',
             'email' => 'required|string|email|max:255|unique:users,email,' . $student->user_id,
             'status' => 'required|in:aktif,lulus,pindah,keluar',
@@ -225,6 +228,7 @@ class PeopleController extends Controller
             $student->update([
                 'name' => $request->name,
                 'nis' => $request->nis,
+                'learning_email' => $request->learning_email,
                 'school_class_id' => $request->school_class_id,
                 'status' => $request->status,
             ]);
