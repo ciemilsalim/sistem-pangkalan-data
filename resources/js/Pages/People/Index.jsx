@@ -25,6 +25,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     const [activeEntity, setActiveEntity] = useState(null); // 'student' or 'teacher' or 'parent'
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [qrFilter, setQrFilter] = useState({ search: '', school_class_id: '' });
+    const [parentSearchTerm, setParentSearchTerm] = useState('');
 
     // Form Hooks
     const studentForm = useForm({
@@ -249,6 +250,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         setModalType(null);
         setActiveEntity(null);
         setSelectedRecord(null);
+        setParentSearchTerm(''); // Reset search term on close
     };
 
     // Form Submit Handlers
@@ -675,26 +677,37 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                 </div>
                                 <div className="mb-4">
                                     <InputLabel value="Hubungkan dengan Wali Murid (Pilih satu atau lebih)" />
+                                    <TextInput
+                                        type="text"
+                                        placeholder="Cari nama wali murid..."
+                                        className="mt-1 mb-2 block w-full text-sm"
+                                        value={parentSearchTerm}
+                                        onChange={(e) => setParentSearchTerm(e.target.value)}
+                                    />
                                     <div className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm max-h-32 overflow-y-auto p-2 bg-white dark:bg-gray-800">
                                         {parentsList.length === 0 ? (
                                             <span className="text-sm text-gray-400 italic">Belum ada data wali murid.</span>
                                         ) : (
-                                            parentsList.map((parent) => (
-                                                <label key={parent.id} className="flex items-center mb-1.5 cursor-pointer">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                                                        checked={studentForm.data.parent_ids.includes(parent.id)}
-                                                        onChange={(e) => {
-                                                            const newIds = e.target.checked
-                                                                ? [...studentForm.data.parent_ids, parent.id]
-                                                                : studentForm.data.parent_ids.filter(id => id !== parent.id);
-                                                            studentForm.setData('parent_ids', newIds);
-                                                        }}
-                                                    />
-                                                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{parent.name}</span>
-                                                </label>
-                                            ))
+                                            parentsList.filter(parent => parent.name.toLowerCase().includes(parentSearchTerm.toLowerCase())).length === 0 ? (
+                                                <span className="text-sm text-gray-400 italic">Wali murid tidak ditemukan.</span>
+                                            ) : (
+                                                parentsList.filter(parent => parent.name.toLowerCase().includes(parentSearchTerm.toLowerCase())).map((parent) => (
+                                                    <label key={parent.id} className="flex items-center mb-1.5 cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                                            checked={studentForm.data.parent_ids.includes(parent.id)}
+                                                            onChange={(e) => {
+                                                                const newIds = e.target.checked
+                                                                    ? [...studentForm.data.parent_ids, parent.id]
+                                                                    : studentForm.data.parent_ids.filter(id => id !== parent.id);
+                                                                studentForm.setData('parent_ids', newIds);
+                                                            }}
+                                                        />
+                                                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{parent.name}</span>
+                                                    </label>
+                                                ))
+                                            )
                                         )}
                                     </div>
                                     <InputError message={studentForm.errors.parent_ids} className="mt-2" />
