@@ -237,6 +237,13 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         setSelectedRecord(record);
     };
 
+    // Open Detail Modal
+    const openDetailModal = (entityType, record) => {
+        setActiveEntity(entityType);
+        setModalType('detail');
+        setSelectedRecord(record);
+    };
+
     // Close Modal
     const closeModal = () => {
         setModalType(null);
@@ -913,6 +920,98 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                 </Modal>
             )}
 
+            {/* Detail Student Modal */}
+            {modalType === 'detail' && activeEntity === 'student' && selectedRecord && (
+                <Modal show={true} onClose={closeModal} maxWidth="2xl">
+                    <div className="p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Detail Siswa: {selectedRecord.name}</h3>
+                            <button onClick={closeModal} className="text-gray-400 hover:text-gray-500">
+                                <span className="sr-only">Close</span>
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div className="flex flex-col md:flex-row gap-6">
+                            {/* Photo Column */}
+                            <div className="flex-shrink-0 flex flex-col items-center justify-start space-y-3 md:w-1/3">
+                                <div className="w-40 h-48 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm flex items-center justify-center">
+                                    {selectedRecord.photo ? (
+                                        <img src={`/storage/${selectedRecord.photo}`} alt={selectedRecord.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                    )}
+                                </div>
+                                <div className="text-center">
+                                    <span className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold ${
+                                        selectedRecord.status === 'aktif' ? 'bg-green-100 text-green-800' :
+                                        selectedRecord.status === 'lulus' ? 'bg-blue-100 text-blue-800' :
+                                        selectedRecord.status === 'pindah' ? 'bg-yellow-100 text-yellow-800' :
+                                        selectedRecord.status === 'keluar' ? 'bg-red-100 text-red-800' :
+                                        'bg-gray-100 text-gray-800'
+                                    }`}>
+                                        Status: {selectedRecord.status ? selectedRecord.status.charAt(0).toUpperCase() + selectedRecord.status.slice(1) : '-'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Data Column */}
+                            <div className="flex-1 space-y-4">
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">NIS</h4>
+                                    <p className="mt-1 text-base text-gray-900 dark:text-gray-100">{selectedRecord.nis || '-'}</p>
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Kelas</h4>
+                                    <p className="mt-1 text-base text-gray-900 dark:text-gray-100 font-bold">{selectedRecord.school_class?.name || '-'}</p>
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Email Akun Login</h4>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-gray-100">{selectedRecord.user?.email || '-'}</p>
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Email Belajar (Belajar.id)</h4>
+                                    <p className="mt-1 text-sm text-indigo-600 dark:text-indigo-400 font-medium">{selectedRecord.learning_email || '-'}</p>
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Wali Murid Terhubung</h4>
+                                    {selectedRecord.parents && selectedRecord.parents.length > 0 ? (
+                                        <div className="flex flex-col gap-2">
+                                            {selectedRecord.parents.map((p) => (
+                                                <div key={p.id} className="flex items-center p-2 border border-gray-200 dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-800/50">
+                                                    <div className="flex-1">
+                                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{p.name}</p>
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400">{p.phone_number || p.user?.email || 'Tidak ada kontak'}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-sm text-gray-400 italic">Belum ada wali murid yang dihubungkan.</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-8 flex justify-end gap-3 border-t border-gray-200 dark:border-gray-700 pt-4">
+                            <SecondaryButton onClick={closeModal} className="px-4 py-2">
+                                Tutup
+                            </SecondaryButton>
+                            <PrimaryButton onClick={() => {
+                                closeModal();
+                                openEditModal('student', selectedRecord);
+                            }} className="px-4 py-2">
+                                Edit Data
+                            </PrimaryButton>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+
             {/* Delete Confirmation Modal */}
             {modalType === 'delete' && (
                 <Modal show={true} onClose={closeModal}>
@@ -1011,9 +1110,6 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">NIS</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Kelas</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Email Akun</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Email Belajar</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Wali Murid</th>
                                 <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>
                             </tr>
                         </thead>
@@ -1041,20 +1137,13 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                                 <span className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">{student.status || '-'}</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{student.user?.email || '-'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 font-semibold text-indigo-600 dark:text-indigo-400">{student.learning_email || '-'}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                                            {student.parents && student.parents.length > 0 ? (
-                                                <div className="flex flex-wrap gap-1">
-                                                    {student.parents.map((p) => (
-                                                        <span key={p.id} className="inline-flex items-center rounded bg-purple-50 px-2 py-0.5 text-xs font-semibold text-purple-700 border border-purple-100">{p.name}</span>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <span className="text-gray-400 italic text-xs">Belum dihubungkan</span>
-                                            )}
-                                        </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button onClick={() => openDetailModal('student', student)} className="text-blue-600 hover:text-blue-900 mr-3" title="Detail">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                </svg>
+                                            </button>
                                             <button onClick={() => openEditModal('student', student)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
