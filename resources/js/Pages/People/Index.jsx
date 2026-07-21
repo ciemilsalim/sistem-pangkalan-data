@@ -667,8 +667,8 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                         >
                                             <option value="aktif">Aktif</option>
                                             <option value="lulus">Lulus</option>
-                                            <option value="pindah">Pindah Sekolah</option>
-                                            <option value="keluar">Berhenti / Keluar</option>
+                                            <option value="pindah">Pindah</option>
+                                            <option value="keluar">Keluar</option>
                                         </select>
                                         <InputError message={studentForm.errors.status} className="mt-2" />
                                     </div>
@@ -998,6 +998,8 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                                 <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">Lulus</span>
                                             ) : student.status === 'pindah' ? (
                                                 <span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">Pindah</span>
+                                            ) : student.status === 'keluar' ? (
+                                                <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">Keluar</span>
                                             ) : (
                                                 <span className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">{student.status || '-'}</span>
                                             )}
