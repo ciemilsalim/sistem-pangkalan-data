@@ -28,18 +28,6 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
     const [parentSearchTerm, setParentSearchTerm] = useState('');
     const [studentPhotoPreview, setStudentPhotoPreview] = useState(null);
 
-    useEffect(() => {
-        if (!studentForm.data.photo) {
-            setStudentPhotoPreview(null);
-            return;
-        }
-        if (!(studentForm.data.photo instanceof File)) {
-            return;
-        }
-        const objectUrl = URL.createObjectURL(studentForm.data.photo);
-        setStudentPhotoPreview(objectUrl);
-        return () => URL.revokeObjectURL(objectUrl);
-    }, [studentForm.data.photo]);
 
     // Form Hooks
     const studentForm = useForm({
@@ -53,6 +41,19 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         status: 'aktif',
         photo: null,
     });
+
+    useEffect(() => {
+        if (!studentForm.data.photo) {
+            setStudentPhotoPreview(null);
+            return;
+        }
+        if (!(studentForm.data.photo instanceof File)) {
+            return;
+        }
+        const objectUrl = URL.createObjectURL(studentForm.data.photo);
+        setStudentPhotoPreview(objectUrl);
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [studentForm.data.photo]);
 
     const teacherForm = useForm({
         name: '',
