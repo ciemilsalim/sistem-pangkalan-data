@@ -29,7 +29,7 @@ export default function Index({ auth, settings }) {
         student_card_background: null,
         global_ai_provider: settings.global_ai_provider || 'openrouter',
         global_ai_api_key: settings.global_ai_api_key || '',
-        global_ai_model: settings.global_ai_model || 'google/gemini-2.0-flash-exp:free',
+        global_ai_model: settings.global_ai_model || 'qwen/qwen-2.5-72b-instruct:free',
         _method: 'PUT',
     });
 

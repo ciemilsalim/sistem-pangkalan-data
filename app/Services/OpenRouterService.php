@@ -38,8 +38,8 @@ class OpenRouterService
         $model = Setting::where('key', 'global_ai_model')->value('value');
         
         // Mencegah error jika database/cache masih menyangkut pada model lama yang sudah deprecated
-        if (empty($model) || str_contains($model, 'gemini-1.5-flash:free')) {
-            $model = 'google/gemini-2.0-flash-exp:free';
+        if (empty($model) || str_contains($model, 'gemini')) {
+            $model = 'qwen/qwen-2.5-72b-instruct:free';
             
             // Auto-update DB agar konsisten
             Setting::updateOrCreate(
