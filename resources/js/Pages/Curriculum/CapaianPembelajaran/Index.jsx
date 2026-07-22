@@ -14,6 +14,7 @@ export default function CapaianPembelajaranIndex({ auth, capaianPembelajarans, s
     const [isCreating, setIsCreating] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [isGeneratingAi, setIsGeneratingAi] = useState(false);
 
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [faseFilter, setFaseFilter] = useState(filters.fase || '');
@@ -101,6 +102,30 @@ export default function CapaianPembelajaranIndex({ auth, capaianPembelajarans, s
             preserveScroll: true,
             onSuccess: () => closeModal(),
         });
+    };
+
+    const handleGenerateCp = async () => {
+        if (!form.data.subject_id || !form.data.fase) {
+            alert('Mohon pilih Mata Pelajaran dan Fase terlebih dahulu sebelum menggunakan AI.');
+            return;
+        }
+
+        setIsGeneratingAi(true);
+        try {
+            const response = await window.axios.post(route('curriculum.capaian-pembelajaran.generate'), {
+                fase: form.data.fase,
+                subject_id: form.data.subject_id,
+                elemen: form.data.elemen
+            });
+            
+            if (response.data.deskripsi) {
+                form.setData('deskripsi', response.data.deskripsi);
+            }
+        } catch (error) {
+            alert('Gagal: ' + (error.response?.data?.error || error.message));
+        } finally {
+            setIsGeneratingAi(false);
+        }
     };
 
     const fases = ['Fondasi', 'A', 'B', 'C', 'D', 'E', 'F'];
@@ -295,7 +320,17 @@ export default function CapaianPembelajaranIndex({ auth, capaianPembelajarans, s
                     </div>
 
                     <div className="mt-4">
-                        <InputLabel htmlFor="deskripsi" value="Deskripsi Capaian" />
+                        <div className="flex justify-between items-end mb-1">
+                            <InputLabel htmlFor="deskripsi" value="Deskripsi Capaian" />
+                            <button
+                                type="button"
+                                onClick={handleGenerateCp}
+                                disabled={isGeneratingAi}
+                                className="inline-flex items-center px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 rounded-md font-semibold text-xs text-indigo-700 dark:text-indigo-400 uppercase tracking-widest hover:bg-indigo-100 dark:hover:bg-indigo-900/50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 transition ease-in-out duration-150"
+                            >
+                                {isGeneratingAi ? '✨ Memproses AI...' : '✨ Generate AI'}
+                            </button>
+                        </div>
                         <textarea
                             id="deskripsi"
                             className="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"

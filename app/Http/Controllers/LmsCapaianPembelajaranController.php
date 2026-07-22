@@ -7,6 +7,7 @@ use App\Models\Subject;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Validation\Rule;
+use App\Services\OpenRouterService;
 
 class LmsCapaianPembelajaranController extends Controller
 {
@@ -90,5 +91,31 @@ class LmsCapaianPembelajaranController extends Controller
         $capaianPembelajaran->delete();
 
         return redirect()->back()->with('success', 'Capaian Pembelajaran berhasil dihapus.');
+    }
+
+    public function generateDescription(Request $request, OpenRouterService $ai)
+    {
+        $request->validate([
+            'fase' => 'required|string',
+            'subject_id' => 'required|exists:subjects,id',
+            'elemen' => 'nullable|string',
+        ]);
+
+        $subject = Subject::find($request->subject_id);
+        
+        $systemPrompt = "Anda adalah asisten kurikulum pendidikan Indonesia yang ahli dalam Kurikulum Merdeka. Tugas Anda adalah menyusun deskripsi Capaian Pembelajaran (CP) yang ringkas, jelas, dan sesuai standar BSKAP Kemdikbud.";
+        
+        $userPrompt = "Buatkan rumusan Capaian Pembelajaran (CP) untuk mata pelajaran {$subject->name} pada Fase {$request->fase}.";
+        if ($request->elemen) {
+            $userPrompt .= " Fokuskan pada elemen: {$request->elemen}.";
+        }
+        $userPrompt .= " Tuliskan hanya isi deskripsinya saja tanpa basa-basi awalan, maksimal 2-3 paragraf singkat.";
+
+        try {
+            $description = $ai->generate($systemPrompt, $userPrompt);
+            return response()->json(['deskripsi' => $description]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

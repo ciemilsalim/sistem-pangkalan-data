@@ -71,6 +71,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Capaian Pembelajaran
     Route::middleware('can:manage_cp')->group(function () {
         Route::get('/curriculum/capaian-pembelajaran', [App\Http\Controllers\LmsCapaianPembelajaranController::class, 'index'])->name('curriculum.capaian-pembelajaran.index');
+        Route::post('/curriculum/capaian-pembelajaran/generate', [App\Http\Controllers\LmsCapaianPembelajaranController::class, 'generateDescription'])->name('curriculum.capaian-pembelajaran.generate');
         Route::post('/curriculum/capaian-pembelajaran', [App\Http\Controllers\LmsCapaianPembelajaranController::class, 'store'])->name('curriculum.capaian-pembelajaran.store');
         Route::put('/curriculum/capaian-pembelajaran/{capaianPembelajaran}', [App\Http\Controllers\LmsCapaianPembelajaranController::class, 'update'])->name('curriculum.capaian-pembelajaran.update');
         Route::delete('/curriculum/capaian-pembelajaran/{capaianPembelajaran}', [App\Http\Controllers\LmsCapaianPembelajaranController::class, 'destroy'])->name('curriculum.capaian-pembelajaran.destroy');
