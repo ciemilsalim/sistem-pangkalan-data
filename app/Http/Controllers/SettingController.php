@@ -38,7 +38,7 @@ class SettingController extends Controller
             'student_card_background' => '',
             'global_ai_provider' => 'openrouter',
             'global_ai_api_key' => '',
-            'global_ai_model' => 'google/gemini-1.5-flash:free',
+            'global_ai_model' => 'google/gemini-2.0-flash-exp:free',
         ];
 
         $settings = array_merge($defaultKeys, $settings);

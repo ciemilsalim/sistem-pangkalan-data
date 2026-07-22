@@ -35,7 +35,7 @@ class OpenRouterService
         }
 
         // Tentukan model berdasarkan pengaturan global
-        $model = Setting::where('key', 'global_ai_model')->value('value') ?: 'google/gemini-1.5-flash:free';
+        $model = Setting::where('key', 'global_ai_model')->value('value') ?: 'google/gemini-2.0-flash-exp:free';
 
         try {
             $response = Http::withHeaders([
