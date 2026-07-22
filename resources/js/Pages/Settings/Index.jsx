@@ -29,7 +29,7 @@ export default function Index({ auth, settings }) {
         student_card_background: null,
         global_ai_provider: settings.global_ai_provider || 'openrouter',
         global_ai_api_key: settings.global_ai_api_key || '',
-        global_ai_model: settings.global_ai_model || 'qwen/qwen-2.5-72b-instruct:free',
+        global_ai_model: settings.global_ai_model || 'openrouter/free',
         _method: 'PUT',
     });
 
@@ -541,11 +541,10 @@ export default function Index({ auth, settings }) {
                                             className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                             onChange={(e) => setData('global_ai_model', e.target.value)}
                                         >
-                                            <option value="google/gemini-2.0-flash-exp:free">Google Gemini 2.0 Flash (Gratis)</option>
-                                            <option value="google/gemini-2.0-pro-exp-02-05:free">Google Gemini 2.0 Pro (Gratis)</option>
-                                            <option value="qwen/qwen-2.5-72b-instruct:free">Qwen 2.5 72B Instruct (Gratis)</option>
-                                            <option value="meta-llama/llama-3.1-8b-instruct:free">Meta Llama 3.1 8B Instruct (Gratis)</option>
-                                            <option value="meta-llama/llama-3.3-70b-instruct:free">Meta Llama 3.3 70B Instruct (Gratis)</option>
+                                            <option value="openrouter/free">Auto-Select Free Model (Paling Stabil)</option>
+                                            <option value="google/gemma-4-31b-it:free">Google Gemma 4 (Gratis)</option>
+                                            <option value="openai/gpt-oss-20b:free">OpenAI OSS (Gratis)</option>
+                                            <option value="poolside/laguna-s-2.1:free">Laguna S 2.1 (Gratis)</option>
                                         </select>
                                         <p className="mt-1 text-xs text-gray-500">
                                             Model ini akan digunakan oleh seluruh guru saat men-generate RPP atau soal.
