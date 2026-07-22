@@ -27,6 +27,7 @@ class User extends Authenticatable
         'role', // TAMBAHKAN BARIS INI
         'ai_provider',
         'ai_api_key',
+        'ai_model',
     ];
 
     /**
