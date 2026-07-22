@@ -16,9 +16,6 @@ export default function UpdateProfileInformation({
         useForm({
             name: user.name,
             email: user.email,
-            ai_provider: user.ai_provider || 'gemini',
-            ai_api_key: user.ai_api_key || '',
-            ai_model: user.ai_model || 'google/gemini-1.5-flash:free',
         });
 
     const submit = (e) => {
@@ -70,69 +67,6 @@ export default function UpdateProfileInformation({
                     />
 
                     <InputError className="mt-2" message={errors.email} />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="ai_provider" value="Pilih Penyedia AI" />
-
-                    <select
-                        id="ai_provider"
-                        className="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
-                        value={data.ai_provider}
-                        onChange={(e) => setData('ai_provider', e.target.value)}
-                    >
-                        <option value="gemini">Google Gemini</option>
-                        <option value="openai">OpenAI (ChatGPT)</option>
-                        <option value="claude">Anthropic Claude</option>
-                        <option value="groq">Groq (Llama 3)</option>
-                        <option value="openrouter">OpenRouter AI (Gratis/Pro)</option>
-                    </select>
-
-                    <InputError className="mt-2" message={errors.ai_provider} />
-                </div>
-
-                {data.ai_provider === 'openrouter' && (
-                    <div>
-                        <InputLabel htmlFor="ai_model" value="Pilih Model OpenRouter" />
-
-                        <select
-                            id="ai_model"
-                            className="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
-                            value={data.ai_model}
-                            onChange={(e) => setData('ai_model', e.target.value)}
-                        >
-                            <option value="google/gemini-1.5-flash:free">Google Gemini 1.5 Flash (Gratis)</option>
-                            <option value="qwen/qwen-2.5-72b-instruct:free">Qwen 2.5 72B Instruct (Gratis)</option>
-                            <option value="meta-llama/llama-3.1-8b-instruct:free">Meta Llama 3.1 8B Instruct (Gratis)</option>
-                        </select>
-
-                        <InputError className="mt-2" message={errors.ai_model} />
-                    </div>
-                )}
-
-                <div>
-                    <InputLabel htmlFor="ai_api_key" value="AI API Key (Opsional)" />
-
-                    <TextInput
-                        id="ai_api_key"
-                        type="text"
-                        className="mt-1 block w-full"
-                        value={data.ai_api_key}
-                        onChange={(e) => setData('ai_api_key', e.target.value)}
-                        placeholder={
-                            data.ai_provider === 'openai' ? 'Contoh: sk-proj-...' :
-                            data.ai_provider === 'claude' ? 'Contoh: sk-ant-api03-...' :
-                            data.ai_provider === 'groq' ? 'Contoh: gsk_...' :
-                            data.ai_provider === 'openrouter' ? 'Contoh: sk-or-v1-...' :
-                            'Contoh: AIzaSyB...'
-                        }
-                    />
-
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Masukkan API Key Anda sendiri jika Anda ingin menggunakan fitur AI tanpa batasan kuota sistem. Key ini disimpan secara aman (terenkripsi).
-                    </p>
-
-                    <InputError className="mt-2" message={errors.ai_api_key} />
                 </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (

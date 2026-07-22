@@ -36,6 +36,9 @@ class SettingController extends Controller
             'school_logo' => '',
             'google_education_logo' => '',
             'student_card_background' => '',
+            'global_ai_provider' => 'openrouter',
+            'global_ai_api_key' => '',
+            'global_ai_model' => 'google/gemini-1.5-flash:free',
         ];
 
         $settings = array_merge($defaultKeys, $settings);
@@ -83,6 +86,9 @@ class SettingController extends Controller
             'school_logo' => 'nullable|image|max:2048',
             'google_education_logo' => 'nullable|image|max:2048',
             'student_card_background' => 'nullable|image|max:4096',
+            'global_ai_provider' => 'nullable|string|in:openrouter,gemini,openai,claude,groq',
+            'global_ai_api_key' => 'nullable|string',
+            'global_ai_model' => 'nullable|string',
         ]);
 
         $settingsData = $request->only([
@@ -99,6 +105,9 @@ class SettingController extends Controller
             'school_radius',
             'send_absent_notification',
             'dark_mode',
+            'global_ai_provider',
+            'global_ai_api_key',
+            'global_ai_model',
         ]);
 
         // Also update attendance_radius key to match school_radius for backward compatibility

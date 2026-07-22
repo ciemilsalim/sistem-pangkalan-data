@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Models\Setting;
 use Exception;
 
 class OpenRouterService
@@ -19,20 +20,22 @@ class OpenRouterService
      * @return string
      * @throws Exception
      */
-    public function generate(string $systemPrompt, string $userPrompt, $user): string
+    public function generate(string $systemPrompt, string $userPrompt, $user = null): string
     {
-        // Pastikan provider adalah openrouter
-        if ($user->ai_provider !== 'openrouter') {
-            throw new Exception("Penyedia AI yang dipilih bukan OpenRouter.");
+        // Ambil pengaturan dari tabel Setting
+        $provider = Setting::where('key', 'global_ai_provider')->value('value') ?: 'openrouter';
+        
+        if ($provider !== 'openrouter') {
+            throw new Exception("Penyedia AI global yang dipilih bukan OpenRouter.");
         }
 
-        $apiKey = $user->ai_api_key;
+        $apiKey = Setting::where('key', 'global_ai_api_key')->value('value');
         if (empty($apiKey)) {
-            throw new Exception("API Key OpenRouter tidak ditemukan. Harap isi di halaman Profil.");
+            throw new Exception("API Key OpenRouter global tidak ditemukan. Harap hubungi Admin.");
         }
 
-        // Tentukan model berdasarkan pilihan user, fallback ke gemini-1.5-flash
-        $model = $user->ai_model ?: 'google/gemini-1.5-flash:free';
+        // Tentukan model berdasarkan pengaturan global
+        $model = Setting::where('key', 'global_ai_model')->value('value') ?: 'google/gemini-1.5-flash:free';
 
         try {
             $response = Http::withHeaders([

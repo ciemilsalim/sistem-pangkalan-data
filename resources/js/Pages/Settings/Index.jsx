@@ -27,6 +27,9 @@ export default function Index({ auth, settings }) {
         school_logo: null,
         google_education_logo: null,
         student_card_background: null,
+        global_ai_provider: settings.global_ai_provider || 'openrouter',
+        global_ai_api_key: settings.global_ai_api_key || '',
+        global_ai_model: settings.global_ai_model || 'google/gemini-1.5-flash:free',
         _method: 'PUT',
     });
 
@@ -490,6 +493,65 @@ export default function Index({ auth, settings }) {
                                     </select>
                                     <InputError message={errors.dark_mode} className="mt-2" />
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* SECTION 5: PENGATURAN KECERDASAN BUATAN (AI) */}
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-100 pb-3 mb-6">
+                                5. Pengaturan Kecerdasan Buatan (AI)
+                            </h3>
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <InputLabel htmlFor="global_ai_provider" value="Penyedia AI Default Sekolah" />
+                                        <select
+                                            id="global_ai_provider"
+                                            value={data.global_ai_provider}
+                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                            onChange={(e) => setData('global_ai_provider', e.target.value)}
+                                        >
+                                            <option value="openrouter">OpenRouter AI (Gratis/Pro)</option>
+                                            <option value="gemini">Google Gemini</option>
+                                            <option value="openai">OpenAI (ChatGPT)</option>
+                                            <option value="claude">Anthropic Claude</option>
+                                        </select>
+                                        <InputError message={errors.global_ai_provider} className="mt-2" />
+                                    </div>
+                                    <div>
+                                        <InputLabel htmlFor="global_ai_api_key" value="API Key Default (Opsional, tapi disarankan)" />
+                                        <TextInput
+                                            id="global_ai_api_key"
+                                            type="text"
+                                            className="mt-1 block w-full text-sm font-mono"
+                                            value={data.global_ai_api_key}
+                                            onChange={(e) => setData('global_ai_api_key', e.target.value)}
+                                            placeholder={data.global_ai_provider === 'openrouter' ? 'sk-or-v1-...' : 'API Key...'}
+                                        />
+                                        <InputError message={errors.global_ai_api_key} className="mt-2" />
+                                    </div>
+                                </div>
+
+                                {data.global_ai_provider === 'openrouter' && (
+                                    <div>
+                                        <InputLabel htmlFor="global_ai_model" value="Model OpenRouter Default" />
+                                        <select
+                                            id="global_ai_model"
+                                            value={data.global_ai_model}
+                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                            onChange={(e) => setData('global_ai_model', e.target.value)}
+                                        >
+                                            <option value="google/gemini-1.5-flash:free">Google Gemini 1.5 Flash (Gratis)</option>
+                                            <option value="qwen/qwen-2.5-72b-instruct:free">Qwen 2.5 72B Instruct (Gratis)</option>
+                                            <option value="meta-llama/llama-3.1-8b-instruct:free">Meta Llama 3.1 8B Instruct (Gratis)</option>
+                                            <option value="meta-llama/llama-3.3-70b-instruct:free">Meta Llama 3.3 70B Instruct (Gratis)</option>
+                                        </select>
+                                        <p className="mt-1 text-xs text-gray-500">
+                                            Model ini akan digunakan oleh seluruh guru saat men-generate RPP atau soal.
+                                        </p>
+                                        <InputError message={errors.global_ai_model} className="mt-2" />
+                                    </div>
+                                )}
                             </div>
                         </div>
 
