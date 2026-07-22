@@ -35,7 +35,18 @@ class OpenRouterService
         }
 
         // Tentukan model berdasarkan pengaturan global
-        $model = Setting::where('key', 'global_ai_model')->value('value') ?: 'google/gemini-2.0-flash-exp:free';
+        $model = Setting::where('key', 'global_ai_model')->value('value');
+        
+        // Mencegah error jika database/cache masih menyangkut pada model lama yang sudah deprecated
+        if (empty($model) || str_contains($model, 'gemini-1.5-flash:free')) {
+            $model = 'google/gemini-2.0-flash-exp:free';
+            
+            // Auto-update DB agar konsisten
+            Setting::updateOrCreate(
+                ['key' => 'global_ai_model'],
+                ['value' => $model]
+            );
+        }
 
         try {
             $response = Http::withHeaders([
