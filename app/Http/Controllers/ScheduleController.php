@@ -7,6 +7,7 @@ use App\Models\Semester;
 use App\Models\SchoolClass;
 use App\Models\Teacher;
 use App\Models\Schedule;
+use App\Models\Subject;
 use App\Models\TeachingAssignment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -49,9 +50,12 @@ class ScheduleController extends Controller
             })
             ->get();
 
+        $subjects = Subject::orderBy('name')->get();
+
         return Inertia::render('Schedules/Index', [
             'schoolClasses' => $schoolClasses,
             'teachers' => $teachers,
+            'subjects' => $subjects,
             'schedules' => $schedules,
             'teachingAssignments' => $teachingAssignments,
             'canManageSchedules' => request()->user()->hasRole('admin') || request()->user()->hasPermissionTo('manage_schedules'),

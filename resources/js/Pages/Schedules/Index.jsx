@@ -12,7 +12,7 @@ import WeeklyGrid from './WeeklyGrid';
 
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 
-export default function SchedulesIndex({ auth, schoolClasses, teachers, schedules, teachingAssignments, canManageSchedules }) {
+export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects, schedules, teachingAssignments, canManageSchedules }) {
     const [viewMode, setViewMode] = useState('class'); // 'class' or 'teacher'
     const [selectedClassId, setSelectedClassId] = useState(schoolClasses.length > 0 ? schoolClasses[0].id : '');
     const [selectedTeacherId, setSelectedTeacherId] = useState(teachers.length > 0 ? teachers[0].id : '');
@@ -54,19 +54,15 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, schedule
         setEditingSchedule(null);
         reset();
         clearErrors();
-        // pre-fill teaching assignment if there's any available
-        if (availableAssignments.length > 0) {
-            const ta = availableAssignments[0];
-            setData({
-                teaching_assignment_id: ta.id,
-                school_class_id: ta.school_class_id,
-                subject_id: ta.subject_id,
-                teacher_id: ta.teacher_id,
-                day_of_week: '1',
-                start_time: '07:00',
-                end_time: '08:30',
-            });
-        }
+        setData({
+            teaching_assignment_id: '',
+            school_class_id: viewMode === 'class' ? selectedClassId : '',
+            subject_id: '',
+            teacher_id: viewMode === 'teacher' ? selectedTeacherId : '',
+            day_of_week: '1',
+            start_time: '07:00',
+            end_time: '08:30',
+        });
         setIsFormModalOpen(true);
     };
 
@@ -198,37 +194,57 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, schedule
                     </h2>
 
                     <div className="space-y-4">
-                        <div>
-                            <InputLabel htmlFor="teaching_assignment_id" value="Penugasan Mengajar (Mapel & Guru)" />
-                            <select
-                                id="teaching_assignment_id"
-                                value={data.teaching_assignment_id}
-                                onChange={(e) => {
-                                    const ta = availableAssignments.find(a => a.id == e.target.value);
-                                    if(ta) {
-                                        setData(prev => ({
-                                            ...prev,
-                                            teaching_assignment_id: ta.id,
-                                            school_class_id: ta.school_class_id,
-                                            subject_id: ta.subject_id,
-                                            teacher_id: ta.teacher_id
-                                        }));
-                                    }
-                                }}
-                                className="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
-                                required
-                            >
-                                <option value="" disabled>Pilih Penugasan</option>
-                                {availableAssignments.map(ta => (
-                                    <option key={ta.id} value={ta.id}>
-                                        {ta.subject?.name} - {ta.teacher?.name} (Kelas {ta.school_class?.name})
-                                    </option>
-                                ))}
-                            </select>
-                            <InputError message={errors.teaching_assignment_id} className="mt-2" />
-                            {availableAssignments.length === 0 && (
-                                <p className="text-xs text-amber-600 mt-1">Belum ada penugasan mengajar untuk {viewMode === 'class' ? 'kelas' : 'guru'} ini. Silakan tambahkan di menu Kurikulum terlebih dahulu.</p>
-                            )}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <InputLabel htmlFor="school_class_id" value="Kelas" />
+                                <select
+                                    id="school_class_id"
+                                    value={data.school_class_id}
+                                    onChange={(e) => setData('school_class_id', e.target.value)}
+                                    className="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
+                                    required
+                                >
+                                    <option value="" disabled>Pilih Kelas</option>
+                                    {schoolClasses.map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                </select>
+                                <InputError message={errors.school_class_id} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="subject_id" value="Mata Pelajaran" />
+                                <select
+                                    id="subject_id"
+                                    value={data.subject_id}
+                                    onChange={(e) => setData('subject_id', e.target.value)}
+                                    className="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
+                                    required
+                                >
+                                    <option value="" disabled>Pilih Mapel</option>
+                                    {subjects.map(s => (
+                                        <option key={s.id} value={s.id}>{s.name}</option>
+                                    ))}
+                                </select>
+                                <InputError message={errors.subject_id} className="mt-2" />
+                            </div>
+
+                            <div>
+                                <InputLabel htmlFor="teacher_id" value="Guru Pengampu" />
+                                <select
+                                    id="teacher_id"
+                                    value={data.teacher_id}
+                                    onChange={(e) => setData('teacher_id', e.target.value)}
+                                    className="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
+                                    required
+                                >
+                                    <option value="" disabled>Pilih Guru</option>
+                                    {teachers.map(t => (
+                                        <option key={t.id} value={t.id}>{t.name}</option>
+                                    ))}
+                                </select>
+                                <InputError message={errors.teacher_id} className="mt-2" />
+                            </div>
                         </div>
 
                         <div>
