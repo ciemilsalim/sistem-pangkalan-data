@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CurriculumController;
+use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\SettingController;
@@ -44,6 +45,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Curriculum Routes
     Route::get('/curriculum', [CurriculumController::class, 'index'])->name('curriculum.index');
+    Route::get('/schedules', [ScheduleController::class, 'index'])->name('schedules.index');
 
     // Curriculum Management Routes (restricted)
     Route::middleware('can:manage_curriculum')->group(function () {
