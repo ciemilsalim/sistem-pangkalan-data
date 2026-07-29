@@ -23,7 +23,10 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, schedule
 
     const { data, setData, post, put, delete: destroy, processing, errors, reset, clearErrors } = useForm({
         teaching_assignment_id: '',
-        day_of_week: 'Senin',
+        school_class_id: '',
+        subject_id: '',
+        teacher_id: '',
+        day_of_week: '1',
         start_time: '07:00',
         end_time: '08:30',
     });
@@ -53,7 +56,16 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, schedule
         clearErrors();
         // pre-fill teaching assignment if there's any available
         if (availableAssignments.length > 0) {
-            setData('teaching_assignment_id', availableAssignments[0].id);
+            const ta = availableAssignments[0];
+            setData({
+                teaching_assignment_id: ta.id,
+                school_class_id: ta.school_class_id,
+                subject_id: ta.subject_id,
+                teacher_id: ta.teacher_id,
+                day_of_week: '1',
+                start_time: '07:00',
+                end_time: '08:30',
+            });
         }
         setIsFormModalOpen(true);
     };
@@ -62,7 +74,10 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, schedule
         setEditingSchedule(schedule);
         setData({
             teaching_assignment_id: schedule.teaching_assignment_id,
-            day_of_week: schedule.day_of_week,
+            school_class_id: schedule.teaching_assignment?.school_class_id || '',
+            subject_id: schedule.teaching_assignment?.subject_id || '',
+            teacher_id: schedule.teaching_assignment?.teacher_id || '',
+            day_of_week: schedule.day_of_week.toString(),
             start_time: schedule.start_time.substring(0, 5),
             end_time: schedule.end_time.substring(0, 5),
         });
@@ -186,7 +201,18 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, schedule
                             <select
                                 id="teaching_assignment_id"
                                 value={data.teaching_assignment_id}
-                                onChange={(e) => setData('teaching_assignment_id', e.target.value)}
+                                onChange={(e) => {
+                                    const ta = availableAssignments.find(a => a.id == e.target.value);
+                                    if(ta) {
+                                        setData(prev => ({
+                                            ...prev,
+                                            teaching_assignment_id: ta.id,
+                                            school_class_id: ta.school_class_id,
+                                            subject_id: ta.subject_id,
+                                            teacher_id: ta.teacher_id
+                                        }));
+                                    }
+                                }}
                                 className="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
                                 required
                             >
@@ -212,8 +238,8 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, schedule
                                 className="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
                                 required
                             >
-                                {DAYS.map(day => (
-                                    <option key={day} value={day}>{day}</option>
+                                {DAYS.map((day, idx) => (
+                                    <option key={day} value={idx + 1}>{day}</option>
                                 ))}
                             </select>
                             <InputError message={errors.day_of_week} className="mt-2" />

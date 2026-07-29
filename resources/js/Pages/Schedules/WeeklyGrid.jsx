@@ -51,7 +51,7 @@ export default function WeeklyGrid({ schedules, onScheduleClick, viewMode }) {
                             <div key={`col-${day}`} className="flex-1 border-r border-gray-100/50 last:border-0 relative">
                                 {/* Render Schedules for this Day */}
                                 {schedules
-                                    .filter(s => s.day_of_week === day)
+                                    .filter(s => s.day_of_week == (dayIndex + 1))
                                     .map(schedule => {
                                         const startDec = timeToDecimal(schedule.start_time);
                                         const endDec = timeToDecimal(schedule.end_time);

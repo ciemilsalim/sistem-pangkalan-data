@@ -390,16 +390,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 >
                                     Mata Pelajaran
                                 </button>
-                                <button
-                                    onClick={() => setActiveTab('schedules')}
-                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
-                                        activeTab === 'schedules'
-                                            ? 'border-indigo-500 text-indigo-600'
-                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
-                                    }`}
-                                >
-                                    Jadwal Pelajaran
-                                </button>
+
                                 <button
                                     onClick={() => setActiveTab('extracurriculars')}
                                     className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
@@ -420,7 +411,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                             {activeTab === 'levels' && renderLevelsTab()}
                             {activeTab === 'schoolClasses' && renderSchoolClassesTab()}
                             {activeTab === 'subjects' && renderSubjectsTab()}
-                            {activeTab === 'schedules' && renderSchedulesTab()}
+
                             {activeTab === 'extracurriculars' && renderExtracurricularsTab()}
                         </div>
                     </div>
