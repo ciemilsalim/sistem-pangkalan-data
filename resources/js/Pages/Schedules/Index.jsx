@@ -10,9 +10,9 @@ import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 import WeeklyGrid from './WeeklyGrid';
 
-const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 
-export default function SchedulesIndex({ auth, schoolClasses, teachers, schedules, teachingAssignments }) {
+export default function SchedulesIndex({ auth, schoolClasses, teachers, schedules, teachingAssignments, canManageSchedules }) {
     const [viewMode, setViewMode] = useState('class'); // 'class' or 'teacher'
     const [selectedClassId, setSelectedClassId] = useState(schoolClasses.length > 0 ? schoolClasses[0].id : '');
     const [selectedTeacherId, setSelectedTeacherId] = useState(teachers.length > 0 ? teachers[0].id : '');
@@ -172,17 +172,19 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, schedule
                             )}
                         </div>
                         
-                        <PrimaryButton onClick={openAddModal} className="flex items-center gap-2">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-                            Tambah Jadwal
-                        </PrimaryButton>
+                        {canManageSchedules && (
+                            <PrimaryButton onClick={openAddModal} className="flex items-center gap-2">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                                Tambah Jadwal
+                            </PrimaryButton>
+                        )}
                     </div>
 
                     {/* Schedule Grid */}
                     <WeeklyGrid 
                         schedules={filteredSchedules} 
                         viewMode={viewMode}
-                        onScheduleClick={openEditModal} 
+                        onScheduleClick={canManageSchedules ? openEditModal : undefined} 
                     />
 
                 </div>

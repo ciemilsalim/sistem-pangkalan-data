@@ -54,6 +54,7 @@ class ScheduleController extends Controller
             'teachers' => $teachers,
             'schedules' => $schedules,
             'teachingAssignments' => $teachingAssignments,
+            'canManageSchedules' => request()->user()->hasRole('admin') || request()->user()->hasPermissionTo('manage_schedules'),
         ]);
     }
 }

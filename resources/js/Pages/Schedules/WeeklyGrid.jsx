@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 const HOURS = Array.from({ length: 11 }, (_, i) => i + 7); // 07:00 to 17:00
 
 export default function WeeklyGrid({ schedules, onScheduleClick, viewMode }) {
@@ -12,8 +12,8 @@ export default function WeeklyGrid({ schedules, onScheduleClick, viewMode }) {
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100/50 p-6 overflow-x-auto overflow-y-hidden">
-            <div className="min-w-[800px] h-[600px] flex flex-col">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100/50 p-6 overflow-x-auto">
+            <div className="min-w-[1000px] h-[1200px] flex flex-col">
                 {/* Header Row (Days) */}
                 <div className="flex bg-gray-50/50 rounded-t-lg border-b border-gray-100">
                     <div className="w-16 flex-shrink-0 border-r border-gray-100"></div>
@@ -79,12 +79,11 @@ export default function WeeklyGrid({ schedules, onScheduleClick, viewMode }) {
                                         return (
                                             <div
                                                 key={schedule.id}
-                                                onClick={() => onScheduleClick(schedule)}
-                                                className="absolute left-1 right-1 rounded-md p-2 text-xs overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-all duration-200 border-l-4 group"
+                                                onClick={() => onScheduleClick && onScheduleClick(schedule)}
+                                                className={`absolute left-1 right-1 rounded-md p-2 text-xs overflow-y-auto shadow-sm hover:shadow-md transition-all duration-200 border-l-4 group bg-blue-50 hover:bg-blue-100 z-10 hover:z-20 scrollbar-thin scrollbar-thumb-blue-200 ${onScheduleClick ? 'cursor-pointer' : 'cursor-default'}`}
                                                 style={{
                                                     top: `${topPercent}%`,
                                                     height: `${heightPercent}%`,
-                                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
                                                     borderColor: '#3b82f6',
                                                 }}
                                             >
