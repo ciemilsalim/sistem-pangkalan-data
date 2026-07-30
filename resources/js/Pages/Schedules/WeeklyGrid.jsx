@@ -1,7 +1,6 @@
 import React from 'react';
 
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 const HOURS = Array.from({ length: 7 }, (_, i) => i + 7); // 07:00 to 13:00
 
 const SUBJECT_COLORS = [
