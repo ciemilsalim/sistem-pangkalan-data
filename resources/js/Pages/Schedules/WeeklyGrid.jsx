@@ -1,7 +1,7 @@
 import React from 'react';
 
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-const HOURS = Array.from({ length: 7 }, (_, i) => i + 7); // 07:00 to 13:00
+const HOURS = Array.from({ length: 9 }, (_, i) => i + 7); // 07:00 to 15:00
 
 const SUBJECT_COLORS = [
     { bg: 'bg-red-50', hoverBg: 'hover:bg-red-100', border: '#f87171', text: 'text-red-900', textHover: 'group-hover:text-red-700', subText: 'text-red-700/80', timeText: 'text-red-600/60', scrollThumb: 'scrollbar-thumb-red-200' },
