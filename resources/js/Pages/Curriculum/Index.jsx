@@ -39,6 +39,8 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
     const schoolClassForm = useForm({ name: '', level_id: '', teacher_id: '' });
     const subjectForm = useForm({ name: '', code: '', description: '' });
     const scheduleForm = useForm({
+        schedule_type: 'regular',
+        cocurricular_id: '',
         school_class_id: '',
         subject_id: '',
         teacher_id: '',
@@ -102,6 +104,8 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
         } else if (entityType === 'schedule') {
             scheduleForm.reset();
             scheduleForm.setData({
+                schedule_type: 'regular',
+                cocurricular_id: cocurriculars.length > 0 ? cocurriculars[0].id.toString() : '',
                 school_class_id: schoolClasses.length > 0 ? schoolClasses[0].id.toString() : '',
                 subject_id: subjects.length > 0 ? subjects[0].id.toString() : '',
                 teacher_id: teachers.length > 0 ? teachers[0].id.toString() : '',
@@ -181,6 +185,8 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             const startClean = record.start_time ? record.start_time.substring(0, 5) : '';
             const endClean = record.end_time ? record.end_time.substring(0, 5) : '';
             scheduleForm.setData({
+                schedule_type: record.schedule_type || 'regular',
+                cocurricular_id: record.cocurricular_id ? record.cocurricular_id.toString() : (cocurriculars.length > 0 ? cocurriculars[0].id.toString() : ''),
                 school_class_id: record.teaching_assignment?.school_class_id?.toString() || '',
                 subject_id: record.teaching_assignment?.subject_id?.toString() || '',
                 teacher_id: record.teaching_assignment?.teacher_id?.toString() || '',
@@ -683,56 +689,104 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
 
                         {activeEntity === 'schedule' && (
                             <>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                    <div>
-                                        <InputLabel htmlFor="sch_class" value="Kelas" />
-                                        <select
-                                            id="sch_class"
-                                            value={scheduleForm.data.school_class_id}
-                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
-                                            onChange={(e) => scheduleForm.setData('school_class_id', e.target.value)}
-                                            required
-                                        >
-                                            <option value="">-- Pilih Kelas --</option>
-                                            {schoolClasses.map((cls) => (
-                                                <option key={cls.id} value={cls.id}>{cls.name}</option>
-                                            ))}
-                                        </select>
-                                        <InputError message={scheduleForm.errors.school_class_id} className="mt-2" />
+                                <div className="mb-4">
+                                    <InputLabel value="Tipe Jadwal" />
+                                    <div className="flex gap-4 mt-2">
+                                        <label className="flex items-center">
+                                            <input
+                                                type="radio"
+                                                name="schedule_type"
+                                                value="regular"
+                                                checked={scheduleForm.data.schedule_type === 'regular'}
+                                                onChange={(e) => scheduleForm.setData('schedule_type', e.target.value)}
+                                                className="mr-2 border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                            />
+                                            <span className="text-sm text-gray-700 dark:text-gray-300">Reguler</span>
+                                        </label>
+                                        <label className="flex items-center">
+                                            <input
+                                                type="radio"
+                                                name="schedule_type"
+                                                value="cocurricular"
+                                                checked={scheduleForm.data.schedule_type === 'cocurricular'}
+                                                onChange={(e) => scheduleForm.setData('schedule_type', e.target.value)}
+                                                className="mr-2 border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                            />
+                                            <span className="text-sm text-gray-700 dark:text-gray-300">Proyek Kokurikuler</span>
+                                        </label>
                                     </div>
-                                    <div>
-                                        <InputLabel htmlFor="sch_subject" value="Mata Pelajaran" />
-                                        <select
-                                            id="sch_subject"
-                                            value={scheduleForm.data.subject_id}
-                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
-                                            onChange={(e) => scheduleForm.setData('subject_id', e.target.value)}
-                                            required
-                                        >
-                                            <option value="">-- Pilih Mapel --</option>
-                                            {subjects.map((sub) => (
-                                                <option key={sub.id} value={sub.id}>{sub.name} ({sub.code})</option>
-                                            ))}
-                                        </select>
-                                        <InputError message={scheduleForm.errors.subject_id} className="mt-2" />
-                                    </div>
-                                    <div>
-                                        <InputLabel htmlFor="sch_teacher" value="Guru Pengampu" />
-                                        <select
-                                            id="sch_teacher"
-                                            value={scheduleForm.data.teacher_id}
-                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
-                                            onChange={(e) => scheduleForm.setData('teacher_id', e.target.value)}
-                                            required
-                                        >
-                                            <option value="">-- Pilih Guru --</option>
-                                            {teachers.map((t) => (
-                                                <option key={t.id} value={t.id}>{t.name}</option>
-                                            ))}
-                                        </select>
-                                        <InputError message={scheduleForm.errors.teacher_id} className="mt-2" />
-                                    </div>
+                                    <InputError message={scheduleForm.errors.schedule_type} className="mt-2" />
                                 </div>
+
+                                {scheduleForm.data.schedule_type === 'cocurricular' ? (
+                                    <div className="mb-4">
+                                        <InputLabel htmlFor="sch_cocurricular" value="Proyek Kokurikuler" />
+                                        <select
+                                            id="sch_cocurricular"
+                                            value={scheduleForm.data.cocurricular_id}
+                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                            onChange={(e) => scheduleForm.setData('cocurricular_id', e.target.value)}
+                                            required={scheduleForm.data.schedule_type === 'cocurricular'}
+                                        >
+                                            <option value="">-- Pilih Proyek Kokurikuler --</option>
+                                            {cocurriculars.map((c) => (
+                                                <option key={c.id} value={c.id}>{c.title} ({c.code || 'Proyek'})</option>
+                                            ))}
+                                        </select>
+                                        <InputError message={scheduleForm.errors.cocurricular_id} className="mt-2" />
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                        <div>
+                                            <InputLabel htmlFor="sch_class" value="Kelas" />
+                                            <select
+                                                id="sch_class"
+                                                value={scheduleForm.data.school_class_id}
+                                                className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                                onChange={(e) => scheduleForm.setData('school_class_id', e.target.value)}
+                                                required={scheduleForm.data.schedule_type === 'regular'}
+                                            >
+                                                <option value="">-- Pilih Kelas --</option>
+                                                {schoolClasses.map((cls) => (
+                                                    <option key={cls.id} value={cls.id}>{cls.name}</option>
+                                                ))}
+                                            </select>
+                                            <InputError message={scheduleForm.errors.school_class_id} className="mt-2" />
+                                        </div>
+                                        <div>
+                                            <InputLabel htmlFor="sch_subject" value="Mata Pelajaran" />
+                                            <select
+                                                id="sch_subject"
+                                                value={scheduleForm.data.subject_id}
+                                                className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                                onChange={(e) => scheduleForm.setData('subject_id', e.target.value)}
+                                                required={scheduleForm.data.schedule_type === 'regular'}
+                                            >
+                                                <option value="">-- Pilih Mapel --</option>
+                                                {subjects.map((sub) => (
+                                                    <option key={sub.id} value={sub.id}>{sub.name} ({sub.code})</option>
+                                                ))}
+                                            </select>
+                                            <InputError message={scheduleForm.errors.subject_id} className="mt-2" />
+                                        </div>
+                                        <div>
+                                            <InputLabel htmlFor="sch_teacher" value="Guru Pengampu" />
+                                            <select
+                                                id="sch_teacher"
+                                                value={scheduleForm.data.teacher_id}
+                                                className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                                onChange={(e) => scheduleForm.setData('teacher_id', e.target.value)}
+                                                required={scheduleForm.data.schedule_type === 'regular'}
+                                            >
+                                                <option value="">-- Pilih Guru --</option>
+                                                {teachers.map((t) => (
+                                                    <option key={t.id} value={t.id}>{t.name}</option>
+                                                ))}
+                                            </select>
+                                            <InputError message={scheduleForm.errors.teacher_id} className="mt-2" />
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="mb-4">
                                     <InputLabel htmlFor="sch_day" value="Hari" />
                                     <select
@@ -1477,13 +1531,29 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                         <tr key={sch.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-gray-100">{getDayName(sch.day_of_week)}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-600">{startClean} - {endClean}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-950">{sch.teaching_assignment?.school_class?.name || '-'}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                                                {sch.teaching_assignment?.subject?.name || '-'} <span className="text-xs text-gray-400 font-semibold">({sch.teaching_assignment?.subject?.code})</span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 font-semibold">
-                                                {sch.teaching_assignment?.teacher?.name || '-'}
-                                            </td>
+                                            {sch.schedule_type === 'cocurricular' ? (
+                                                <>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-950">
+                                                        {sch.cocurricular?.school_classes?.map(c => c.name).join(', ') || '-'}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-green-700 dark:text-green-400 font-bold">
+                                                        {sch.cocurricular?.title || '-'} <span className="text-xs text-gray-400 font-semibold">({sch.cocurricular?.code || 'Proyek'})</span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 font-semibold max-w-xs truncate">
+                                                        {sch.cocurricular?.teachers?.map(t => t.name).join(', ') || '-'}
+                                                    </td>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-950">{sch.teaching_assignment?.school_class?.name || '-'}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                                        {sch.teaching_assignment?.subject?.name || '-'} <span className="text-xs text-gray-400 font-semibold">({sch.teaching_assignment?.subject?.code})</span>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 font-semibold">
+                                                        {sch.teaching_assignment?.teacher?.name || '-'}
+                                                    </td>
+                                                </>
+                                            )}
                                             {canManageCurriculum && (
                                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                     <button onClick={() => openEditModal('schedule', sch)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">

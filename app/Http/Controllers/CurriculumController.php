@@ -385,41 +385,122 @@ class CurriculumController extends Controller
     /*                                6. SCHEDULES                                */
     /* -------------------------------------------------------------------------- */
 
+    private function checkScheduleConflict($dayOfWeek, $startTime, $endTime, $semesterId, $schoolClassIds, $teacherIds, $ignoreScheduleId = null)
+    {
+        // Find any schedule in the same semester and day that overlaps in time
+        $query = Schedule::where('semester_id', $semesterId)
+            ->where('day_of_week', $dayOfWeek)
+            ->where(function ($q) use ($startTime, $endTime) {
+                $q->where('start_time', '<', $endTime)
+                  ->where('end_time', '>', $startTime);
+            })->with(['teachingAssignment', 'cocurricular.schoolClasses', 'cocurricular.teachers']);
+
+        if ($ignoreScheduleId) {
+            $query->where('id', '!=', $ignoreScheduleId);
+        }
+
+        $conflicts = $query->get();
+
+        foreach ($conflicts as $conflict) {
+            if ($conflict->schedule_type === 'regular' && $conflict->teachingAssignment) {
+                if (in_array($conflict->teachingAssignment->school_class_id, $schoolClassIds)) {
+                    return "Terdapat bentrok waktu dengan jadwal reguler di kelas tersebut.";
+                }
+                if (in_array($conflict->teachingAssignment->teacher_id, $teacherIds)) {
+                    return "Terdapat bentrok waktu mengajar guru tersebut pada jadwal reguler lain.";
+                }
+            } elseif ($conflict->schedule_type === 'cocurricular' && $conflict->cocurricular) {
+                $conflictClassIds = $conflict->cocurricular->schoolClasses->pluck('id')->toArray();
+                $conflictTeacherIds = $conflict->cocurricular->teachers->pluck('id')->toArray();
+
+                if (count(array_intersect($conflictClassIds, $schoolClassIds)) > 0) {
+                    return "Terdapat bentrok waktu dengan jadwal proyek kokurikuler di salah satu kelas target.";
+                }
+                if (count(array_intersect($conflictTeacherIds, $teacherIds)) > 0) {
+                    return "Terdapat bentrok waktu dengan penugasan fasilitator proyek kokurikuler guru tersebut.";
+                }
+            }
+        }
+
+        return null; // No conflict
+    }
+
     public function storeSchedule(Request $request): RedirectResponse
     {
         $request->validate([
-            'school_class_id' => 'required|exists:school_classes,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'teacher_id' => 'required|exists:teachers,id',
+            'schedule_type' => 'required|in:regular,cocurricular',
             'day_of_week' => 'required|integer|between:1,7',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
+            'school_class_id' => 'required_if:schedule_type,regular|nullable|exists:school_classes,id',
+            'subject_id' => 'required_if:schedule_type,regular|nullable|exists:subjects,id',
+            'teacher_id' => 'required_if:schedule_type,regular|nullable|exists:teachers,id',
+            'cocurricular_id' => 'required_if:schedule_type,cocurricular|nullable|exists:cocurriculars,id',
         ]);
 
+        $activeSemesterId = session('active_semester_id') ?? Semester::where('is_active', true)->value('id');
+        $schoolClassIds = [];
+        $teacherIds = [];
+
+        if ($request->schedule_type === 'regular') {
+            $schoolClassIds = [$request->school_class_id];
+            $teacherIds = [$request->teacher_id];
+        } else {
+            $cocurricular = \App\Models\Cocurricular::with(['schoolClasses', 'teachers'])->findOrFail($request->cocurricular_id);
+            $schoolClassIds = $cocurricular->schoolClasses->pluck('id')->toArray();
+            $teacherIds = $cocurricular->teachers->pluck('id')->toArray();
+        }
+
+        // Check Conflict
+        $conflictError = $this->checkScheduleConflict(
+            $request->day_of_week, 
+            $request->start_time, 
+            $request->end_time, 
+            $activeSemesterId, 
+            $schoolClassIds, 
+            $teacherIds
+        );
+
+        if ($conflictError) {
+            return redirect()->back()->withErrors(['error' => $conflictError])->withInput();
+        }
+
         \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
-            // Find or create TeachingAssignment
-            $assignment = TeachingAssignment::firstOrCreate(
-                [
-                    'school_class_id' => $request->school_class_id,
-                    'subject_id' => $request->subject_id,
-                ],
-                [
-                    'teacher_id' => $request->teacher_id,
-                ]
-            );
+            if ($request->schedule_type === 'regular') {
+                // Find or create TeachingAssignment
+                $assignment = TeachingAssignment::firstOrCreate(
+                    [
+                        'school_class_id' => $request->school_class_id,
+                        'subject_id' => $request->subject_id,
+                    ],
+                    [
+                        'teacher_id' => $request->teacher_id,
+                    ]
+                );
 
-            // If the teacher has changed, update it to the newly selected teacher
-            if ($assignment->teacher_id != $request->teacher_id) {
-                $assignment->update(['teacher_id' => $request->teacher_id]);
+                // If the teacher has changed, update it to the newly selected teacher
+                if ($assignment->teacher_id != $request->teacher_id) {
+                    $assignment->update(['teacher_id' => $request->teacher_id]);
+                }
+
+                Schedule::create([
+                    'schedule_type' => 'regular',
+                    'teaching_assignment_id' => $assignment->id,
+                    'cocurricular_id' => null,
+                    'day_of_week' => $request->day_of_week,
+                    'start_time' => $request->start_time,
+                    'end_time' => $request->end_time,
+                ]);
+            } else {
+                Schedule::create([
+                    'schedule_type' => 'cocurricular',
+                    'teaching_assignment_id' => null,
+                    'cocurricular_id' => $request->cocurricular_id,
+                    'day_of_week' => $request->day_of_week,
+                    'start_time' => $request->start_time,
+                    'end_time' => $request->end_time,
+                ]);
             }
-
-            // Create Schedule pointing to this teaching assignment
-            Schedule::create([
-                'teaching_assignment_id' => $assignment->id,
-                'day_of_week' => $request->day_of_week,
-                'start_time' => $request->start_time,
-                'end_time' => $request->end_time,
-            ]);
         });
 
         return redirect()->route('curriculum.index')->with('message', 'Jadwal Pelajaran berhasil ditambahkan.');
@@ -428,38 +509,81 @@ class CurriculumController extends Controller
     public function updateSchedule(Request $request, Schedule $schedule): RedirectResponse
     {
         $request->validate([
-            'school_class_id' => 'required|exists:school_classes,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'teacher_id' => 'required|exists:teachers,id',
+            'schedule_type' => 'required|in:regular,cocurricular',
             'day_of_week' => 'required|integer|between:1,7',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
+            'school_class_id' => 'required_if:schedule_type,regular|nullable|exists:school_classes,id',
+            'subject_id' => 'required_if:schedule_type,regular|nullable|exists:subjects,id',
+            'teacher_id' => 'required_if:schedule_type,regular|nullable|exists:teachers,id',
+            'cocurricular_id' => 'required_if:schedule_type,cocurricular|nullable|exists:cocurriculars,id',
         ]);
 
+        $activeSemesterId = session('active_semester_id') ?? Semester::where('is_active', true)->value('id');
+        $schoolClassIds = [];
+        $teacherIds = [];
+
+        if ($request->schedule_type === 'regular') {
+            $schoolClassIds = [$request->school_class_id];
+            $teacherIds = [$request->teacher_id];
+        } else {
+            $cocurricular = \App\Models\Cocurricular::with(['schoolClasses', 'teachers'])->findOrFail($request->cocurricular_id);
+            $schoolClassIds = $cocurricular->schoolClasses->pluck('id')->toArray();
+            $teacherIds = $cocurricular->teachers->pluck('id')->toArray();
+        }
+
+        // Check Conflict
+        $conflictError = $this->checkScheduleConflict(
+            $request->day_of_week, 
+            $request->start_time, 
+            $request->end_time, 
+            $activeSemesterId, 
+            $schoolClassIds, 
+            $teacherIds,
+            $schedule->id
+        );
+
+        if ($conflictError) {
+            return redirect()->back()->withErrors(['error' => $conflictError])->withInput();
+        }
+
         \Illuminate\Support\Facades\DB::transaction(function () use ($request, $schedule) {
-            // Find or create TeachingAssignment
-            $assignment = TeachingAssignment::firstOrCreate(
-                [
-                    'school_class_id' => $request->school_class_id,
-                    'subject_id' => $request->subject_id,
-                ],
-                [
-                    'teacher_id' => $request->teacher_id,
-                ]
-            );
+            if ($request->schedule_type === 'regular') {
+                // Find or create TeachingAssignment
+                $assignment = TeachingAssignment::firstOrCreate(
+                    [
+                        'school_class_id' => $request->school_class_id,
+                        'subject_id' => $request->subject_id,
+                    ],
+                    [
+                        'teacher_id' => $request->teacher_id,
+                    ]
+                );
 
-            // If the teacher has changed, update it to the newly selected teacher
-            if ($assignment->teacher_id != $request->teacher_id) {
-                $assignment->update(['teacher_id' => $request->teacher_id]);
+                // If the teacher has changed, update it to the newly selected teacher
+                if ($assignment->teacher_id != $request->teacher_id) {
+                    $assignment->update(['teacher_id' => $request->teacher_id]);
+                }
+
+                // Update Schedule attributes
+                $schedule->update([
+                    'schedule_type' => 'regular',
+                    'teaching_assignment_id' => $assignment->id,
+                    'cocurricular_id' => null,
+                    'day_of_week' => $request->day_of_week,
+                    'start_time' => $request->start_time,
+                    'end_time' => $request->end_time,
+                ]);
+            } else {
+                $schedule->update([
+                    'schedule_type' => 'cocurricular',
+                    'teaching_assignment_id' => null,
+                    'cocurricular_id' => $request->cocurricular_id,
+                    'day_of_week' => $request->day_of_week,
+                    'start_time' => $request->start_time,
+                    'end_time' => $request->end_time,
+                ]);
             }
-
-            // Update Schedule attributes
-            $schedule->update([
-                'teaching_assignment_id' => $assignment->id,
-                'day_of_week' => $request->day_of_week,
-                'start_time' => $request->start_time,
-                'end_time' => $request->end_time,
-            ]);
         });
 
         return redirect()->route('curriculum.index')->with('message', 'Jadwal Pelajaran berhasil diperbarui.');

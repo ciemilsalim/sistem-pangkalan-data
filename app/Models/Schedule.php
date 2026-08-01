@@ -11,6 +11,8 @@ class Schedule extends Model
 
     protected $fillable = [
         'teaching_assignment_id',
+        'cocurricular_id',
+        'schedule_type',
         'day_of_week',
         'start_time',
         'end_time',
@@ -45,5 +47,13 @@ class Schedule extends Model
     public function subjectAttendances()
     {
         return $this->hasMany(SubjectAttendance::class);
+    }
+
+    /**
+     * Mendapatkan data proyek kokurikuler yang terkait dengan jadwal ini.
+     */
+    public function cocurricular()
+    {
+        return $this->belongsTo(Cocurricular::class);
     }
 }

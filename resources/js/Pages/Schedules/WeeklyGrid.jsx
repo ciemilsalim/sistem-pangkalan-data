@@ -89,15 +89,27 @@ export default function WeeklyGrid({ schedules, onScheduleClick, viewMode }) {
                                         const topPercent = ((clampedStart - minHour) / (maxHour - minHour)) * 100;
                                         const heightPercent = ((clampedEnd - clampedStart) / (maxHour - minHour)) * 100;
                                         
-                                        const assignment = schedule.teaching_assignment;
-                                        if (!assignment) return null;
+                                        const isCocurricular = schedule.schedule_type === 'cocurricular';
+                                        
+                                        let title, secondaryText, color;
 
-                                        const subjectName = assignment.subject?.name || 'Unknown Subject';
-                                        const secondaryText = viewMode === 'teacher' 
-                                            ? (assignment.school_class?.name || '-')
-                                            : (assignment.teacher?.name || '-');
-                                            
-                                        const color = getSubjectColor(assignment.subject_id);
+                                        if (isCocurricular) {
+                                            const cocur = schedule.cocurricular;
+                                            if (!cocur) return null;
+                                            title = cocur.title || 'Proyek Kokurikuler';
+                                            secondaryText = viewMode === 'teacher'
+                                                ? (cocur.school_classes?.map(c => c.name).join(', ') || '-')
+                                                : (cocur.teachers?.map(t => t.name).join(', ') || '-');
+                                            color = SUBJECT_COLORS[3]; // Use green base color for Cocurricular
+                                        } else {
+                                            const assignment = schedule.teaching_assignment;
+                                            if (!assignment) return null;
+                                            title = assignment.subject?.name || 'Unknown Subject';
+                                            secondaryText = viewMode === 'teacher' 
+                                                ? (assignment.school_class?.name || '-')
+                                                : (assignment.teacher?.name || '-');
+                                            color = getSubjectColor(assignment.subject_id);
+                                        }
                                             
                                         return (
                                             <div
@@ -111,7 +123,7 @@ export default function WeeklyGrid({ schedules, onScheduleClick, viewMode }) {
                                                 }}
                                             >
                                                 <div className={`font-semibold leading-tight mb-1 ${color.text} ${color.textHover}`}>
-                                                    {subjectName}
+                                                    {title}
                                                 </div>
                                                 <div className={`truncate ${color.subText}`}>
                                                     {secondaryText}
