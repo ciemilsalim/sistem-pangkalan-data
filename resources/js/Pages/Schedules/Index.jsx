@@ -12,7 +12,7 @@ import WeeklyGrid from './WeeklyGrid';
 
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 
-export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects, schedules, teachingAssignments, canManageSchedules }) {
+export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects, schedules, teachingAssignments, cocurriculars = [], canManageSchedules }) {
     const [viewMode, setViewMode] = useState('class'); // 'class' or 'teacher'
     const [selectedClassId, setSelectedClassId] = useState(schoolClasses.length > 0 ? schoolClasses[0].id : '');
     const [selectedTeacherId, setSelectedTeacherId] = useState(teachers.length > 0 ? teachers[0].id : '');
@@ -22,6 +22,8 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
     const [editingSchedule, setEditingSchedule] = useState(null);
 
     const { data, setData, post, put, delete: destroy, processing, errors, reset, clearErrors } = useForm({
+        schedule_type: 'regular',
+        cocurricular_id: '',
         teaching_assignment_id: '',
         school_class_id: '',
         subject_id: '',
@@ -34,15 +36,30 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
     const filteredSchedules = useMemo(() => {
         return schedules.filter(s => {
             if (viewMode === 'class') {
-                return s.teaching_assignment?.school_class_id == selectedClassId;
+                // Regular: match by teaching assignment class
+                if (s.schedule_type === 'regular' || !s.schedule_type) {
+                    return s.teaching_assignment?.school_class_id == selectedClassId;
+                }
+                // Cocurricular: match if any of the target classes matches
+                if (s.schedule_type === 'cocurricular' && s.cocurricular) {
+                    return s.cocurricular.school_classes?.some(c => c.id == selectedClassId);
+                }
+                return false;
             } else {
-                return s.teaching_assignment?.teacher_id == selectedTeacherId;
+                // Regular: match by teaching assignment teacher
+                if (s.schedule_type === 'regular' || !s.schedule_type) {
+                    return s.teaching_assignment?.teacher_id == selectedTeacherId;
+                }
+                // Cocurricular: match if any facilitator teacher matches
+                if (s.schedule_type === 'cocurricular' && s.cocurricular) {
+                    return s.cocurricular.teachers?.some(t => t.id == selectedTeacherId);
+                }
+                return false;
             }
         });
     }, [schedules, viewMode, selectedClassId, selectedTeacherId]);
 
     const availableAssignments = useMemo(() => {
-        // Only show assignments relevant to the current filter to make adding easier
         if (viewMode === 'class') {
             return teachingAssignments.filter(ta => ta.school_class_id == selectedClassId);
         } else {
@@ -55,6 +72,8 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
         reset();
         clearErrors();
         setData({
+            schedule_type: 'regular',
+            cocurricular_id: cocurriculars.length > 0 ? cocurriculars[0].id.toString() : '',
             teaching_assignment_id: '',
             school_class_id: viewMode === 'class' ? selectedClassId : '',
             subject_id: '',
@@ -69,7 +88,9 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
     const openEditModal = (schedule) => {
         setEditingSchedule(schedule);
         setData({
-            teaching_assignment_id: schedule.teaching_assignment_id,
+            schedule_type: schedule.schedule_type || 'regular',
+            cocurricular_id: schedule.cocurricular_id ? schedule.cocurricular_id.toString() : (cocurriculars.length > 0 ? cocurriculars[0].id.toString() : ''),
+            teaching_assignment_id: schedule.teaching_assignment_id || '',
             school_class_id: schedule.teaching_assignment?.school_class_id || '',
             subject_id: schedule.teaching_assignment?.subject_id || '',
             teacher_id: schedule.teaching_assignment?.teacher_id || '',
@@ -113,6 +134,15 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
         destroy(route('curriculum.schedules.destroy', editingSchedule.id), {
             onSuccess: () => closeModals(),
         });
+    };
+
+    // Helper to get display name for the delete modal
+    const getScheduleDisplayName = () => {
+        if (!editingSchedule) return '';
+        if (editingSchedule.schedule_type === 'cocurricular' && editingSchedule.cocurricular) {
+            return editingSchedule.cocurricular.title;
+        }
+        return editingSchedule.teaching_assignment?.subject?.name || 'Jadwal';
     };
 
     return (
@@ -188,64 +218,136 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
 
             {/* Add / Edit Form Modal */}
             <Modal show={isFormModalOpen} onClose={closeModals}>
-                <form onSubmit={submitForm} className="p-6">
+                <form onSubmit={submitForm} className="p-6 max-h-[85vh] overflow-y-auto">
                     <h2 className="text-lg font-medium text-gray-900 mb-6">
                         {editingSchedule ? 'Edit Jadwal Pelajaran' : 'Tambah Jadwal Pelajaran'}
                     </h2>
 
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <InputLabel htmlFor="school_class_id" value="Kelas" />
-                                <select
-                                    id="school_class_id"
-                                    value={data.school_class_id}
-                                    onChange={(e) => setData('school_class_id', e.target.value)}
-                                    className="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
-                                    required
-                                >
-                                    <option value="" disabled>Pilih Kelas</option>
-                                    {schoolClasses.map(c => (
-                                        <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                </select>
-                                <InputError message={errors.school_class_id} className="mt-2" />
-                            </div>
-
-                            <div>
-                                <InputLabel htmlFor="subject_id" value="Mata Pelajaran" />
-                                <select
-                                    id="subject_id"
-                                    value={data.subject_id}
-                                    onChange={(e) => setData('subject_id', e.target.value)}
-                                    className="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
-                                    required
-                                >
-                                    <option value="" disabled>Pilih Mapel</option>
-                                    {subjects.map(s => (
-                                        <option key={s.id} value={s.id}>{s.name}</option>
-                                    ))}
-                                </select>
-                                <InputError message={errors.subject_id} className="mt-2" />
-                            </div>
-
-                            <div>
-                                <InputLabel htmlFor="teacher_id" value="Guru Pengampu" />
-                                <select
-                                    id="teacher_id"
-                                    value={data.teacher_id}
-                                    onChange={(e) => setData('teacher_id', e.target.value)}
-                                    className="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
-                                    required
-                                >
-                                    <option value="" disabled>Pilih Guru</option>
-                                    {teachers.map(t => (
-                                        <option key={t.id} value={t.id}>{t.name}</option>
-                                    ))}
-                                </select>
-                                <InputError message={errors.teacher_id} className="mt-2" />
-                            </div>
+                    {/* Error display */}
+                    {errors.error && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
+                            {errors.error}
                         </div>
+                    )}
+
+                    <div className="space-y-4">
+                        {/* Schedule Type Toggle */}
+                        <div>
+                            <InputLabel value="Tipe Jadwal" />
+                            <div className="flex gap-4 mt-2">
+                                <label className="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="schedule_type"
+                                        value="regular"
+                                        checked={data.schedule_type === 'regular'}
+                                        onChange={(e) => setData('schedule_type', e.target.value)}
+                                        className="mr-2 border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                    />
+                                    <span className="text-sm text-gray-700">Mapel Reguler</span>
+                                </label>
+                                <label className="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="schedule_type"
+                                        value="cocurricular"
+                                        checked={data.schedule_type === 'cocurricular'}
+                                        onChange={(e) => setData('schedule_type', e.target.value)}
+                                        className="mr-2 border-gray-300 text-green-600 shadow-sm focus:ring-green-500"
+                                    />
+                                    <span className="text-sm text-gray-700">Proyek Kokurikuler</span>
+                                </label>
+                            </div>
+                            <InputError message={errors.schedule_type} className="mt-2" />
+                        </div>
+
+                        {/* Conditional Fields based on Type */}
+                        {data.schedule_type === 'cocurricular' ? (
+                            <div>
+                                <InputLabel htmlFor="cocurricular_id" value="Proyek Kokurikuler" />
+                                <select
+                                    id="cocurricular_id"
+                                    value={data.cocurricular_id}
+                                    onChange={(e) => setData('cocurricular_id', e.target.value)}
+                                    className="mt-1 block w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm"
+                                    required
+                                >
+                                    <option value="">-- Pilih Proyek Kokurikuler --</option>
+                                    {cocurriculars.map(c => (
+                                        <option key={c.id} value={c.id}>
+                                            {c.code ? `[${c.code}] ` : ''}{c.title} — {c.school_classes?.map(sc => sc.name).join(', ') || 'Belum ada kelas'}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError message={errors.cocurricular_id} className="mt-2" />
+                                
+                                {/* Preview info for selected cocurricular */}
+                                {data.cocurricular_id && (() => {
+                                    const selected = cocurriculars.find(c => c.id == data.cocurricular_id);
+                                    if (!selected) return null;
+                                    return (
+                                        <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md text-sm space-y-1">
+                                            <p className="text-green-800 font-semibold">{selected.title}</p>
+                                            <p className="text-green-700"><strong>Kelas Target:</strong> {selected.school_classes?.map(c => c.name).join(', ') || '-'}</p>
+                                            <p className="text-green-700"><strong>Tim Fasilitator:</strong> {selected.teachers?.map(t => t.name).join(', ') || '-'}</p>
+                                        </div>
+                                    );
+                                })()}
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <InputLabel htmlFor="school_class_id" value="Kelas" />
+                                    <select
+                                        id="school_class_id"
+                                        value={data.school_class_id}
+                                        onChange={(e) => setData('school_class_id', e.target.value)}
+                                        className="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
+                                        required
+                                    >
+                                        <option value="" disabled>Pilih Kelas</option>
+                                        {schoolClasses.map(c => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                    <InputError message={errors.school_class_id} className="mt-2" />
+                                </div>
+
+                                <div>
+                                    <InputLabel htmlFor="subject_id" value="Mata Pelajaran" />
+                                    <select
+                                        id="subject_id"
+                                        value={data.subject_id}
+                                        onChange={(e) => setData('subject_id', e.target.value)}
+                                        className="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
+                                        required
+                                    >
+                                        <option value="" disabled>Pilih Mapel</option>
+                                        {subjects.map(s => (
+                                            <option key={s.id} value={s.id}>{s.name}</option>
+                                        ))}
+                                    </select>
+                                    <InputError message={errors.subject_id} className="mt-2" />
+                                </div>
+
+                                <div>
+                                    <InputLabel htmlFor="teacher_id" value="Guru Pengampu" />
+                                    <select
+                                        id="teacher_id"
+                                        value={data.teacher_id}
+                                        onChange={(e) => setData('teacher_id', e.target.value)}
+                                        className="mt-1 block w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm"
+                                        required
+                                    >
+                                        <option value="" disabled>Pilih Guru</option>
+                                        {teachers.map(t => (
+                                            <option key={t.id} value={t.id}>{t.name}</option>
+                                        ))}
+                                    </select>
+                                    <InputError message={errors.teacher_id} className="mt-2" />
+                                </div>
+                            </div>
+                        )}
 
                         <div>
                             <InputLabel htmlFor="day_of_week" value="Hari" />
@@ -317,7 +419,7 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
                 <div className="p-6">
                     <h2 className="text-lg font-medium text-gray-900">Konfirmasi Hapus</h2>
                     <p className="mt-3 text-sm text-gray-600">
-                        Apakah Anda yakin ingin menghapus jadwal <strong>{editingSchedule?.teaching_assignment?.subject?.name}</strong> pada hari <strong>{editingSchedule?.day_of_week}</strong> jam <strong>{editingSchedule?.start_time?.substring(0,5)}</strong>?
+                        Apakah Anda yakin ingin menghapus jadwal <strong>{getScheduleDisplayName()}</strong> pada hari <strong>{editingSchedule?.day_of_week}</strong> jam <strong>{editingSchedule?.start_time?.substring(0,5)}</strong>?
                     </p>
                     <div className="mt-6 flex justify-end gap-3">
                         <SecondaryButton onClick={closeModals}>Batal</SecondaryButton>

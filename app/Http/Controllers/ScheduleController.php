@@ -9,6 +9,7 @@ use App\Models\Teacher;
 use App\Models\Schedule;
 use App\Models\Subject;
 use App\Models\TeachingAssignment;
+use App\Models\Cocurricular;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -35,7 +36,9 @@ class ScheduleController extends Controller
         $schedules = Schedule::with([
             'teachingAssignment.schoolClass',
             'teachingAssignment.subject',
-            'teachingAssignment.teacher'
+            'teachingAssignment.teacher',
+            'cocurricular.schoolClasses',
+            'cocurricular.teachers',
         ])
           ->when($activeSemesterId, function ($query, $activeSemesterId) {
               return $query->where('semester_id', $activeSemesterId);
@@ -52,12 +55,20 @@ class ScheduleController extends Controller
 
         $subjects = Subject::orderBy('name')->get();
 
+        $cocurriculars = Cocurricular::with(['level', 'teachers', 'schoolClasses'])
+            ->when($activeAcademicYearId, function ($query, $activeAcademicYearId) {
+                return $query->where('academic_year_id', $activeAcademicYearId);
+            })
+            ->orderBy('title')
+            ->get();
+
         return Inertia::render('Schedules/Index', [
             'schoolClasses' => $schoolClasses,
             'teachers' => $teachers,
             'subjects' => $subjects,
             'schedules' => $schedules,
             'teachingAssignments' => $teachingAssignments,
+            'cocurriculars' => $cocurriculars,
             'canManageSchedules' => request()->user()->hasRole('admin') || request()->user()->hasPermissionTo('manage_schedules'),
         ]);
     }
