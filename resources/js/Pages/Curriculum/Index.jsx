@@ -28,6 +28,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
     const [modalType, setModalType] = useState(null); // 'create' or 'edit' or 'delete'
     const [activeEntity, setActiveEntity] = useState(null); // 'academicYear', 'semester', 'level', 'schoolClass', 'subject', 'schedule', 'extracurricular'
     const [selectedRecord, setSelectedRecord] = useState(null);
+    const [extraStudentSearch, setExtraStudentSearch] = useState('');
 
     // Form Hooks for each entity
     const academicYearForm = useForm({ name: '', is_active: false });
@@ -105,6 +106,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                 student_ids: [],
             });
             extracurricularForm.clearErrors();
+            setExtraStudentSearch('');
         }
     };
 
@@ -167,6 +169,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                 student_ids: linkedStudentIds,
             });
             extracurricularForm.clearErrors();
+            setExtraStudentSearch('');
         }
     };
 
@@ -749,12 +752,25 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     <InputError message={extracurricularForm.errors.description} className="mt-2" />
                                 </div>
                                 <div className="mb-4">
+                                    <InputLabel htmlFor="extra_student_search" value="Cari Nama Siswa" />
+                                    <input
+                                        id="extra_student_search"
+                                        type="text"
+                                        placeholder="Ketik nama siswa..."
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        value={extraStudentSearch}
+                                        onChange={(e) => setExtraStudentSearch(e.target.value)}
+                                    />
+                                </div>
+                                <div className="mb-4">
                                     <InputLabel value="Daftar Anggota Siswa (Pilih satu atau lebih)" />
                                     <div className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm max-h-40 overflow-y-auto p-2 bg-white dark:bg-gray-800">
                                         {studentsList.length === 0 ? (
                                             <span className="text-sm text-gray-400 italic">Belum ada data siswa.</span>
                                         ) : (
-                                            studentsList.map((student) => (
+                                            studentsList
+                                                .filter(student => student.name.toLowerCase().includes(extraStudentSearch.toLowerCase()))
+                                                .map((student) => (
                                                 <label key={student.id} className="flex items-center mb-1.5 cursor-pointer">
                                                     <input
                                                         type="checkbox"
@@ -767,9 +783,14 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                                             extracurricularForm.setData('student_ids', newIds);
                                                         }}
                                                     />
-                                                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 font-semibold">{student.name} <span className="text-xs text-gray-400">({student.nis})</span></span>
+                                                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 font-semibold">
+                                                        {student.name} <span className="text-xs text-gray-400">({student.nis}) - {student.school_class?.name || 'Belum ada kelas'}</span>
+                                                    </span>
                                                 </label>
                                             ))
+                                        )}
+                                        {studentsList.length > 0 && studentsList.filter(s => s.name.toLowerCase().includes(extraStudentSearch.toLowerCase())).length === 0 && (
+                                            <span className="text-sm text-gray-400 italic">Tidak ada siswa yang cocok dengan pencarian.</span>
                                         )}
                                     </div>
                                     <InputError message={extracurricularForm.errors.student_ids} className="mt-2" />

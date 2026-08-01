@@ -110,4 +110,21 @@ SIPADA dilengkapi dengan Dropdown Semester Global di sudut kanan atas layar.
 2. **Riwayat Terjaga**: Admin dapat mengubah tuas dropdown untuk mundur ke semester lalu (melihat arsip) atau maju ke semester depan (untuk persiapan kelas tahun ajaran baru).
 
 ---
+
+## 📅 Changelog & Pembaruan Terkini (Agustus 2026)
+
+Sejumlah pembaruan fitur telah ditambahkan untuk meningkatkan fleksibilitas dan kenyamanan pengguna:
+
+*   **Jadwal Pelajaran**: Penyesuaian antarmuka *grid* mingguan untuk menampilkan slot jam secara penuh hingga pukul 15.00 sore.
+*   **Pengumpulan Berkas (Guru & Wakasek)**: Sistem kini mendukung pengumpulan dokumen dalam bentuk tautan/URL eksternal. Terdapat deteksi otomatis yang akan menampilkan ikon sesuai dengan jenis tautan (Google Docs, Google Sheets, Google Drive, PDF, dsb).
+*   **Kalender Akademik**: Pembaruan tampilan kalender menjadi format bulanan penuh (*grid view* bergaya Google Calendar) sehingga lebih mudah dibaca, lengkap dengan penanda warna khusus untuk hari libur (merah) dan acara sekolah.
+*   **Manajemen Status Siswa**:
+    *   Penggantian terminologi status "Keluar" menjadi "Tidak Aktif".
+    *   Penambahan status baru: **Lulus** dan **Pindah**.
+    *   Perbaikan logika pada formulir Edit dan Filter Tabel agar data siswa yang sudah lulus/tidak aktif tetap dapat dikelola secara normal meskipun mereka sudah tidak lagi terikat pada kelas (ID Kelas dikosongkan).
+*   **Dasbor Analitik (Grafik Kehadiran)**:
+    *   Optimalisasi akurasi data grafik Tren Persentase Kehadiran agar terhubung langsung dengan tabel `attendances` (aplikasi absensi) dan hanya menghitung siswa berstatus hadir (*Tepat Waktu* & *Terlambat*).
+    *   Penerapan **Skala Sumbu-Y Dinamis** pada grafik SVG untuk memastikan visualisasi tren data tetap terlihat jelas meskipun di dalam lingkungan pengujian (development) dengan persentase data yang sangat kecil.
+
+---
 *Dibuat dengan dedikasi penuh untuk kemajuan ekosistem pendidikan digital Indonesia.*

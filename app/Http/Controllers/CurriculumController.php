@@ -65,8 +65,11 @@ class CurriculumController extends Controller
             ->orderBy('name')
             ->get();
 
-        // Fetch students list for extracurricular member selection (id, name, and nis)
-        $studentsList = Student::select('id', 'name', 'nis')->orderBy('name')->get();
+        // Fetch students list for extracurricular member selection (id, name, nis, and class)
+        $studentsList = Student::with('schoolClass:id,name')
+            ->select('id', 'name', 'nis', 'school_class_id')
+            ->orderBy('name')
+            ->get();
 
         return Inertia::render('Curriculum/Index', [
             'academicYears' => $academicYears,
