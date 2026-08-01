@@ -75,7 +75,7 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
         setConflictError(null);
         setData({
             schedule_type: 'regular',
-            cocurricular_id: cocurriculars.length > 0 ? cocurriculars[0].id.toString() : '',
+            cocurricular_id: '',
             teaching_assignment_id: '',
             school_class_id: viewMode === 'class' ? selectedClassId : '',
             subject_id: '',
@@ -92,7 +92,7 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
         setConflictError(null);
         setData({
             schedule_type: 'regular',
-            cocurricular_id: cocurriculars.length > 0 ? cocurriculars[0].id.toString() : '',
+            cocurricular_id: '',
             teaching_assignment_id: '',
             school_class_id: viewMode === 'class' ? selectedClassId : '',
             subject_id: '',

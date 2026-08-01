@@ -206,17 +206,18 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             extracurricularForm.clearErrors();
             setExtraStudentSearch('');
         } else if (entityType === 'cocurricular') {
-            cocurricularForm.reset();
+            const linkedTeacherIds = record.teachers ? record.teachers.map(t => t.id) : [];
+            const linkedClassIds = record.school_classes ? record.school_classes.map(c => c.id) : [];
             cocurricularForm.setData({
-                level_id: levels.length > 0 ? levels[0].id.toString() : '',
-                code: '',
-                title: '',
-                activity_type: 'pembelajaran_kolaboratif',
-                dimensions: [],
-                time_allocation: 0,
-                learning_objectives: '',
-                teacher_ids: [],
-                school_class_ids: [],
+                level_id: record.level_id ? record.level_id.toString() : (levels.length > 0 ? levels[0].id.toString() : ''),
+                code: record.code || '',
+                title: record.title || '',
+                activity_type: record.activity_type || 'pembelajaran_kolaboratif',
+                dimensions: record.dimensions || [],
+                time_allocation: record.time_allocation || 0,
+                learning_objectives: record.learning_objectives || '',
+                teacher_ids: linkedTeacherIds,
+                school_class_ids: linkedClassIds,
             });
             cocurricularForm.clearErrors();
             setCocurricularTeacherSearch('');
