@@ -145,6 +145,7 @@ class PeopleController extends Controller
             'parent_ids' => 'nullable|array',
             'parent_ids.*' => 'exists:parents,id',
             'photo' => 'nullable|image|max:2048',
+            'status' => 'required|in:aktif,lulus,pindah,tidak_aktif',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -163,6 +164,7 @@ class PeopleController extends Controller
                 'nis' => $request->nis,
                 'learning_email' => $request->learning_email,
                 'school_class_id' => $request->school_class_id,
+                'status' => $request->status,
             ]);
 
             if ($request->hasFile('photo')) {
@@ -218,7 +220,7 @@ class PeopleController extends Controller
             'learning_email' => 'nullable|string|email|max:255|unique:students,learning_email,' . $student->id,
             'school_class_id' => 'required|exists:school_classes,id',
             'email' => 'required|string|email|max:255|unique:users,email,' . $student->user_id,
-            'status' => 'required|in:aktif,lulus,pindah,keluar',
+            'status' => 'required|in:aktif,lulus,pindah,tidak_aktif',
             'parent_ids' => 'nullable|array',
             'parent_ids.*' => 'exists:parents,id',
             'photo' => 'nullable|image|max:2048',

@@ -182,6 +182,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                     password: '',
                     parent_ids: [],
                     photo: null,
+                    status: 'aktif',
                 });
             }
             studentForm.clearErrors();
@@ -431,7 +432,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                         >
                                             <option value="aktif">Status: Aktif</option>
                                             <option value="lulus_pindah">Status: Lulus / Pindah</option>
-                                            <option value="berhenti">Status: Berhenti / Keluar / Tidak Aktif</option>
+                                            <option value="berhenti">Status: Berhenti / Tidak Aktif</option>
                                         </select>
                                     </div>
                                 </>
@@ -666,8 +667,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                         <InputError message={studentForm.errors.password} className="mt-2" />
                                     </div>
 
-                                    {modalType === 'edit' && (
-                                        <div>
+                                        <div className="mt-4">
                                             <InputLabel htmlFor="status" value="Status Siswa" />
                                             <select
                                                 id="status"
@@ -678,11 +678,10 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                                 <option value="aktif">Aktif</option>
                                                 <option value="lulus">Lulus</option>
                                                 <option value="pindah">Pindah</option>
-                                                <option value="keluar">Keluar</option>
+                                                <option value="tidak_aktif">Tidak Aktif</option>
                                             </select>
                                             <InputError message={studentForm.errors.status} className="mt-2" />
                                         </div>
-                                    )}
                                 </div>
 
                                 {/* Right Column: Photo, Learning Email, Parent Association */}
@@ -1002,7 +1001,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                         selectedRecord.status === 'aktif' ? 'bg-green-100 text-green-800' :
                                         selectedRecord.status === 'lulus' ? 'bg-blue-100 text-blue-800' :
                                         selectedRecord.status === 'pindah' ? 'bg-yellow-100 text-yellow-800' :
-                                        selectedRecord.status === 'keluar' ? 'bg-red-100 text-red-800' :
+                                        selectedRecord.status === 'tidak_aktif' ? 'bg-red-100 text-red-800' :
                                         'bg-gray-100 text-gray-800'
                                     }`}>
                                         Status: {selectedRecord.status ? selectedRecord.status.charAt(0).toUpperCase() + selectedRecord.status.slice(1) : '-'}
@@ -1182,8 +1181,8 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                                 <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">Lulus</span>
                                             ) : student.status === 'pindah' ? (
                                                 <span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-800 ring-1 ring-inset ring-yellow-600/20">Pindah</span>
-                                            ) : student.status === 'keluar' ? (
-                                                <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">Keluar</span>
+                                            ) : student.status === 'tidak_aktif' ? (
+                                                <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">Tidak Aktif</span>
                                             ) : (
                                                 <span className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">{student.status || '-'}</span>
                                             )}
