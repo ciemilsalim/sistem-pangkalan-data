@@ -388,12 +388,19 @@ class CurriculumController extends Controller
     private function checkScheduleConflict($dayOfWeek, $startTime, $endTime, $semesterId, $schoolClassIds, $teacherIds, $ignoreScheduleId = null)
     {
         // Find any schedule in the same semester and day that overlaps in time
+        // Back-to-back schedules (end_time == start_time) are NOT considered conflicts
         $query = Schedule::where('semester_id', $semesterId)
             ->where('day_of_week', $dayOfWeek)
             ->where(function ($q) use ($startTime, $endTime) {
                 $q->where('start_time', '<', $endTime)
                   ->where('end_time', '>', $startTime);
-            })->with(['teachingAssignment', 'cocurricular.schoolClasses', 'cocurricular.teachers']);
+            })->with([
+                'teachingAssignment.schoolClass',
+                'teachingAssignment.subject',
+                'teachingAssignment.teacher',
+                'cocurricular.schoolClasses',
+                'cocurricular.teachers',
+            ]);
 
         if ($ignoreScheduleId) {
             $query->where('id', '!=', $ignoreScheduleId);
@@ -402,22 +409,33 @@ class CurriculumController extends Controller
         $conflicts = $query->get();
 
         foreach ($conflicts as $conflict) {
-            if ($conflict->schedule_type === 'regular' && $conflict->teachingAssignment) {
-                if (in_array($conflict->teachingAssignment->school_class_id, $schoolClassIds)) {
-                    return "Terdapat bentrok waktu dengan jadwal reguler di kelas tersebut.";
+            $conflictTime = substr($conflict->start_time, 0, 5) . '-' . substr($conflict->end_time, 0, 5);
+
+            if (($conflict->schedule_type === 'regular' || !$conflict->schedule_type) && $conflict->teachingAssignment) {
+                $ta = $conflict->teachingAssignment;
+
+                if (in_array($ta->school_class_id, $schoolClassIds)) {
+                    $className = $ta->schoolClass->name ?? 'Kelas';
+                    $subjectName = $ta->subject->name ?? 'Mapel';
+                    return "Kelas {$className} sudah memiliki jadwal {$subjectName} pada jam {$conflictTime}.";
                 }
-                if (in_array($conflict->teachingAssignment->teacher_id, $teacherIds)) {
-                    return "Terdapat bentrok waktu mengajar guru tersebut pada jadwal reguler lain.";
+                if (in_array($ta->teacher_id, $teacherIds)) {
+                    $teacherName = $ta->teacher->name ?? 'Guru';
+                    $className = $ta->schoolClass->name ?? 'Kelas';
+                    return "Guru {$teacherName} sudah dijadwalkan di {$className} pada jam {$conflictTime}.";
                 }
             } elseif ($conflict->schedule_type === 'cocurricular' && $conflict->cocurricular) {
-                $conflictClassIds = $conflict->cocurricular->schoolClasses->pluck('id')->toArray();
-                $conflictTeacherIds = $conflict->cocurricular->teachers->pluck('id')->toArray();
+                $cocur = $conflict->cocurricular;
+                $conflictClassIds = $cocur->schoolClasses->pluck('id')->toArray();
+                $conflictTeacherIds = $cocur->teachers->pluck('id')->toArray();
 
                 if (count(array_intersect($conflictClassIds, $schoolClassIds)) > 0) {
-                    return "Terdapat bentrok waktu dengan jadwal proyek kokurikuler di salah satu kelas target.";
+                    $overlappingClasses = $cocur->schoolClasses->whereIn('id', $schoolClassIds)->pluck('name')->join(', ');
+                    return "Kelas {$overlappingClasses} sudah memiliki jadwal proyek kokurikuler \"{$cocur->title}\" pada jam {$conflictTime}.";
                 }
                 if (count(array_intersect($conflictTeacherIds, $teacherIds)) > 0) {
-                    return "Terdapat bentrok waktu dengan penugasan fasilitator proyek kokurikuler guru tersebut.";
+                    $overlappingTeachers = $cocur->teachers->whereIn('id', $teacherIds)->pluck('name')->join(', ');
+                    return "Guru {$overlappingTeachers} sudah menjadi fasilitator proyek \"{$cocur->title}\" pada jam {$conflictTime}.";
                 }
             }
         }

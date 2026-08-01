@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, useForm, router, usePage } from '@inertiajs/react';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
@@ -12,7 +12,7 @@ import WeeklyGrid from './WeeklyGrid';
 
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 
-export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects, schedules, teachingAssignments, cocurriculars = [], canManageSchedules }) {
+export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects, schedules, teachingAssignments, cocurriculars = [], existingConflicts = [], canManageSchedules }) {
     const [viewMode, setViewMode] = useState('class'); // 'class' or 'teacher'
     const [selectedClassId, setSelectedClassId] = useState(schoolClasses.length > 0 ? schoolClasses[0].id : '');
     const [selectedTeacherId, setSelectedTeacherId] = useState(teachers.length > 0 ? teachers[0].id : '');
@@ -20,6 +20,7 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [editingSchedule, setEditingSchedule] = useState(null);
+    const [conflictError, setConflictError] = useState(null);
 
     const { data, setData, post, put, delete: destroy, processing, errors, reset, clearErrors } = useForm({
         schedule_type: 'regular',
@@ -71,6 +72,7 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
         setEditingSchedule(null);
         reset();
         clearErrors();
+        setConflictError(null);
         setData({
             schedule_type: 'regular',
             cocurricular_id: cocurriculars.length > 0 ? cocurriculars[0].id.toString() : '',
@@ -83,6 +85,22 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
             end_time: '08:30',
         });
         setIsFormModalOpen(true);
+    };
+
+    const handleResetForm = () => {
+        clearErrors();
+        setConflictError(null);
+        setData({
+            schedule_type: 'regular',
+            cocurricular_id: cocurriculars.length > 0 ? cocurriculars[0].id.toString() : '',
+            teaching_assignment_id: '',
+            school_class_id: viewMode === 'class' ? selectedClassId : '',
+            subject_id: '',
+            teacher_id: viewMode === 'teacher' ? selectedTeacherId : '',
+            day_of_week: '1',
+            start_time: '07:00',
+            end_time: '08:30',
+        });
     };
 
     const openEditModal = (schedule) => {
@@ -99,6 +117,7 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
             end_time: schedule.end_time.substring(0, 5),
         });
         clearErrors();
+        setConflictError(null);
         setIsFormModalOpen(true);
     };
 
@@ -114,19 +133,38 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
             setEditingSchedule(null);
             reset();
             clearErrors();
+            setConflictError(null);
         }, 200);
     };
 
     const submitForm = (e) => {
         e.preventDefault();
+        setConflictError(null);
+
+        // Validasi Waktu
+        const startTime = data.start_time;
+        const endTime = data.end_time;
+        
+        if (startTime >= endTime) {
+            setConflictError("Waktu mulai harus lebih awal dari waktu selesai.");
+            return;
+        }
+        if (startTime < "07:00" || endTime > "15:00") {
+            setConflictError("Jadwal harus berada dalam jam operasional sekolah (07:00 - 15:00).");
+            return;
+        }
+
+        const options = {
+            onSuccess: () => closeModals(),
+            onError: (errs) => {
+                if (errs.error) setConflictError(errs.error);
+            },
+            preserveScroll: true,
+        };
         if (editingSchedule) {
-            put(route('curriculum.schedules.update', editingSchedule.id), {
-                onSuccess: () => closeModals(),
-            });
+            put(route('curriculum.schedules.update', editingSchedule.id), options);
         } else {
-            post(route('curriculum.schedules.store'), {
-                onSuccess: () => closeModals(),
-            });
+            post(route('curriculum.schedules.store'), options);
         }
     };
 
@@ -206,6 +244,50 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
                         )}
                     </div>
 
+                    {/* Existing Conflict Warnings */}
+                    {existingConflicts.length > 0 && canManageSchedules && (
+                        <div className="bg-amber-50 border border-amber-300 rounded-lg p-5 shadow-sm">
+                            <div className="flex items-start gap-3 mb-3">
+                                <svg className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                </svg>
+                                <div>
+                                    <h3 className="text-amber-800 font-bold text-sm">Terdeteksi {existingConflicts.length} Jadwal Bentrok</h3>
+                                    <p className="text-amber-700 text-xs mt-1">Hapus salah satu jadwal dari setiap pasangan yang bentrok berikut agar tidak terjadi tabrakan.</p>
+                                </div>
+                            </div>
+                            <div className="space-y-2 max-h-60 overflow-y-auto">
+                                {existingConflicts.map((conflict, idx) => (
+                                    <div key={idx} className="flex items-center justify-between bg-white border border-amber-200 rounded-md px-4 py-3 text-sm">
+                                        <span className="text-amber-900 font-medium flex-1 mr-3">{conflict.description}</span>
+                                        <div className="flex gap-1 flex-shrink-0">
+                                            {conflict.schedule_ids.map(sid => {
+                                                const sch = schedules.find(s => s.id === sid);
+                                                const label = sch?.schedule_type === 'cocurricular'
+                                                    ? (sch?.cocurricular?.title || 'Proyek')
+                                                    : (sch?.teaching_assignment?.subject?.name || 'Jadwal');
+                                                return (
+                                                    <button
+                                                        key={sid}
+                                                        onClick={() => {
+                                                            const found = schedules.find(s => s.id === sid);
+                                                            if (found) openDeleteModal(found);
+                                                        }}
+                                                        className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 border border-red-200 text-red-700 rounded text-xs font-medium hover:bg-red-100 transition-colors"
+                                                        title={`Hapus: ${label}`}
+                                                    >
+                                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                        Hapus "{label}"
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Schedule Grid */}
                     <WeeklyGrid 
                         schedules={filteredSchedules} 
@@ -224,9 +306,10 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
                     </h2>
 
                     {/* Error display */}
-                    {errors.error && (
-                        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
-                            {errors.error}
+                    {conflictError && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm font-medium flex items-start gap-2">
+                            <svg className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+                            <span>{conflictError}</span>
                         </div>
                     )}
 
@@ -371,6 +454,8 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
                                 <TextInput
                                     id="start_time"
                                     type="time"
+                                    min="07:00"
+                                    max="15:00"
                                     value={data.start_time}
                                     onChange={(e) => setData('start_time', e.target.value)}
                                     className="mt-1 block w-full"
@@ -383,6 +468,8 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
                                 <TextInput
                                     id="end_time"
                                     type="time"
+                                    min="07:00"
+                                    max="15:00"
                                     value={data.end_time}
                                     onChange={(e) => setData('end_time', e.target.value)}
                                     className="mt-1 block w-full"
@@ -404,7 +491,15 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
                                 Hapus
                             </button>
                         ) : (
-                            <div></div>
+                            <button
+                                type="button"
+                                onClick={handleResetForm}
+                                className="text-gray-500 hover:text-gray-700 font-medium text-sm flex items-center gap-1 transition-colors"
+                                title="Kembalikan form ke isian awal"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                Reset
+                            </button>
                         )}
                         <div className="flex justify-end gap-3">
                             <SecondaryButton onClick={closeModals}>Batal</SecondaryButton>
