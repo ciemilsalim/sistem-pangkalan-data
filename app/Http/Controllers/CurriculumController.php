@@ -67,7 +67,9 @@ class CurriculumController extends Controller
             ->get();
 
         // Fetch students list for extracurricular member selection (id, name, nis, and class)
+        // Hanya tampilkan siswa dengan status 'aktif'
         $studentsList = Student::with('schoolClass:id,name')
+            ->where('status', 'aktif')
             ->select('id', 'name', 'nis', 'school_class_id')
             ->orderBy('name')
             ->get();
