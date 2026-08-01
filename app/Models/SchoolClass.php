@@ -53,4 +53,9 @@ class SchoolClass extends Model
     {
         return $this->belongsTo(AcademicYear::class);
     }
+
+    public function cocurriculars()
+    {
+        return $this->belongsToMany(Cocurricular::class, 'cocurricular_school_class');
+    }
 }

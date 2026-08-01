@@ -125,6 +125,9 @@ Sejumlah pembaruan fitur telah ditambahkan untuk meningkatkan fleksibilitas dan 
 *   **Dasbor Analitik (Grafik Kehadiran)**:
     *   Optimalisasi akurasi data grafik Tren Persentase Kehadiran agar terhubung langsung dengan tabel `attendances` (aplikasi absensi) dan hanya menghitung siswa berstatus hadir (*Tepat Waktu* & *Terlambat*).
     *   Penerapan **Skala Sumbu-Y Dinamis** pada grafik SVG untuk memastikan visualisasi tren data tetap terlihat jelas meskipun di dalam lingkungan pengujian (development) dengan persentase data yang sangat kecil.
+*   **Manajemen Kurikulum**:
+    *   **Ekstrakurikuler**: Peningkatan fungsi pada form penambahan/pengelolaan siswa dengan menambahkan fitur pencarian (search filter) dan menampilkan detail rombongan belajar setiap siswa, sehingga memudahkan pemilihan siswa lintas kelas.
+    *   **Kokurikuler (Fitur Baru)**: Implementasi tab khusus Proyek Kokurikuler sesuai Panduan Kokurikuler terbaru. Mendukung penambahan kode proyek (Misal: P1, P2), Judul Kegiatan, bentuk kegiatan (Pembelajaran Kolaboratif Lintas Disiplin Ilmu, 7KAIH, dll.), pilihan Multi-Dimensi Profil Lulusan, penugasan **Tim Fasilitator Lintas Mapel**, serta penargetan ke berbagai Rombongan Belajar.
 
 ---
 *Dibuat dengan dedikasi penuh untuk kemajuan ekosistem pendidikan digital Indonesia.*

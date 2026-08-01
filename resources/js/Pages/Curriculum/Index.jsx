@@ -9,7 +9,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
 
-export default function Index({ auth, academicYears, semesters, levels, schoolClasses, subjects, teachers, schedules, extracurriculars, studentsList }) {
+export default function Index({ auth, academicYears, semesters, levels, schoolClasses, subjects, teachers, schedules, extracurriculars, cocurriculars, studentsList }) {
     const hasRole = (role) => auth.user.roles?.includes(role);
     const hasPermission = (permission) => auth.user.permissions?.includes(permission);
     const isAdmin = hasRole('admin');
@@ -29,6 +29,8 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
     const [activeEntity, setActiveEntity] = useState(null); // 'academicYear', 'semester', 'level', 'schoolClass', 'subject', 'schedule', 'extracurricular'
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [extraStudentSearch, setExtraStudentSearch] = useState('');
+    const [cocurricularTeacherSearch, setCocurricularTeacherSearch] = useState('');
+    const [cocurricularClassSearch, setCocurricularClassSearch] = useState('');
 
     // Form Hooks for each entity
     const academicYearForm = useForm({ name: '', is_active: false });
@@ -49,6 +51,17 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
         description: '',
         teacher_id: '',
         student_ids: [],
+    });
+    const cocurricularForm = useForm({
+        level_id: '',
+        code: '',
+        title: '',
+        activity_type: 'pembelajaran_kolaboratif',
+        dimensions: [],
+        time_allocation: 0,
+        learning_objectives: '',
+        teacher_ids: [],
+        school_class_ids: [],
     });
 
     // Open Create Modal
@@ -107,6 +120,22 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             });
             extracurricularForm.clearErrors();
             setExtraStudentSearch('');
+        } else if (entityType === 'cocurricular') {
+            cocurricularForm.reset();
+            cocurricularForm.setData({
+                level_id: levels.length > 0 ? levels[0].id.toString() : '',
+                code: '',
+                title: '',
+                activity_type: 'pembelajaran_kolaboratif',
+                dimensions: [],
+                time_allocation: 0,
+                learning_objectives: '',
+                teacher_ids: [],
+                school_class_ids: [],
+            });
+            cocurricularForm.clearErrors();
+            setCocurricularTeacherSearch('');
+            setCocurricularClassSearch('');
         }
     };
 
@@ -170,6 +199,22 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             });
             extracurricularForm.clearErrors();
             setExtraStudentSearch('');
+        } else if (entityType === 'cocurricular') {
+            cocurricularForm.reset();
+            cocurricularForm.setData({
+                level_id: levels.length > 0 ? levels[0].id.toString() : '',
+                code: '',
+                title: '',
+                activity_type: 'pembelajaran_kolaboratif',
+                dimensions: [],
+                time_allocation: 0,
+                learning_objectives: '',
+                teacher_ids: [],
+                school_class_ids: [],
+            });
+            cocurricularForm.clearErrors();
+            setCocurricularTeacherSearch('');
+            setCocurricularClassSearch('');
         }
     };
 
@@ -261,6 +306,16 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                     onSuccess: () => closeModal()
                 });
             }
+        } else if (activeEntity === 'cocurricular') {
+            if (modalType === 'create') {
+                cocurricularForm.post(route('curriculum.cocurriculars.store'), {
+                    onSuccess: () => closeModal()
+                });
+            } else {
+                cocurricularForm.put(route('curriculum.cocurriculars.update', selectedRecord.id), {
+                    onSuccess: () => closeModal()
+                });
+            }
         }
     };
 
@@ -281,8 +336,10 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             deleteRoute = route('curriculum.subjects.destroy', selectedRecord.id);
         } else if (activeEntity === 'schedule') {
             deleteRoute = route('curriculum.schedules.destroy', selectedRecord.id);
-        } else if (activeEntity === 'extracurricular') {
+} else if (activeEntity === 'extracurricular') {
             deleteRoute = route('curriculum.extracurriculars.destroy', selectedRecord.id);
+        } else if (activeEntity === 'cocurricular') {
+            deleteRoute = route('curriculum.cocurriculars.destroy', selectedRecord.id);
         }
 
         router.delete(deleteRoute, {
@@ -404,6 +461,16 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 >
                                     Ekstrakurikuler
                                 </button>
+                                <button
+                                    onClick={() => setActiveTab('cocurriculars')}
+                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
+                                        activeTab === 'cocurriculars'
+                                            ? 'border-indigo-500 text-indigo-600'
+                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
+                                    }`}
+                                >
+                                    Kokurikuler
+                                </button>
                             </nav>
                         </div>
 
@@ -416,6 +483,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                             {activeTab === 'subjects' && renderSubjectsTab()}
 
                             {activeTab === 'extracurriculars' && renderExtracurricularsTab()}
+                            {activeTab === 'cocurriculars' && renderCocurricularsTab()}
                         </div>
                     </div>
                 </div>
@@ -424,7 +492,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             {/* Entity Form Modal (Create & Edit) */}
             {modalType && modalType !== 'delete' && (
                 <Modal show={true} onClose={closeModal}>
-                    <form onSubmit={handleSubmit} className="p-6">
+                    <form onSubmit={handleSubmit} className="p-6 max-h-[85vh] overflow-y-auto">
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
                             {modalType === 'create' ? 'Tambah ' : 'Edit '} 
                             {activeEntity === 'academicYear' && 'Tahun Akademik'}
@@ -795,6 +863,182 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     </div>
                                     <InputError message={extracurricularForm.errors.student_ids} className="mt-2" />
                                 </div>
+                                                        </>
+                        )}
+
+                        {activeEntity === 'cocurricular' && (
+                            <>
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="cocurricular_code" value="Kode Proyek (Cth: P1, P2) (Opsional)" />
+                                    <TextInput
+                                        id="cocurricular_code"
+                                        type="text"
+                                        className="mt-1 block w-full"
+                                        value={cocurricularForm.data.code}
+                                        onChange={(e) => cocurricularForm.setData('code', e.target.value)}
+                                    />
+                                    <InputError message={cocurricularForm.errors.code} className="mt-2" />
+                                </div>
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="cocurricular_title" value="Judul Proyek Kokurikuler" />
+                                    <TextInput
+                                        id="cocurricular_title"
+                                        type="text"
+                                        className="mt-1 block w-full"
+                                        value={cocurricularForm.data.title}
+                                        onChange={(e) => cocurricularForm.setData('title', e.target.value)}
+                                        required
+                                    />
+                                    <InputError message={cocurricularForm.errors.title} className="mt-2" />
+                                </div>
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="cocurricular_level" value="Jenjang Kelas" />
+                                    <select
+                                        id="cocurricular_level"
+                                        value={cocurricularForm.data.level_id}
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        onChange={(e) => cocurricularForm.setData('level_id', e.target.value)}
+                                        required
+                                    >
+                                        <option value="">-- Pilih Jenjang --</option>
+                                        {levels.map((level) => (
+                                            <option key={level.id} value={level.id}>{level.name}</option>
+                                        ))}
+                                    </select>
+                                    <InputError message={cocurricularForm.errors.level_id} className="mt-2" />
+                                </div>
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="cocurricular_activity_type" value="Bentuk Kegiatan" />
+                                    <select
+                                        id="cocurricular_activity_type"
+                                        value={cocurricularForm.data.activity_type}
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        onChange={(e) => cocurricularForm.setData('activity_type', e.target.value)}
+                                        required
+                                    >
+                                        <option value="pembelajaran_kolaboratif">Pembelajaran Kolaboratif Lintas Disiplin Ilmu</option>
+                                        <option value="7kaih">Gerakan 7 Kebiasaan Anak Indonesia Hebat (7KAIH)</option>
+                                        <option value="cara_lainnya">Cara Lainnya</option>
+                                    </select>
+                                    <InputError message={cocurricularForm.errors.activity_type} className="mt-2" />
+                                </div>
+                                <div className="mb-4">
+                                    <InputLabel value="Dimensi Profil Lulusan (Pilih minimal satu)" />
+                                    <div className="mt-1 grid grid-cols-1 sm:grid-cols-2 gap-2 border border-gray-300 dark:border-gray-600 p-3 rounded-md max-h-48 overflow-y-auto bg-white dark:bg-gray-800">
+                                        {[
+                                            'Keimanan dan Ketakwaan terhadap Tuhan YME',
+                                            'Kewargaan',
+                                            'Penalaran Kritis',
+                                            'Kreativitas',
+                                            'Kolaborasi',
+                                            'Kemandirian',
+                                            'Kesehatan',
+                                            'Komunikasi'
+                                        ].map((dim, idx) => (
+                                            <label key={idx} className="flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500 h-4 w-4"
+                                                    checked={cocurricularForm.data.dimensions.includes(dim)}
+                                                    onChange={(e) => {
+                                                        const newDims = e.target.checked
+                                                            ? [...cocurricularForm.data.dimensions, dim]
+                                                            : cocurricularForm.data.dimensions.filter(d => d !== dim);
+                                                        cocurricularForm.setData('dimensions', newDims);
+                                                    }}
+                                                />
+                                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">{dim}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                    <InputError message={cocurricularForm.errors.dimensions} className="mt-2" />
+                                </div>
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="cocurricular_time_allocation" value="Alokasi Waktu (Jam Pelajaran / JP)" />
+                                    <TextInput
+                                        id="cocurricular_time_allocation"
+                                        type="number"
+                                        min="0"
+                                        className="mt-1 block w-full"
+                                        value={cocurricularForm.data.time_allocation}
+                                        onChange={(e) => cocurricularForm.setData('time_allocation', e.target.value)}
+                                        required
+                                    />
+                                    <InputError message={cocurricularForm.errors.time_allocation} className="mt-2" />
+                                </div>
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="cocurricular_learning_objectives" value="Tujuan Pembelajaran" />
+                                    <textarea
+                                        id="cocurricular_learning_objectives"
+                                        rows="3"
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                        value={cocurricularForm.data.learning_objectives}
+                                        onChange={(e) => cocurricularForm.setData('learning_objectives', e.target.value)}
+                                    />
+                                    <InputError message={cocurricularForm.errors.learning_objectives} className="mt-2" />
+                                </div>
+
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="cocurricular_teacher_search" value="Tim Fasilitator (Cari Guru)" />
+                                    <input
+                                        id="cocurricular_teacher_search"
+                                        type="text"
+                                        placeholder="Ketik nama guru..."
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm mb-2"
+                                        value={cocurricularTeacherSearch}
+                                        onChange={(e) => setCocurricularTeacherSearch(e.target.value)}
+                                    />
+                                    <div className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm max-h-32 overflow-y-auto p-2 bg-white dark:bg-gray-800">
+                                        {teachers.filter(t => t.name.toLowerCase().includes(cocurricularTeacherSearch.toLowerCase())).map((teacher) => (
+                                            <label key={teacher.id} className="flex items-center mb-1.5 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500 h-4 w-4"
+                                                    checked={cocurricularForm.data.teacher_ids.includes(teacher.id)}
+                                                    onChange={(e) => {
+                                                        const newIds = e.target.checked
+                                                            ? [...cocurricularForm.data.teacher_ids, teacher.id]
+                                                            : cocurricularForm.data.teacher_ids.filter(id => id !== teacher.id);
+                                                        cocurricularForm.setData('teacher_ids', newIds);
+                                                    }}
+                                                />
+                                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 font-semibold">{teacher.name}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                    <InputError message={cocurricularForm.errors.teacher_ids} className="mt-2" />
+                                </div>
+
+                                <div className="mb-4">
+                                    <InputLabel htmlFor="cocurricular_class_search" value="Target Rombongan Belajar (Kelas)" />
+                                    <input
+                                        id="cocurricular_class_search"
+                                        type="text"
+                                        placeholder="Ketik nama kelas..."
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm mb-2"
+                                        value={cocurricularClassSearch}
+                                        onChange={(e) => setCocurricularClassSearch(e.target.value)}
+                                    />
+                                    <div className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm max-h-32 overflow-y-auto p-2 bg-white dark:bg-gray-800">
+                                        {schoolClasses.filter(c => c.name.toLowerCase().includes(cocurricularClassSearch.toLowerCase())).map((cls) => (
+                                            <label key={cls.id} className="flex items-center mb-1.5 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500 h-4 w-4"
+                                                    checked={cocurricularForm.data.school_class_ids.includes(cls.id)}
+                                                    onChange={(e) => {
+                                                        const newIds = e.target.checked
+                                                            ? [...cocurricularForm.data.school_class_ids, cls.id]
+                                                            : cocurricularForm.data.school_class_ids.filter(id => id !== cls.id);
+                                                        cocurricularForm.setData('school_class_ids', newIds);
+                                                    }}
+                                                />
+                                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 font-semibold">{cls.name}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                    <InputError message={cocurricularForm.errors.school_class_ids} className="mt-2" />
+                                </div>
                             </>
                         )}
 
@@ -811,7 +1055,8 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 schoolClassForm.processing || 
                                 subjectForm.processing ||
                                 scheduleForm.processing ||
-                                extracurricularForm.processing
+                                extracurricularForm.processing ||
+                                cocurricularForm.processing
                             }>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />`r`n                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 21v-8H7v8" />`r`n                                        <path strokeLinecap="round" strokeLinejoin="round" d="M7 3v5h8" />
@@ -1334,4 +1579,81 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             </div>
         );
     }
+    // 8. Cocurriculars Tab
+    function renderCocurricularsTab() {
+        return (
+            <div>
+                <div className="mb-4 flex items-center justify-between">
+                    <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Proyek Kokurikuler</h3>
+                    {canManageCurriculum && (
+                        <PrimaryButton onClick={() => openCreateModal('cocurricular')} className="text-xs" title="Tambah Proyek Kokurikuler">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                        </PrimaryButton>
+                    )}
+                </div>
+                <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50 dark:bg-gray-900/50">
+                            <tr>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Kode & Judul Proyek</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Jenjang & Waktu</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Bentuk Kegiatan</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tim Fasilitator</th>
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Target Kelas</th>
+                                {canManageCurriculum && <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>}
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
+                            {cocurriculars?.length === 0 || !cocurriculars ? (
+                                <tr>
+                                    <td colSpan="6" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data proyek kokurikuler.</td>
+                                </tr>
+                            ) : (
+                                cocurriculars.map((coc) => (
+                                    <tr key={coc.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-gray-100">
+                                            {coc.code && <span className="text-indigo-600 mr-2">[{coc.code}]</span>}
+                                            {coc.title}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 font-semibold">
+                                            {coc.level?.name || '-'} <span className="text-xs text-gray-400 font-normal">({coc.time_allocation} JP)</span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                                            {coc.activity_type === 'pembelajaran_kolaboratif' ? 'Pembelajaran Kolaboratif' : 
+                                             coc.activity_type === '7kaih' ? '7 Kebiasaan (7KAIH)' : 'Cara Lainnya'}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
+                                            {coc.teachers && coc.teachers.length > 0 ? coc.teachers.map(t => t.name).join(', ') : <span className="italic">Belum ada</span>}
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
+                                            {coc.school_classes && coc.school_classes.length > 0 ? coc.school_classes.map(c => c.name).join(', ') : <span className="italic">Belum ada</span>}
+                                        </td>
+                                        {canManageCurriculum && (
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                <button onClick={() => openEditModal('cocurricular', coc)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.89 1.14l-2.812.93a.75.75 0 0 1-.95-.95l.93-2.811a4.5 4.5 0 0 1 1.14-1.89l11.43-11.43Z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 7.125-2.625-2.625" />
+                                                    </svg>
+                                                </button>
+                                                <button onClick={() => openDeleteModal('cocurricular', coc)} className="text-red-600 hover:text-red-900" title="Hapus">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 inline-block">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>
+                                                </button>
+                                            </td>
+                                        )}
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
+    }
 }
+
+

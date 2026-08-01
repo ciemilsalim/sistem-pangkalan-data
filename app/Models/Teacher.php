@@ -55,4 +55,9 @@ class Teacher extends Model
     {
         return $this->hasMany(Extracurricular::class, 'teacher_id');
     }
+
+    public function cocurriculars()
+    {
+        return $this->belongsToMany(Cocurricular::class, 'cocurricular_teacher');
+    }
 }

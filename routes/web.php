@@ -90,6 +90,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/curriculum/extracurriculars', [CurriculumController::class, 'storeExtracurricular'])->name('curriculum.extracurriculars.store');
         Route::put('/curriculum/extracurriculars/{extracurricular}', [CurriculumController::class, 'updateExtracurricular'])->name('curriculum.extracurriculars.update');
         Route::delete('/curriculum/extracurriculars/{extracurricular}', [CurriculumController::class, 'destroyExtracurricular'])->name('curriculum.extracurriculars.destroy');
+        
+        Route::post('/curriculum/cocurriculars', [CurriculumController::class, 'storeCocurricular'])->name('curriculum.cocurriculars.store');
+        Route::put('/curriculum/cocurriculars/{cocurricular}', [CurriculumController::class, 'updateCocurricular'])->name('curriculum.cocurriculars.update');
+        Route::delete('/curriculum/cocurriculars/{cocurricular}', [CurriculumController::class, 'destroyCocurricular'])->name('curriculum.cocurriculars.destroy');
     });
 
     // Promotions

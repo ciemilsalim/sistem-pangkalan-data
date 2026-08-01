@@ -11,6 +11,7 @@ use App\Models\Teacher;
 use App\Models\Schedule;
 use App\Models\TeachingAssignment;
 use App\Models\Extracurricular;
+use App\Models\Cocurricular;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -71,6 +72,14 @@ class CurriculumController extends Controller
             ->orderBy('name')
             ->get();
 
+        // Fetch cocurriculars with relations
+        $cocurriculars = Cocurricular::with(['level', 'teachers', 'schoolClasses'])
+            ->when($activeAcademicYearId, function ($query, $activeAcademicYearId) {
+                return $query->where('academic_year_id', $activeAcademicYearId);
+            })
+            ->orderBy('title')
+            ->get();
+
         return Inertia::render('Curriculum/Index', [
             'academicYears' => $academicYears,
             'semesters' => $semesters,
@@ -80,6 +89,7 @@ class CurriculumController extends Controller
             'teachers' => $teachers,
             'schedules' => $schedules,
             'extracurriculars' => $extracurriculars,
+            'cocurriculars' => $cocurriculars,
             'studentsList' => $studentsList,
             'flash' => [
                 'message' => session('message'),
@@ -540,5 +550,91 @@ class CurriculumController extends Controller
         });
 
         return redirect()->route('curriculum.index')->with('message', 'Ekstrakurikuler berhasil dihapus.');
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                         COCURRICULAR (KOKURIKULER)                         */
+    /* -------------------------------------------------------------------------- */
+
+    public function storeCocurricular(Request $request): RedirectResponse
+    {
+        $activeAcademicYearId = session('active_academic_year_id') ?? \App\Models\Semester::where('is_active', true)->value('academic_year_id');
+
+        $request->validate([
+            'level_id' => 'required|exists:levels,id',
+            'code' => 'nullable|string|max:50',
+            'title' => 'required|string|max:255',
+            'activity_type' => 'required|in:pembelajaran_kolaboratif,7kaih,cara_lainnya',
+            'dimensions' => 'nullable|array',
+            'time_allocation' => 'required|integer|min:0',
+            'learning_objectives' => 'nullable|string',
+            'teacher_ids' => 'nullable|array',
+            'teacher_ids.*' => 'exists:teachers,id',
+            'school_class_ids' => 'nullable|array',
+            'school_class_ids.*' => 'exists:school_classes,id',
+        ]);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $activeAcademicYearId) {
+            $cocurricular = Cocurricular::create([
+                'academic_year_id' => $activeAcademicYearId,
+                'level_id' => $request->level_id,
+                'code' => $request->code,
+                'title' => $request->title,
+                'activity_type' => $request->activity_type,
+                'dimensions' => $request->dimensions,
+                'time_allocation' => $request->time_allocation,
+                'learning_objectives' => $request->learning_objectives,
+            ]);
+
+            $cocurricular->teachers()->sync($request->input('teacher_ids', []));
+            $cocurricular->schoolClasses()->sync($request->input('school_class_ids', []));
+        });
+
+        return redirect()->route('curriculum.index')->with('message', 'Proyek Kokurikuler berhasil ditambahkan.');
+    }
+
+    public function updateCocurricular(Request $request, Cocurricular $cocurricular): RedirectResponse
+    {
+        $request->validate([
+            'level_id' => 'required|exists:levels,id',
+            'code' => 'nullable|string|max:50',
+            'title' => 'required|string|max:255',
+            'activity_type' => 'required|in:pembelajaran_kolaboratif,7kaih,cara_lainnya',
+            'dimensions' => 'nullable|array',
+            'time_allocation' => 'required|integer|min:0',
+            'learning_objectives' => 'nullable|string',
+            'teacher_ids' => 'nullable|array',
+            'teacher_ids.*' => 'exists:teachers,id',
+            'school_class_ids' => 'nullable|array',
+            'school_class_ids.*' => 'exists:school_classes,id',
+        ]);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $cocurricular) {
+            $cocurricular->update([
+                'level_id' => $request->level_id,
+                'code' => $request->code,
+                'title' => $request->title,
+                'activity_type' => $request->activity_type,
+                'dimensions' => $request->dimensions,
+                'time_allocation' => $request->time_allocation,
+                'learning_objectives' => $request->learning_objectives,
+            ]);
+
+            $cocurricular->teachers()->sync($request->input('teacher_ids', []));
+            $cocurricular->schoolClasses()->sync($request->input('school_class_ids', []));
+        });
+
+        return redirect()->route('curriculum.index')->with('message', 'Proyek Kokurikuler berhasil diperbarui.');
+    }
+
+    public function destroyCocurricular(Cocurricular $cocurricular): RedirectResponse
+    {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($cocurricular) {
+            $cocurricular->teachers()->detach();
+            $cocurricular->schoolClasses()->detach();
+            $cocurricular->delete();
+        });
+
+        return redirect()->route('curriculum.index')->with('message', 'Proyek Kokurikuler berhasil dihapus.');
     }
 }
