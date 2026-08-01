@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import Modal from '@/Components/Modal';
+import MonthlyCalendar from '@/Components/MonthlyCalendar';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
@@ -11,6 +12,7 @@ import DangerButton from '@/Components/DangerButton';
 
 export default function Index({ auth, calendars, filters }) {
     const [search, setSearch] = useState(filters.search || '');
+    const [viewMode, setViewMode] = useState('calendar'); // 'calendar' or 'list'
     const pageProps = usePage().props;
 
     // Modal States
@@ -48,12 +50,12 @@ export default function Index({ auth, calendars, filters }) {
     };
 
     // Open Create Modal
-    const openCreateModal = () => {
+    const openCreateModal = (initialDate = '') => {
         setModalType('create');
         calendarForm.reset({
             title: '',
-            start_date: '',
-            end_date: '',
+            start_date: typeof initialDate === 'string' ? initialDate : '',
+            end_date: typeof initialDate === 'string' ? initialDate : '',
             description: '',
             is_holiday: false,
             is_self_study: false,
@@ -240,9 +242,23 @@ export default function Index({ auth, calendars, filters }) {
                             </div>
                         </form>
 
-                        <div>
+                        <div className="flex gap-2 items-center w-full sm:w-auto">
+                            <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
+                                <button
+                                    onClick={() => setViewMode('calendar')}
+                                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'calendar' ? 'bg-white shadow-sm text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
+                                >
+                                    Kalender
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm text-blue-700 dark:bg-gray-800 dark:text-blue-400' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'}`}
+                                >
+                                    Daftar
+                                </button>
+                            </div>
                             <PrimaryButton
-                                onClick={openCreateModal}
+                                onClick={() => openCreateModal()}
                                 className="w-full sm:w-auto text-xs"
                                 title="Tambah Agenda Akademik"
                             >
@@ -253,7 +269,13 @@ export default function Index({ auth, calendars, filters }) {
                         </div>
                     </div>
 
-                    {/* Table Card */}
+                    {viewMode === 'calendar' ? (
+                        <MonthlyCalendar 
+                            events={calendars.data || calendars} 
+                            onEventClick={openEditModal} 
+                            onDayClick={openCreateModal} 
+                        />
+                    ) : (
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                         <div className="p-6">
                             <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
@@ -321,6 +343,7 @@ export default function Index({ auth, calendars, filters }) {
                             {renderPagination(calendars)}
                         </div>
                     </div>
+                    )}
                 </div>
             </div>
 
