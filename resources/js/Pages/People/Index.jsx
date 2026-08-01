@@ -215,7 +215,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                 name: record.name,
                 nis: record.nis,
                 learning_email: record.learning_email || '',
-                school_class_id: record.school_class_id.toString(),
+                school_class_id: record.school_class_id ? record.school_class_id.toString() : '',
                 email: record.user?.email || '',
                 password: '', // optional on update
                 parent_ids: linkedParentIds,
@@ -629,8 +629,9 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                                 value={studentForm.data.school_class_id}
                                                 className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
                                                 onChange={(e) => studentForm.setData('school_class_id', e.target.value)}
-                                                required
+                                                required={studentForm.data.status === 'aktif'}
                                             >
+                                                <option value="">-- Pilih Kelas --</option>
                                                 {schoolClasses.map((cls) => (
                                                     <option key={cls.id} value={cls.id}>{cls.name} ({cls.level?.name || 'Kurikulum'})</option>
                                                 ))}

@@ -56,7 +56,7 @@ class PeopleController extends Controller
             } elseif ($studentStatus === 'lulus_pindah') {
                 $query->whereIn('status', ['lulus', 'pindah']);
             } elseif ($studentStatus === 'berhenti') {
-                $query->where('status', 'keluar');
+                $query->where('status', 'tidak_aktif');
             } else {
                 // If somehow it's something else, fall back to aktif
                 $query->where('status', 'aktif');
@@ -139,7 +139,7 @@ class PeopleController extends Controller
             'name' => 'required|string|max:255',
             'nis' => 'required|string|max:50|unique:students,nis',
             'learning_email' => 'nullable|string|email|max:255|unique:students,learning_email',
-            'school_class_id' => 'required|exists:school_classes,id',
+            'school_class_id' => 'nullable|exists:school_classes,id',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => ['required', Rules\Password::defaults()],
             'parent_ids' => 'nullable|array',
@@ -218,7 +218,7 @@ class PeopleController extends Controller
             'name' => 'required|string|max:255',
             'nis' => 'required|string|max:50|unique:students,nis,' . $student->id,
             'learning_email' => 'nullable|string|email|max:255|unique:students,learning_email,' . $student->id,
-            'school_class_id' => 'required|exists:school_classes,id',
+            'school_class_id' => 'nullable|exists:school_classes,id',
             'email' => 'required|string|email|max:255|unique:users,email,' . $student->user_id,
             'status' => 'required|in:aktif,lulus,pindah,tidak_aktif',
             'parent_ids' => 'nullable|array',
