@@ -50,8 +50,17 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
     const paddingBottom = 40;
     const plotWidth = svgWidth - paddingLeft - paddingRight;
     const plotHeight = svgHeight - paddingTop - paddingBottom;
-    const yMin = 80; // Scale from 80% to 100%
+    
+    // Dynamic Y-axis scale
+    const minPercentage = attendanceTrend.length > 0 ? Math.min(...attendanceTrend.map(item => item.percentage)) : 80;
+    const yMin = minPercentage < 80 ? Math.max(0, Math.floor(minPercentage / 10) * 10) : 80;
     const yMax = 100;
+    
+    const yTicks = [];
+    const step = (yMax - yMin) / 4;
+    for(let i=0; i<=4; i++) {
+        yTicks.push(Math.round(yMin + (step * i)));
+    }
 
     // Generate coordinates
     const points = attendanceTrend.map((item, index) => {
@@ -352,7 +361,7 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                                             <p className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-400">Fluktuasi kehadiran 7 hari aktif belajar terakhir</p>
                                         </div>
                                         <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-600 border border-indigo-100">
-                                            Skala Zoomed (80% - 100%)
+                                            Skala {yMin === 80 ? "Zoomed (80% - 100%)" : `Dinamis (${yMin}% - 100%)`}
                                         </span>
                                     </div>
 
@@ -368,11 +377,11 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                                                 </filter>
                                             </defs>
 
-                                            {[80, 85, 90, 95, 100].map((val) => {
+                                            {yTicks.map((val) => {
                                                 const y = paddingTop + plotHeight - (((val - yMin) / (yMax - yMin)) * plotHeight);
                                                 return (
                                                     <g key={val}>
-                                                        <line x1={paddingLeft} y1={y} x2={svgWidth - paddingRight} y2={y} stroke="#f3f4f6" strokeWidth="1.2" strokeDasharray={val === 80 ? "none" : "4 4"} />
+                                                        <line x1={paddingLeft} y1={y} x2={svgWidth - paddingRight} y2={y} stroke="#f3f4f6" strokeWidth="1.2" strokeDasharray={val === yMin ? "none" : "4 4"} />
                                                         <text x={paddingLeft - 8} y={y + 4} textAnchor="end" className="text-[10px] fill-gray-400 font-medium font-mono">{val}%</text>
                                                     </g>
                                                 );

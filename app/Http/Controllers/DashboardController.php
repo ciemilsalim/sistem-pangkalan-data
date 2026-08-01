@@ -35,7 +35,9 @@ class DashboardController extends Controller
 
         // Kehadiran Hari Ini
         $today = now()->toDateString();
-        $presentToday = Attendance::whereDate('attendance_time', $today)->count();
+        $presentToday = Attendance::whereDate('attendance_time', $today)
+            ->whereIn('status', ['tepat_waktu', 'terlambat'])
+            ->count();
         
         if ($totalStudents > 0) {
             $attendanceRateToday = round(($presentToday / $totalStudents) * 100, 1);
@@ -48,7 +50,9 @@ class DashboardController extends Controller
             $latestAttendanceDate = Attendance::latest('attendance_time')->value('attendance_time');
             if ($latestAttendanceDate) {
                 $latestDateStr = $latestAttendanceDate->toDateString();
-                $presentLatest = Attendance::whereDate('attendance_time', $latestDateStr)->count();
+                $presentLatest = Attendance::whereDate('attendance_time', $latestDateStr)
+                    ->whereIn('status', ['tepat_waktu', 'terlambat'])
+                    ->count();
                 $attendanceRateToday = round(($presentLatest / $totalStudents) * 100, 1);
             } else {
                 $attendanceRateToday = 96.4; // Fallback realistis untuk demo jika DB kosong
@@ -94,7 +98,9 @@ class DashboardController extends Controller
 
         if (count($dates) > 0) {
             foreach ($dates as $d) {
-                $count = Attendance::whereDate('attendance_time', $d)->count();
+                $count = Attendance::whereDate('attendance_time', $d)
+                    ->whereIn('status', ['tepat_waktu', 'terlambat'])
+                    ->count();
                 $rate = round(($count / $trendTotalStudents) * 100, 1);
                 $dayName = date('D', strtotime($d));
                 $dayTranslations = [
