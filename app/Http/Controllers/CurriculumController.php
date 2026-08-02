@@ -523,7 +523,7 @@ class CurriculumController extends Controller
             }
         });
 
-        return redirect()->route('curriculum.index')->with('message', 'Jadwal Pelajaran berhasil ditambahkan.');
+        return redirect()->back()->with('message', 'Jadwal Pelajaran berhasil ditambahkan.');
     }
 
     public function updateSchedule(Request $request, Schedule $schedule): RedirectResponse
@@ -606,13 +606,13 @@ class CurriculumController extends Controller
             }
         });
 
-        return redirect()->route('curriculum.index')->with('message', 'Jadwal Pelajaran berhasil diperbarui.');
+        return redirect()->back()->with('message', 'Jadwal Pelajaran berhasil diperbarui.');
     }
 
     public function destroySchedule(Schedule $schedule): RedirectResponse
     {
         $schedule->delete();
-        return redirect()->route('curriculum.index')->with('message', 'Jadwal Pelajaran berhasil dihapus.');
+        return redirect()->back()->with('message', 'Jadwal Pelajaran berhasil dihapus.');
     }
 
     /* -------------------------------------------------------------------------- */

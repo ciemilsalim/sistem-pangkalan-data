@@ -13,6 +13,7 @@ import WeeklyGrid from './WeeklyGrid';
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
 
 export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects, schedules, teachingAssignments, cocurriculars = [], existingConflicts = [], canManageSchedules }) {
+    const pageProps = usePage().props;
     const [viewMode, setViewMode] = useState('class'); // 'class' or 'teacher'
     const [selectedClassId, setSelectedClassId] = useState(schoolClasses.length > 0 ? schoolClasses[0].id : '');
     const [selectedTeacherId, setSelectedTeacherId] = useState(teachers.length > 0 ? teachers[0].id : '');
@@ -193,6 +194,24 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                     
+                    {/* Flash Message */}
+                    {pageProps.flash?.message && (
+                        <div className="bg-green-50 p-4 rounded-md border border-green-200">
+                            <div className="flex">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm font-medium text-green-800">
+                                        {pageProps.flash.message}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Filters & Actions */}
                     <div className="bg-white p-6 shadow-sm sm:rounded-lg border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
