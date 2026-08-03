@@ -49,7 +49,10 @@ class CurriculumController extends Controller
         $schedules = Schedule::with([
             'teachingAssignment.schoolClass',
             'teachingAssignment.subject',
-            'teachingAssignment.teacher'
+            'teachingAssignment.teacher',
+            'cocurricular',
+            'schoolClass',
+            'teacher'
         ])
           ->when($activeSemesterId, function ($query, $activeSemesterId) {
               return $query->where('semester_id', $activeSemesterId);
@@ -387,7 +390,7 @@ class CurriculumController extends Controller
     /*                                6. SCHEDULES                                */
     /* -------------------------------------------------------------------------- */
 
-    private function checkScheduleConflict($dayOfWeek, $startTime, $endTime, $semesterId, $schoolClassIds, $teacherIds, $ignoreScheduleId = null)
+    private function checkScheduleConflict($dayOfWeek, $startTime, $endTime, $semesterId, $schoolClassId, $teacherId, $ignoreScheduleId = null)
     {
         // Find any schedule in the same semester and day that overlaps in time
         // Back-to-back schedules (end_time == start_time) are NOT considered conflicts
@@ -400,8 +403,9 @@ class CurriculumController extends Controller
                 'teachingAssignment.schoolClass',
                 'teachingAssignment.subject',
                 'teachingAssignment.teacher',
-                'cocurricular.schoolClasses',
-                'cocurricular.teachers',
+                'cocurricular',
+                'schoolClass',
+                'teacher'
             ]);
 
         if ($ignoreScheduleId) {
@@ -416,28 +420,24 @@ class CurriculumController extends Controller
             if (($conflict->schedule_type === 'regular' || !$conflict->schedule_type) && $conflict->teachingAssignment) {
                 $ta = $conflict->teachingAssignment;
 
-                if (in_array($ta->school_class_id, $schoolClassIds)) {
+                if ($ta->school_class_id == $schoolClassId) {
                     $className = $ta->schoolClass->name ?? 'Kelas';
                     $subjectName = $ta->subject->name ?? 'Mapel';
                     return "Kelas {$className} sudah memiliki jadwal {$subjectName} pada jam {$conflictTime}.";
                 }
-                if (in_array($ta->teacher_id, $teacherIds)) {
+                if ($ta->teacher_id == $teacherId) {
                     $teacherName = $ta->teacher->name ?? 'Guru';
                     $className = $ta->schoolClass->name ?? 'Kelas';
                     return "Guru {$teacherName} sudah dijadwalkan di {$className} pada jam {$conflictTime}.";
                 }
             } elseif ($conflict->schedule_type === 'cocurricular' && $conflict->cocurricular) {
-                $cocur = $conflict->cocurricular;
-                $conflictClassIds = $cocur->schoolClasses->pluck('id')->toArray();
-                $conflictTeacherIds = $cocur->teachers->pluck('id')->toArray();
-
-                if (count(array_intersect($conflictClassIds, $schoolClassIds)) > 0) {
-                    $overlappingClasses = $cocur->schoolClasses->whereIn('id', $schoolClassIds)->pluck('name')->join(', ');
-                    return "Kelas {$overlappingClasses} sudah memiliki jadwal proyek kokurikuler \"{$cocur->title}\" pada jam {$conflictTime}.";
+                if ($conflict->school_class_id == $schoolClassId) {
+                    $className = $conflict->schoolClass->name ?? 'Kelas';
+                    return "Kelas {$className} sudah memiliki jadwal proyek kokurikuler \"{$conflict->cocurricular->title}\" pada jam {$conflictTime}.";
                 }
-                if (count(array_intersect($conflictTeacherIds, $teacherIds)) > 0) {
-                    $overlappingTeachers = $cocur->teachers->whereIn('id', $teacherIds)->pluck('name')->join(', ');
-                    return "Guru {$overlappingTeachers} sudah menjadi fasilitator proyek \"{$cocur->title}\" pada jam {$conflictTime}.";
+                if ($conflict->teacher_id == $teacherId) {
+                    $teacherName = $conflict->teacher->name ?? 'Guru';
+                    return "Guru {$teacherName} sudah menjadi fasilitator proyek \"{$conflict->cocurricular->title}\" pada jam {$conflictTime}.";
                 }
             }
         }
@@ -452,24 +452,15 @@ class CurriculumController extends Controller
             'day_of_week' => 'required|integer|between:1,7',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
-            'school_class_id' => 'required_if:schedule_type,regular|nullable|exists:school_classes,id',
+            'school_class_id' => 'required|exists:school_classes,id',
             'subject_id' => 'required_if:schedule_type,regular|nullable|exists:subjects,id',
-            'teacher_id' => 'required_if:schedule_type,regular|nullable|exists:teachers,id',
+            'teacher_id' => 'required|exists:teachers,id',
             'cocurricular_id' => 'required_if:schedule_type,cocurricular|nullable|exists:cocurriculars,id',
         ]);
 
         $activeSemesterId = session('active_semester_id') ?? Semester::where('is_active', true)->value('id');
-        $schoolClassIds = [];
-        $teacherIds = [];
-
-        if ($request->schedule_type === 'regular') {
-            $schoolClassIds = [$request->school_class_id];
-            $teacherIds = [$request->teacher_id];
-        } else {
-            $cocurricular = \App\Models\Cocurricular::with(['schoolClasses', 'teachers'])->findOrFail($request->cocurricular_id);
-            $schoolClassIds = $cocurricular->schoolClasses->pluck('id')->toArray();
-            $teacherIds = $cocurricular->teachers->pluck('id')->toArray();
-        }
+        $schoolClassId = $request->school_class_id;
+        $teacherId = $request->teacher_id;
 
         // Check Conflict
         $conflictError = $this->checkScheduleConflict(
@@ -477,8 +468,8 @@ class CurriculumController extends Controller
             $request->start_time, 
             $request->end_time, 
             $activeSemesterId, 
-            $schoolClassIds, 
-            $teacherIds
+            $schoolClassId, 
+            $teacherId
         );
 
         if ($conflictError) {
@@ -519,6 +510,8 @@ class CurriculumController extends Controller
                     'day_of_week' => $request->day_of_week,
                     'start_time' => $request->start_time,
                     'end_time' => $request->end_time,
+                    'school_class_id' => $request->school_class_id,
+                    'teacher_id' => $request->teacher_id,
                 ]);
             }
         });
@@ -533,24 +526,15 @@ class CurriculumController extends Controller
             'day_of_week' => 'required|integer|between:1,7',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
-            'school_class_id' => 'required_if:schedule_type,regular|nullable|exists:school_classes,id',
+            'school_class_id' => 'required|exists:school_classes,id',
             'subject_id' => 'required_if:schedule_type,regular|nullable|exists:subjects,id',
-            'teacher_id' => 'required_if:schedule_type,regular|nullable|exists:teachers,id',
+            'teacher_id' => 'required|exists:teachers,id',
             'cocurricular_id' => 'required_if:schedule_type,cocurricular|nullable|exists:cocurriculars,id',
         ]);
 
         $activeSemesterId = session('active_semester_id') ?? Semester::where('is_active', true)->value('id');
-        $schoolClassIds = [];
-        $teacherIds = [];
-
-        if ($request->schedule_type === 'regular') {
-            $schoolClassIds = [$request->school_class_id];
-            $teacherIds = [$request->teacher_id];
-        } else {
-            $cocurricular = \App\Models\Cocurricular::with(['schoolClasses', 'teachers'])->findOrFail($request->cocurricular_id);
-            $schoolClassIds = $cocurricular->schoolClasses->pluck('id')->toArray();
-            $teacherIds = $cocurricular->teachers->pluck('id')->toArray();
-        }
+        $schoolClassId = $request->school_class_id;
+        $teacherId = $request->teacher_id;
 
         // Check Conflict
         $conflictError = $this->checkScheduleConflict(
@@ -558,8 +542,8 @@ class CurriculumController extends Controller
             $request->start_time, 
             $request->end_time, 
             $activeSemesterId, 
-            $schoolClassIds, 
-            $teacherIds,
+            $schoolClassId, 
+            $teacherId,
             $schedule->id
         );
 
@@ -602,6 +586,8 @@ class CurriculumController extends Controller
                     'day_of_week' => $request->day_of_week,
                     'start_time' => $request->start_time,
                     'end_time' => $request->end_time,
+                    'school_class_id' => $request->school_class_id,
+                    'teacher_id' => $request->teacher_id,
                 ]);
             }
         });
@@ -714,8 +700,6 @@ class CurriculumController extends Controller
             'learning_objectives' => 'nullable|string',
             'teacher_ids' => 'nullable|array',
             'teacher_ids.*' => 'exists:teachers,id',
-            'school_class_ids' => 'nullable|array',
-            'school_class_ids.*' => 'exists:school_classes,id',
         ]);
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($request, $activeAcademicYearId) {
@@ -731,7 +715,6 @@ class CurriculumController extends Controller
             ]);
 
             $cocurricular->teachers()->sync($request->input('teacher_ids', []));
-            $cocurricular->schoolClasses()->sync($request->input('school_class_ids', []));
         });
 
         return redirect()->route('curriculum.index')->with('message', 'Proyek Kokurikuler berhasil ditambahkan.');
@@ -749,8 +732,6 @@ class CurriculumController extends Controller
             'learning_objectives' => 'nullable|string',
             'teacher_ids' => 'nullable|array',
             'teacher_ids.*' => 'exists:teachers,id',
-            'school_class_ids' => 'nullable|array',
-            'school_class_ids.*' => 'exists:school_classes,id',
         ]);
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($request, $cocurricular) {
@@ -765,7 +746,6 @@ class CurriculumController extends Controller
             ]);
 
             $cocurricular->teachers()->sync($request->input('teacher_ids', []));
-            $cocurricular->schoolClasses()->sync($request->input('school_class_ids', []));
         });
 
         return redirect()->route('curriculum.index')->with('message', 'Proyek Kokurikuler berhasil diperbarui.');
@@ -775,7 +755,6 @@ class CurriculumController extends Controller
     {
         \Illuminate\Support\Facades\DB::transaction(function () use ($cocurricular) {
             $cocurricular->teachers()->detach();
-            $cocurricular->schoolClasses()->detach();
             $cocurricular->delete();
         });
 

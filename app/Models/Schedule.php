@@ -16,6 +16,8 @@ class Schedule extends Model
         'day_of_week',
         'start_time',
         'end_time',
+        'teacher_id',
+        'school_class_id',
         'semester_id',
         'academic_year_id',
     ];
@@ -55,5 +57,21 @@ class Schedule extends Model
     public function cocurricular()
     {
         return $this->belongsTo(Cocurricular::class);
+    }
+
+    /**
+     * Mendapatkan data kelas untuk jadwal (terutama jadwal kokurikuler).
+     */
+    public function schoolClass()
+    {
+        return $this->belongsTo(SchoolClass::class, 'school_class_id');
+    }
+
+    /**
+     * Mendapatkan data guru pengampu untuk jadwal (terutama jadwal kokurikuler).
+     */
+    public function teacher()
+    {
+        return $this->belongsTo(Teacher::class, 'teacher_id');
     }
 }

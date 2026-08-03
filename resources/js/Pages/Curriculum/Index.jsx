@@ -63,7 +63,6 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
         time_allocation: 0,
         learning_objectives: '',
         teacher_ids: [],
-        school_class_ids: [],
     });
 
     // Open Create Modal
@@ -135,11 +134,9 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                 time_allocation: 0,
                 learning_objectives: '',
                 teacher_ids: [],
-                school_class_ids: [],
             });
             cocurricularForm.clearErrors();
             setCocurricularTeacherSearch('');
-            setCocurricularClassSearch('');
         }
     };
 
@@ -187,9 +184,13 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             scheduleForm.setData({
                 schedule_type: record.schedule_type || 'regular',
                 cocurricular_id: record.cocurricular_id ? record.cocurricular_id.toString() : (cocurriculars.length > 0 ? cocurriculars[0].id.toString() : ''),
-                school_class_id: record.teaching_assignment?.school_class_id?.toString() || '',
+                school_class_id: record.schedule_type === 'cocurricular' 
+                    ? (record.school_class_id?.toString() || '') 
+                    : (record.teaching_assignment?.school_class_id?.toString() || ''),
                 subject_id: record.teaching_assignment?.subject_id?.toString() || '',
-                teacher_id: record.teaching_assignment?.teacher_id?.toString() || '',
+                teacher_id: record.schedule_type === 'cocurricular' 
+                    ? (record.teacher_id?.toString() || '') 
+                    : (record.teaching_assignment?.teacher_id?.toString() || ''),
                 day_of_week: record.day_of_week.toString(),
                 start_time: startClean,
                 end_time: endClean,
@@ -207,7 +208,6 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             setExtraStudentSearch('');
         } else if (entityType === 'cocurricular') {
             const linkedTeacherIds = record.teachers ? record.teachers.map(t => t.id) : [];
-            const linkedClassIds = record.school_classes ? record.school_classes.map(c => c.id) : [];
             cocurricularForm.setData({
                 level_id: record.level_id ? record.level_id.toString() : (levels.length > 0 ? levels[0].id.toString() : ''),
                 code: record.code || '',
@@ -217,11 +217,9 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                 time_allocation: record.time_allocation || 0,
                 learning_objectives: record.learning_objectives || '',
                 teacher_ids: linkedTeacherIds,
-                school_class_ids: linkedClassIds,
             });
             cocurricularForm.clearErrors();
             setCocurricularTeacherSearch('');
-            setCocurricularClassSearch('');
         }
     };
 
@@ -720,22 +718,66 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 </div>
 
                                 {scheduleForm.data.schedule_type === 'cocurricular' ? (
-                                    <div className="mb-4">
-                                        <InputLabel htmlFor="sch_cocurricular" value="Proyek Kokurikuler" />
-                                        <select
-                                            id="sch_cocurricular"
-                                            value={scheduleForm.data.cocurricular_id}
-                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
-                                            onChange={(e) => scheduleForm.setData('cocurricular_id', e.target.value)}
-                                            required={scheduleForm.data.schedule_type === 'cocurricular'}
-                                        >
-                                            <option value="">-- Pilih Proyek Kokurikuler --</option>
-                                            {cocurriculars.map((c) => (
-                                                <option key={c.id} value={c.id}>{c.title} ({c.code || 'Proyek'})</option>
-                                            ))}
-                                        </select>
-                                        <InputError message={scheduleForm.errors.cocurricular_id} className="mt-2" />
-                                    </div>
+                                    <>
+                                        <div className="mb-4">
+                                            <InputLabel htmlFor="sch_cocurricular" value="Proyek Kokurikuler" />
+                                            <select
+                                                id="sch_cocurricular"
+                                                value={scheduleForm.data.cocurricular_id}
+                                                className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                                onChange={(e) => {
+                                                    scheduleForm.setData({
+                                                        ...scheduleForm.data,
+                                                        cocurricular_id: e.target.value,
+                                                        teacher_id: '' // reset teacher when project changes
+                                                    });
+                                                }}
+                                                required={scheduleForm.data.schedule_type === 'cocurricular'}
+                                            >
+                                                <option value="">-- Pilih Proyek Kokurikuler --</option>
+                                                {cocurriculars.map((c) => (
+                                                    <option key={c.id} value={c.id}>{c.title} ({c.code || 'Proyek'})</option>
+                                                ))}
+                                            </select>
+                                            <InputError message={scheduleForm.errors.cocurricular_id} className="mt-2" />
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                            <div>
+                                                <InputLabel htmlFor="sch_cocurricular_class" value="Pilih Kelas" />
+                                                <select
+                                                    id="sch_cocurricular_class"
+                                                    value={scheduleForm.data.school_class_id}
+                                                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                                    onChange={(e) => scheduleForm.setData('school_class_id', e.target.value)}
+                                                    required={scheduleForm.data.schedule_type === 'cocurricular'}
+                                                >
+                                                    <option value="">-- Pilih Kelas --</option>
+                                                    {schoolClasses.map((cls) => (
+                                                        <option key={cls.id} value={cls.id}>{cls.name}</option>
+                                                    ))}
+                                                </select>
+                                                <InputError message={scheduleForm.errors.school_class_id} className="mt-2" />
+                                            </div>
+                                            <div>
+                                                <InputLabel htmlFor="sch_cocurricular_teacher" value="Pilih Guru Fasilitator" />
+                                                <select
+                                                    id="sch_cocurricular_teacher"
+                                                    value={scheduleForm.data.teacher_id}
+                                                    className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                                    onChange={(e) => scheduleForm.setData('teacher_id', e.target.value)}
+                                                    required={scheduleForm.data.schedule_type === 'cocurricular'}
+                                                    disabled={!scheduleForm.data.cocurricular_id}
+                                                >
+                                                    <option value="">-- Pilih Guru --</option>
+                                                    {scheduleForm.data.cocurricular_id && 
+                                                        cocurriculars.find(c => c.id.toString() === scheduleForm.data.cocurricular_id)?.teachers?.map((t) => (
+                                                        <option key={t.id} value={t.id}>{t.name}</option>
+                                                    ))}
+                                                </select>
+                                                <InputError message={scheduleForm.errors.teacher_id} className="mt-2" />
+                                            </div>
+                                        </div>
+                                    </>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                         <div>
@@ -1064,36 +1106,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     <InputError message={cocurricularForm.errors.teacher_ids} className="mt-2" />
                                 </div>
 
-                                <div className="mb-4">
-                                    <InputLabel htmlFor="cocurricular_class_search" value="Target Rombongan Belajar (Kelas)" />
-                                    <input
-                                        id="cocurricular_class_search"
-                                        type="text"
-                                        placeholder="Ketik nama kelas..."
-                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm mb-2"
-                                        value={cocurricularClassSearch}
-                                        onChange={(e) => setCocurricularClassSearch(e.target.value)}
-                                    />
-                                    <div className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm max-h-32 overflow-y-auto p-2 bg-white dark:bg-gray-800">
-                                        {schoolClasses.filter(c => c.name.toLowerCase().includes(cocurricularClassSearch.toLowerCase())).map((cls) => (
-                                            <label key={cls.id} className="flex items-center mb-1.5 cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500 h-4 w-4"
-                                                    checked={cocurricularForm.data.school_class_ids.includes(cls.id)}
-                                                    onChange={(e) => {
-                                                        const newIds = e.target.checked
-                                                            ? [...cocurricularForm.data.school_class_ids, cls.id]
-                                                            : cocurricularForm.data.school_class_ids.filter(id => id !== cls.id);
-                                                        cocurricularForm.setData('school_class_ids', newIds);
-                                                    }}
-                                                />
-                                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 font-semibold">{cls.name}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                    <InputError message={cocurricularForm.errors.school_class_ids} className="mt-2" />
-                                </div>
+
                             </>
                         )}
 
@@ -1535,13 +1548,13 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                             {sch.schedule_type === 'cocurricular' ? (
                                                 <>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-950">
-                                                        {sch.cocurricular?.school_classes?.map(c => c.name).join(', ') || '-'}
+                                                        {sch.school_class?.name || '-'}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-green-700 dark:text-green-400 font-bold">
                                                         {sch.cocurricular?.title || '-'} <span className="text-xs text-gray-400 font-semibold">({sch.cocurricular?.code || 'Proyek'})</span>
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 font-semibold max-w-xs truncate">
-                                                        {sch.cocurricular?.teachers?.map(t => t.name).join(', ') || '-'}
+                                                        {sch.teacher?.name || '-'}
                                                     </td>
                                                 </>
                                             ) : (

@@ -36,8 +36,4 @@ class Cocurricular extends Model
         return $this->belongsToMany(Teacher::class, 'cocurricular_teacher');
     }
 
-    public function schoolClasses()
-    {
-        return $this->belongsToMany(SchoolClass::class, 'cocurricular_school_class');
-    }
 }
