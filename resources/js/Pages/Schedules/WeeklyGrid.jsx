@@ -98,8 +98,8 @@ export default function WeeklyGrid({ schedules, onScheduleClick, viewMode }) {
                                             if (!cocur) return null;
                                             title = cocur.title || 'Proyek Kokurikuler';
                                             secondaryText = viewMode === 'teacher'
-                                                ? (cocur.school_classes?.map(c => c.name).join(', ') || '-')
-                                                : (cocur.teachers?.map(t => t.name).join(', ') || '-');
+                                                ? (schedule.school_class?.name || '-')
+                                                : (schedule.teacher?.name || '-');
                                             color = SUBJECT_COLORS[3]; // Use green base color for Cocurricular
                                         } else {
                                             const assignment = schedule.teaching_assignment;

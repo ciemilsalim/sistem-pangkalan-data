@@ -42,9 +42,9 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
                 if (s.schedule_type === 'regular' || !s.schedule_type) {
                     return s.teaching_assignment?.school_class_id == selectedClassId;
                 }
-                // Cocurricular: match if any of the target classes matches
-                if (s.schedule_type === 'cocurricular' && s.cocurricular) {
-                    return s.cocurricular.school_classes?.some(c => c.id == selectedClassId);
+                // Cocurricular: match if target class matches
+                if (s.schedule_type === 'cocurricular') {
+                    return s.school_class_id == selectedClassId;
                 }
                 return false;
             } else {
@@ -52,9 +52,9 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
                 if (s.schedule_type === 'regular' || !s.schedule_type) {
                     return s.teaching_assignment?.teacher_id == selectedTeacherId;
                 }
-                // Cocurricular: match if any facilitator teacher matches
-                if (s.schedule_type === 'cocurricular' && s.cocurricular) {
-                    return s.cocurricular.teachers?.some(t => t.id == selectedTeacherId);
+                // Cocurricular: match if facilitator teacher matches
+                if (s.schedule_type === 'cocurricular') {
+                    return s.teacher_id == selectedTeacherId;
                 }
                 return false;
             }
@@ -110,9 +110,13 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
             schedule_type: schedule.schedule_type || 'regular',
             cocurricular_id: schedule.cocurricular_id ? schedule.cocurricular_id.toString() : (cocurriculars.length > 0 ? cocurriculars[0].id.toString() : ''),
             teaching_assignment_id: schedule.teaching_assignment_id || '',
-            school_class_id: schedule.teaching_assignment?.school_class_id || '',
-            subject_id: schedule.teaching_assignment?.subject_id || '',
-            teacher_id: schedule.teaching_assignment?.teacher_id || '',
+            school_class_id: schedule.schedule_type === 'cocurricular' 
+                ? (schedule.school_class_id?.toString() || '') 
+                : (schedule.teaching_assignment?.school_class_id?.toString() || ''),
+            subject_id: schedule.teaching_assignment?.subject_id?.toString() || '',
+            teacher_id: schedule.schedule_type === 'cocurricular' 
+                ? (schedule.teacher_id?.toString() || '') 
+                : (schedule.teaching_assignment?.teacher_id?.toString() || ''),
             day_of_week: schedule.day_of_week.toString(),
             start_time: schedule.start_time.substring(0, 5),
             end_time: schedule.end_time.substring(0, 5),
@@ -365,37 +369,66 @@ export default function SchedulesIndex({ auth, schoolClasses, teachers, subjects
 
                         {/* Conditional Fields based on Type */}
                         {data.schedule_type === 'cocurricular' ? (
-                            <div>
-                                <InputLabel htmlFor="cocurricular_id" value="Proyek Kokurikuler" />
-                                <select
-                                    id="cocurricular_id"
-                                    value={data.cocurricular_id}
-                                    onChange={(e) => setData('cocurricular_id', e.target.value)}
-                                    className="mt-1 block w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm"
-                                    required
-                                >
-                                    <option value="">-- Pilih Proyek Kokurikuler --</option>
-                                    {cocurriculars.map(c => (
-                                        <option key={c.id} value={c.id}>
-                                            {c.code ? `[${c.code}] ` : ''}{c.title} — {c.school_classes?.map(sc => sc.name).join(', ') || 'Belum ada kelas'}
-                                        </option>
-                                    ))}
-                                </select>
-                                <InputError message={errors.cocurricular_id} className="mt-2" />
+                            <>
+                                <div>
+                                    <InputLabel htmlFor="cocurricular_id" value="Proyek Kokurikuler" />
+                                    <select
+                                        id="cocurricular_id"
+                                        value={data.cocurricular_id}
+                                        onChange={(e) => setData({
+                                            ...data,
+                                            cocurricular_id: e.target.value,
+                                            teacher_id: ''
+                                        })}
+                                        className="mt-1 block w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm"
+                                        required
+                                    >
+                                        <option value="">-- Pilih Proyek Kokurikuler --</option>
+                                        {cocurriculars.map(c => (
+                                            <option key={c.id} value={c.id}>
+                                                {c.code ? `[${c.code}] ` : ''}{c.title}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <InputError message={errors.cocurricular_id} className="mt-2" />
+                                </div>
                                 
-                                {/* Preview info for selected cocurricular */}
-                                {data.cocurricular_id && (() => {
-                                    const selected = cocurriculars.find(c => c.id == data.cocurricular_id);
-                                    if (!selected) return null;
-                                    return (
-                                        <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md text-sm space-y-1">
-                                            <p className="text-green-800 font-semibold">{selected.title}</p>
-                                            <p className="text-green-700"><strong>Kelas Target:</strong> {selected.school_classes?.map(c => c.name).join(', ') || '-'}</p>
-                                            <p className="text-green-700"><strong>Tim Fasilitator:</strong> {selected.teachers?.map(t => t.name).join(', ') || '-'}</p>
-                                        </div>
-                                    );
-                                })()}
-                            </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                    <div>
+                                        <InputLabel htmlFor="cocurricular_class_id" value="Pilih Kelas" />
+                                        <select
+                                            id="cocurricular_class_id"
+                                            value={data.school_class_id}
+                                            onChange={(e) => setData('school_class_id', e.target.value)}
+                                            className="mt-1 block w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm"
+                                            required={data.schedule_type === 'cocurricular'}
+                                        >
+                                            <option value="">-- Pilih Kelas --</option>
+                                            {schoolClasses.map((cls) => (
+                                                <option key={cls.id} value={cls.id}>{cls.name}</option>
+                                            ))}
+                                        </select>
+                                        <InputError message={errors.school_class_id} className="mt-2" />
+                                    </div>
+                                    <div>
+                                        <InputLabel htmlFor="cocurricular_teacher_id" value="Pilih Guru Fasilitator" />
+                                        <select
+                                            id="cocurricular_teacher_id"
+                                            value={data.teacher_id}
+                                            onChange={(e) => setData('teacher_id', e.target.value)}
+                                            className="mt-1 block w-full border-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm"
+                                            required={data.schedule_type === 'cocurricular'}
+                                            disabled={!data.cocurricular_id}
+                                        >
+                                            <option value="">-- Pilih Guru --</option>
+                                            {data.cocurricular_id && cocurriculars.find(c => c.id == data.cocurricular_id)?.teachers?.map(t => (
+                                                <option key={t.id} value={t.id}>{t.name}</option>
+                                            ))}
+                                        </select>
+                                        <InputError message={errors.teacher_id} className="mt-2" />
+                                    </div>
+                                </div>
+                            </>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>

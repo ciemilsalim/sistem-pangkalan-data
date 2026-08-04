@@ -1685,14 +1685,14 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Jenjang & Waktu</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Bentuk Kegiatan</th>
                                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Tim Fasilitator</th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Target Kelas</th>
+
                                 {canManageCurriculum && <th scope="col" className="relative px-6 py-3"><span className="sr-only">Aksi</span></th>}
                             </tr>
                         </thead>
                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200">
                             {cocurriculars?.length === 0 || !cocurriculars ? (
                                 <tr>
-                                    <td colSpan="6" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data proyek kokurikuler.</td>
+                                    <td colSpan="5" className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">Belum ada data proyek kokurikuler.</td>
                                 </tr>
                             ) : (
                                 cocurriculars.map((coc) => (
@@ -1711,9 +1711,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                         <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
                                             {coc.teachers && coc.teachers.length > 0 ? coc.teachers.map(t => t.name).join(', ') : <span className="italic">Belum ada</span>}
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
-                                            {coc.school_classes && coc.school_classes.length > 0 ? coc.school_classes.map(c => c.name).join(', ') : <span className="italic">Belum ada</span>}
-                                        </td>
+
                                         {canManageCurriculum && (
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <button onClick={() => openEditModal('cocurricular', coc)} className="text-indigo-600 hover:text-indigo-900 mr-3" title="Edit">

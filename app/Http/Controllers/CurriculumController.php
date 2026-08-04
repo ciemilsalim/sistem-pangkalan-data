@@ -78,7 +78,7 @@ class CurriculumController extends Controller
             ->get();
 
         // Fetch cocurriculars with relations
-        $cocurriculars = Cocurricular::with(['level', 'teachers', 'schoolClasses'])
+        $cocurriculars = Cocurricular::with(['level', 'teachers'])
             ->when($activeAcademicYearId, function ($query, $activeAcademicYearId) {
                 return $query->where('academic_year_id', $activeAcademicYearId);
             })

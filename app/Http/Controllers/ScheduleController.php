@@ -37,7 +37,6 @@ class ScheduleController extends Controller
             'teachingAssignment.schoolClass',
             'teachingAssignment.subject',
             'teachingAssignment.teacher',
-            'cocurricular.schoolClasses',
             'cocurricular.teachers',
         ])
           ->when($activeSemesterId, function ($query, $activeSemesterId) {
@@ -55,7 +54,7 @@ class ScheduleController extends Controller
 
         $subjects = Subject::orderBy('name')->get();
 
-        $cocurriculars = Cocurricular::with(['level', 'teachers', 'schoolClasses'])
+        $cocurriculars = Cocurricular::with(['level', 'teachers'])
             ->when($activeAcademicYearId, function ($query, $activeAcademicYearId) {
                 return $query->where('academic_year_id', $activeAcademicYearId);
             })
@@ -108,16 +107,16 @@ class ScheduleController extends Controller
                     $aClassIds = [$a->teachingAssignment->school_class_id];
                     $aTeacherIds = [$a->teachingAssignment->teacher_id];
                 } elseif ($a->schedule_type === 'cocurricular' && $a->cocurricular) {
-                    $aClassIds = $a->cocurricular->schoolClasses->pluck('id')->toArray();
-                    $aTeacherIds = $a->cocurricular->teachers->pluck('id')->toArray();
+                    $aClassIds = $a->school_class_id ? [$a->school_class_id] : [];
+                    $aTeacherIds = $a->teacher_id ? [$a->teacher_id] : [];
                 }
 
                 if (($b->schedule_type === 'regular' || !$b->schedule_type) && $b->teachingAssignment) {
                     $bClassIds = [$b->teachingAssignment->school_class_id];
                     $bTeacherIds = [$b->teachingAssignment->teacher_id];
                 } elseif ($b->schedule_type === 'cocurricular' && $b->cocurricular) {
-                    $bClassIds = $b->cocurricular->schoolClasses->pluck('id')->toArray();
-                    $bTeacherIds = $b->cocurricular->teachers->pluck('id')->toArray();
+                    $bClassIds = $b->school_class_id ? [$b->school_class_id] : [];
+                    $bTeacherIds = $b->teacher_id ? [$b->teacher_id] : [];
                 }
 
                 $classOverlap = array_intersect($aClassIds, $bClassIds);
