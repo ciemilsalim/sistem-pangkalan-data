@@ -13,8 +13,10 @@ class SettingController extends Controller
     /**
      * Display the settings dashboard.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $selectedYear = $request->input('year', date('Y'));
+        
         // Pluck key-value pairs from settings table
         $settings = Setting::pluck('value', 'key')->all();
 
@@ -41,6 +43,10 @@ class SettingController extends Controller
             'global_ai_model' => 'openrouter/free',
         ];
 
+        for ($i = 1; $i <= 12; $i++) {
+            $defaultKeys['effective_days_' . $selectedYear . '_' . $i] = 0;
+        }
+
         $settings = array_merge($defaultKeys, $settings);
 
         // Add logo URL if logo exists
@@ -58,6 +64,7 @@ class SettingController extends Controller
 
         return Inertia::render('Settings/Index', [
             'settings' => $settings,
+            'selectedYear' => $selectedYear,
             'flash' => [
                 'message' => session('message'),
             ]
@@ -69,7 +76,7 @@ class SettingController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
-        $request->validate([
+        $rules = [
             'school_name' => 'required|string|max:255',
             'school_address' => 'required|string',
             'school_headmaster_name' => 'nullable|string|max:255',
@@ -89,7 +96,15 @@ class SettingController extends Controller
             'global_ai_provider' => 'nullable|string|in:openrouter,gemini,openai,claude,groq',
             'global_ai_api_key' => 'nullable|string',
             'global_ai_model' => 'nullable|string',
-        ]);
+            'effective_year' => 'nullable|integer',
+        ];
+
+        $selectedYear = $request->input('effective_year', date('Y'));
+        for ($i = 1; $i <= 12; $i++) {
+            $rules['effective_days_' . $selectedYear . '_' . $i] = 'nullable|integer|min:0|max:31';
+        }
+
+        $request->validate($rules);
 
         $settingsData = $request->only([
             'school_name',
@@ -109,6 +124,13 @@ class SettingController extends Controller
             'global_ai_api_key',
             'global_ai_model',
         ]);
+
+        for ($i = 1; $i <= 12; $i++) {
+            $monthKey = 'effective_days_' . $selectedYear . '_' . $i;
+            if ($request->has($monthKey)) {
+                $settingsData[$monthKey] = $request->input($monthKey);
+            }
+        }
 
         // Also update attendance_radius key to match school_radius for backward compatibility
         $settingsData['attendance_radius'] = $settingsData['school_radius'];

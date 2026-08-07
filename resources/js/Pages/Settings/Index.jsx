@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage, router } from '@inertiajs/react';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 
-export default function Index({ auth, settings }) {
+export default function Index({ auth, settings, selectedYear }) {
     const pageProps = usePage().props;
 
     // Initialize form with existing setting values from database
@@ -30,8 +30,30 @@ export default function Index({ auth, settings }) {
         global_ai_provider: settings.global_ai_provider || 'openrouter',
         global_ai_api_key: settings.global_ai_api_key || '',
         global_ai_model: settings.global_ai_model || 'openrouter/free',
+        effective_year: selectedYear,
         _method: 'PUT',
     });
+
+    useEffect(() => {
+        const newEffectiveDays = {};
+        for (let i = 1; i <= 12; i++) {
+            newEffectiveDays[`effective_days_${selectedYear}_${i}`] = settings[`effective_days_${selectedYear}_${i}`] || 0;
+        }
+        setData(data => ({
+            ...data,
+            effective_year: selectedYear,
+            ...newEffectiveDays
+        }));
+    }, [selectedYear, settings]);
+
+    const handleYearChange = (e) => {
+        const newYear = e.target.value;
+        router.get(route('settings.index'), { year: newYear }, {
+            preserveState: true,
+            preserveScroll: true,
+            only: ['settings', 'selectedYear']
+        });
+    };
 
     const [logoPreview, setLogoPreview] = useState(null);
     const [googleLogoPreview, setGoogleLogoPreview] = useState(null);
@@ -496,10 +518,59 @@ export default function Index({ auth, settings }) {
                             </div>
                         </div>
 
-                        {/* SECTION 5: PENGATURAN KECERDASAN BUATAN (AI) */}
+                        {/* SECTION 5: HARI EFEKTIF BELAJAR */}
+                        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-100 dark:border-gray-700 pb-3 mb-6">
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                                    5. Pengaturan Hari Efektif Sekolah
+                                </h3>
+                                <div className="mt-4 sm:mt-0 flex items-center gap-2">
+                                    <InputLabel htmlFor="year_select" value="Pilih Tahun:" className="mb-0" />
+                                    <select
+                                        id="year_select"
+                                        value={selectedYear}
+                                        onChange={handleYearChange}
+                                        className="text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 font-semibold cursor-pointer"
+                                    >
+                                        {[...Array(4)].map((_, i) => {
+                                            const y = new Date().getFullYear() - 1 + i;
+                                            return <option key={y} value={y}>Tahun {y}</option>;
+                                        })}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                                Masukkan jumlah hari efektif per bulan untuk kalkulasi persentase pada Laporan Absensi. Pastikan tahun sesuai.
+                            </p>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'].map((monthName, index) => {
+                                    const monthNum = index + 1;
+                                    const key = `effective_days_${selectedYear}_${monthNum}`;
+                                    return (
+                                        <div key={monthNum}>
+                                            <InputLabel htmlFor={key} value={monthName} />
+                                            <TextInput
+                                                id={key}
+                                                type="number"
+                                                min="0"
+                                                max="31"
+                                                className="mt-1 block w-full text-sm"
+                                                value={data[key] || 0}
+                                                onChange={(e) => setData(key, e.target.value)}
+                                            />
+                                            <InputError message={errors[key]} className="mt-2" />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* SECTION 6: PENGATURAN KECERDASAN BUATAN (AI) */}
                         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-100 pb-3 mb-6">
-                                5. Pengaturan Kecerdasan Buatan (AI)
+                                6. Pengaturan Kecerdasan Buatan (AI)
                             </h3>
                             <div className="space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
