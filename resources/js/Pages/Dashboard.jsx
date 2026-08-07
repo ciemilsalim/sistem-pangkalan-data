@@ -139,6 +139,25 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                         </p>
                     </div>
 
+                    {/* Alert for Effective Days */}
+                    {isAdmin && stats.is_effective_days_set === false && (
+                        <div className="mb-8 bg-amber-50 dark:bg-amber-900/30 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm flex items-start gap-3 animate-pulse">
+                            <span className="material-icons text-amber-500 mt-0.5">warning</span>
+                            <div>
+                                <h4 className="text-sm font-bold text-amber-800 dark:text-amber-200">Perhatian: Hari Efektif Belajar Belum Diatur</h4>
+                                <p className="text-xs text-amber-700 dark:text-amber-300/80 mt-1">
+                                    Jumlah hari efektif sekolah untuk bulan ini belum diisi. Kalkulasi persentase kehadiran pada Dasbor Absensi mungkin tidak akurat.
+                                </p>
+                                <Link 
+                                    href={route('settings.index')} 
+                                    className="inline-flex mt-2 text-xs font-semibold text-amber-700 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-100 underline decoration-amber-500/30 underline-offset-4"
+                                >
+                                    Buka menu Pengaturan untuk mengisi data &rarr;
+                                </Link>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Ecosystem Quick Access (Single Sign-On) */}
                     {(isAdmin || hasPermission('access_sso_lms') || hasPermission('access_sso_attendance')) && (
                     <div className="mb-8">

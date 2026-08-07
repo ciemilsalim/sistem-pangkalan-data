@@ -227,6 +227,7 @@ class DashboardController extends Controller
                 'total_classes' => $totalClasses,
                 'total_extracurriculars' => $totalExtracurriculars,
                 'attendance_rate' => $attendanceRateToday,
+                'is_effective_days_set' => $this->checkEffectiveDaysSet(),
             ],
             'charts' => [
                 'student_distribution' => $studentDistribution,
@@ -247,5 +248,17 @@ class DashboardController extends Controller
                 'subject_remedials' => $lmsSubjectRemedials,
             ]
         ]);
+    }
+
+    private function checkEffectiveDaysSet()
+    {
+        $currentYear = date('Y');
+        $currentMonth = date('n');
+        
+        $effectiveDays = \App\Models\Setting::where('key', 'effective_days_' . $currentYear . '_' . $currentMonth)->value('value');
+        if ($effectiveDays === null) {
+            $effectiveDays = \App\Models\Setting::where('key', 'effective_days_' . $currentMonth)->value('value');
+        }
+        return !empty($effectiveDays) && $effectiveDays > 0;
     }
 }
