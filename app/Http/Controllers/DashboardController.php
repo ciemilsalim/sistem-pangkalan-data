@@ -39,8 +39,10 @@ class DashboardController extends Controller
             ->whereIn('status', ['tepat_waktu', 'terlambat'])
             ->count();
         
-        if ($totalStudents > 0) {
-            $attendanceRateToday = round(($presentToday / $totalStudents) * 100, 1);
+        $totalToday = Attendance::whereDate('attendance_time', $today)->count();
+        
+        if ($totalToday > 0) {
+            $attendanceRateToday = round(($presentToday / $totalToday) * 100, 1);
         } else {
             $attendanceRateToday = 0.0;
         }
@@ -53,7 +55,12 @@ class DashboardController extends Controller
                 $presentLatest = Attendance::whereDate('attendance_time', $latestDateStr)
                     ->whereIn('status', ['tepat_waktu', 'terlambat'])
                     ->count();
-                $attendanceRateToday = round(($presentLatest / $totalStudents) * 100, 1);
+                $totalLatest = Attendance::whereDate('attendance_time', $latestDateStr)->count();
+                if ($totalLatest > 0) {
+                    $attendanceRateToday = round(($presentLatest / $totalLatest) * 100, 1);
+                } else {
+                    $attendanceRateToday = 0.0;
+                }
             } else {
                 $attendanceRateToday = 96.4; // Fallback realistis untuk demo jika DB kosong
             }
@@ -98,10 +105,11 @@ class DashboardController extends Controller
 
         if (count($dates) > 0) {
             foreach ($dates as $d) {
+                $totalForDay = Attendance::whereDate('attendance_time', $d)->count();
                 $count = Attendance::whereDate('attendance_time', $d)
                     ->whereIn('status', ['tepat_waktu', 'terlambat'])
                     ->count();
-                $rate = round(($count / $trendTotalStudents) * 100, 1);
+                $rate = $totalForDay > 0 ? round(($count / $totalForDay) * 100, 1) : 0;
                 $dayName = date('D', strtotime($d));
                 $dayTranslations = [
                     'Mon' => 'Sen', 'Tue' => 'Sel', 'Wed' => 'Rab', 
