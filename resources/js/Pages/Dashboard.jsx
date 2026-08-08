@@ -95,8 +95,7 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
         return startFormatted;
     };
 
-    // State for chart hover tooltip
-    const [hoveredPoint, setHoveredPoint] = useState(null);
+
 
     return (
         <AuthenticatedLayout
