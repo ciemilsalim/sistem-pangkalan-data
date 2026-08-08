@@ -55,26 +55,17 @@ class DashboardController extends Controller
             $attendanceRateToday = 0.0;
         }
 
-        // 2. Grafik Distribusi Siswa per Tingkat (Kelas 10, 11, 12)
+        // 2. Grafik Distribusi Siswa per Tingkat
         $levels = Level::all();
         $studentDistribution = [];
         foreach ($levels as $lvl) {
-            $count = Student::whereHas('schoolClass', function($q) use ($lvl) {
-                $q->where('level_id', $lvl->id);
+            $count = Student::where('status', 'aktif')->whereHas('schoolClass', function($q) use ($lvl, $activeAcademicYearId) {
+                $q->where('level_id', $lvl->id)
+                  ->where('academic_year_id', $activeAcademicYearId);
             })->count();
             $studentDistribution[] = [
                 'label' => $lvl->name,
                 'value' => $count,
-            ];
-        }
-        
-        // Fallback jika tidak ada data sama sekali
-        $totalSiswaInDist = collect($studentDistribution)->sum('value');
-        if ($totalSiswaInDist === 0) {
-            $studentDistribution = [
-                ['label' => 'Tingkat 10', 'value' => 148],
-                ['label' => 'Tingkat 11', 'value' => 132],
-                ['label' => 'Tingkat 12', 'value' => 125],
             ];
         }
 
