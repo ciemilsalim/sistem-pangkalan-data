@@ -2,27 +2,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 
-export default function AttendanceMonitoring({ filters, charts, stats }) {
-    const { auth } = usePage().props;
-    const user = auth.user;
-
-    const [startDate, setStartDate] = useState(filters.start_date || '');
-    const [endDate, setEndDate] = useState(filters.end_date || '');
-
-    const handleFilter = (e) => {
-        e.preventDefault();
-        router.get(route('monitoring.attendance'), {
-            start_date: startDate,
-            end_date: endDate,
-        }, {
-            preserveState: true,
-            preserveScroll: true,
-        });
-    };
-
-    // Class Attendance SVG Logic
-    const attendanceTrend = charts.class_attendance_trend || [];
-    const minPercentage = attendanceTrend.length > 0 ? Math.min(...attendanceTrend.map(item => item.percentage)) : 80;
+// Reusable Bar Chart Component for Daily Trends
+const DailyTrendChart = ({ data, title, subtitle }) => {
+    const minPercentage = data.length > 0 ? Math.min(...data.map(item => item.percentage)) : 80;
     const yMin = minPercentage < 80 ? Math.max(0, Math.floor(minPercentage / 10) * 10) : 80;
     const yMax = 100;
     
@@ -41,15 +23,106 @@ export default function AttendanceMonitoring({ filters, charts, stats }) {
         yTicks.push(Math.round(yMin + (step * i)));
     }
 
-    const points = attendanceTrend.map((item, index) => {
-        const x = paddingLeft + (index * (plotWidth / (Math.max(attendanceTrend.length - 1, 1))));
+    const points = data.map((item, index) => {
+        const x = paddingLeft + (index * (plotWidth / (Math.max(data.length - 1, 1))));
         const percentage = Math.max(yMin, Math.min(yMax, item.percentage));
         const y = paddingTop + plotHeight - (((percentage - yMin) / (yMax - yMin)) * plotHeight);
         return { x, y, day: item.day, value: item.percentage };
     });
 
     const [hoveredPoint, setHoveredPoint] = useState(null);
+
+    return (
+        <div className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-between h-full">
+            <div className="flex items-center justify-between mb-4">
+                <div>
+                    <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm">{title}</h3>
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400">{subtitle}</p>
+                </div>
+                <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-600 border border-indigo-100">
+                    Skala {yMin === 80 ? "Zoomed (80% - 100%)" : `Dinamis (${yMin}% - 100%)`}
+                </span>
+            </div>
+
+            <div className="relative w-full flex justify-center pb-2 pt-4">
+                {points.length > 0 ? (
+                    <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full max-w-[550px] h-auto overflow-visible select-none">
+                        {yTicks.map((val) => {
+                            const y = paddingTop + plotHeight - (((val - yMin) / (yMax - yMin)) * plotHeight);
+                            return (
+                                <g key={val}>
+                                    <line x1={paddingLeft} y1={y} x2={svgWidth - paddingRight} y2={y} stroke="#e5e7eb" strokeWidth="1" strokeDasharray="4 4" />
+                                    <text x={paddingLeft - 8} y={y + 4} textAnchor="end" className="text-[10px] fill-gray-400 font-medium font-mono">{val}%</text>
+                                </g>
+                            );
+                        })}
+
+                        {points.map((p, index) => {
+                            const barWidth = Math.min(48, (plotWidth / points.length) * 0.6);
+                            const barHeight = Math.max(0, paddingTop + plotHeight - p.y);
+                            return (
+                                <g key={index}>
+                                    <rect x={p.x - barWidth / 2} y={paddingTop} width={barWidth} height={plotHeight} fill="#f3f4f6" className="dark:fill-gray-700/50" rx="6" />
+                                    <rect x={p.x - barWidth / 2} y={p.y} width={barWidth} height={barHeight} fill={hoveredPoint === index ? "#059669" : "#10b981"} rx="6" className="transition-all duration-300 ease-out" />
+                                    <rect x={p.x - barWidth / 2} y={paddingTop} width={barWidth} height={plotHeight} fill="transparent" className="cursor-pointer" onMouseEnter={() => setHoveredPoint(index)} onMouseLeave={() => setHoveredPoint(null)} onClick={() => setHoveredPoint(hoveredPoint === index ? null : index)} />
+                                </g>
+                            );
+                        })}
+
+                        {points.map((p, index) => {
+                            if (points.length > 10 && index % Math.ceil(points.length / 10) !== 0 && index !== points.length - 1) return null;
+                            return <text key={index} x={p.x} y={svgHeight - 15} textAnchor="middle" className="text-[9px] fill-gray-500 font-semibold">{p.day}</text>
+                        })}
+                    </svg>
+                ) : (
+                    <div className="flex h-48 w-full items-center justify-center text-sm text-gray-500 italic">
+                        Data tidak ditemukan untuk rentang waktu ini.
+                    </div>
+                )}
+                
+                {hoveredPoint !== null && points[hoveredPoint] && (
+                    <div className="absolute bg-slate-900 text-white text-[11px] px-3 py-2 rounded-lg shadow-xl border border-slate-700 font-bold pointer-events-none z-50 flex flex-col items-center gap-1"
+                        style={{
+                            left: `${(points[hoveredPoint].x / svgWidth) * 100}%`,
+                            top: `${(points[hoveredPoint].y / svgHeight) * 100}%`,
+                            transform: 'translate(-50%, -120%)',
+                            transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)'
+                        }}>
+                        <span className="text-[9px] text-slate-300 font-medium">{points[hoveredPoint].day}</span>
+                        <span>{points[hoveredPoint].value}%</span>
+                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+
+export default function AttendanceMonitoring({ filters, options, charts, stats }) {
+    const { auth } = usePage().props;
+    
+    const [startDate, setStartDate] = useState(filters.start_date || '');
+    const [endDate, setEndDate] = useState(filters.end_date || '');
+    const [classId, setClassId] = useState(filters.class_id || '');
+    const [subjectId, setSubjectId] = useState(filters.subject_id || '');
+
+    const handleFilter = (e) => {
+        e.preventDefault();
+        router.get(route('monitoring.attendance'), {
+            start_date: startDate,
+            end_date: endDate,
+            class_id: classId,
+            subject_id: subjectId,
+        }, { preserveState: true, preserveScroll: true });
+    };
+
+    const classAttendanceTrend = charts.class_attendance_trend || [];
+    const subjectAttendanceTrend = charts.subject_attendance_trend || [];
     const subjectAverages = charts.subject_attendance_averages || [];
+    
+    const classes = options?.classes || [];
+    const subjects = options?.subjects || [];
 
     return (
         <AuthenticatedLayout
@@ -73,141 +146,87 @@ export default function AttendanceMonitoring({ filters, charts, stats }) {
                     
                     {/* Filter Section */}
                     <div className="mb-6 rounded-2xl bg-white dark:bg-gray-800 p-5 shadow-sm border border-gray-100 dark:border-gray-700">
-                        <form onSubmit={handleFilter} className="flex flex-col sm:flex-row sm:items-end gap-4">
-                            <div>
+                        <form onSubmit={handleFilter} className="flex flex-col md:flex-row md:items-end gap-4">
+                            <div className="flex-1 min-w-[150px]">
                                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Mulai Tanggal</label>
                                 <input 
                                     type="date" 
-                                    className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     value={startDate}
                                     onChange={e => setStartDate(e.target.value)}
                                 />
                             </div>
-                            <div>
+                            <div className="flex-1 min-w-[150px]">
                                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Sampai Tanggal</label>
                                 <input 
                                     type="date" 
-                                    className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                     value={endDate}
                                     onChange={e => setEndDate(e.target.value)}
                                 />
                             </div>
+                            <div className="flex-1 min-w-[150px]">
+                                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Filter Kelas</label>
+                                <select 
+                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    value={classId}
+                                    onChange={e => setClassId(e.target.value)}
+                                >
+                                    <option value="">Semua Kelas</option>
+                                    {classes.map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex-1 min-w-[150px]">
+                                <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Filter Mata Pelajaran</label>
+                                <select 
+                                    className="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    value={subjectId}
+                                    onChange={e => setSubjectId(e.target.value)}
+                                >
+                                    <option value="">Semua Mapel</option>
+                                    {subjects.map(s => (
+                                        <option key={s.id} value={s.id}>{s.name}</option>
+                                    ))}
+                                </select>
+                            </div>
                             <button 
                                 type="submit"
-                                className="inline-flex justify-center rounded-lg border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                className="inline-flex justify-center whitespace-nowrap rounded-lg border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                             >
-                                Terapkan Filter
+                                Terapkan
                             </button>
                         </form>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                         {/* CHART 1: CLASS ATTENDANCE TREND */}
-                        <div className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-between">
-                            <div className="flex items-center justify-between mb-4">
-                                <div>
-                                    <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm">Tren Kehadiran Harian Kelas</h3>
-                                    <p className="text-[10px] text-gray-500 dark:text-gray-400">Tingkat kehadiran siswa secara kumulatif</p>
-                                </div>
-                                <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-600 border border-indigo-100">
-                                    Skala {yMin === 80 ? "Zoomed (80% - 100%)" : `Dinamis (${yMin}% - 100%)`}
-                                </span>
-                            </div>
+                        <DailyTrendChart 
+                            data={classAttendanceTrend} 
+                            title="Tren Harian Kelas (Gerbang Sekolah)" 
+                            subtitle="Persentase siswa hadir di sekolah" 
+                        />
+                        
+                        {/* CHART 2: SUBJECT ATTENDANCE TREND */}
+                        <DailyTrendChart 
+                            data={subjectAttendanceTrend} 
+                            title="Tren Harian Mata Pelajaran" 
+                            subtitle="Persentase siswa hadir dalam kegiatan belajar" 
+                        />
+                    </div>
 
-                            <div className="relative w-full flex justify-center pb-2 pt-4">
-                                {points.length > 0 ? (
-                                    <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full max-w-[550px] h-auto overflow-visible select-none">
-                                        {yTicks.map((val) => {
-                                            const y = paddingTop + plotHeight - (((val - yMin) / (yMax - yMin)) * plotHeight);
-                                            return (
-                                                <g key={val}>
-                                                    <line x1={paddingLeft} y1={y} x2={svgWidth - paddingRight} y2={y} stroke="#e5e7eb" strokeWidth="1" strokeDasharray="4 4" />
-                                                    <text x={paddingLeft - 8} y={y + 4} textAnchor="end" className="text-[10px] fill-gray-400 font-medium font-mono">{val}%</text>
-                                                </g>
-                                            );
-                                        })}
-
-                                        {points.map((p, index) => {
-                                            const barWidth = Math.min(48, (plotWidth / points.length) * 0.6);
-                                            const barHeight = Math.max(0, paddingTop + plotHeight - p.y);
-                                            return (
-                                                <g key={index}>
-                                                    {/* Track Bar */}
-                                                    <rect
-                                                        x={p.x - barWidth / 2}
-                                                        y={paddingTop}
-                                                        width={barWidth}
-                                                        height={plotHeight}
-                                                        fill="#f3f4f6"
-                                                        className="dark:fill-gray-700/50"
-                                                        rx="6"
-                                                    />
-                                                    {/* Value Bar */}
-                                                    <rect
-                                                        x={p.x - barWidth / 2}
-                                                        y={p.y}
-                                                        width={barWidth}
-                                                        height={barHeight}
-                                                        fill={hoveredPoint === index ? "#059669" : "#10b981"}
-                                                        rx="6"
-                                                        className="transition-all duration-300 ease-out"
-                                                    />
-                                                    {/* Hit Area */}
-                                                    <rect
-                                                        x={p.x - barWidth / 2}
-                                                        y={paddingTop}
-                                                        width={barWidth}
-                                                        height={plotHeight}
-                                                        fill="transparent"
-                                                        className="cursor-pointer"
-                                                        onMouseEnter={() => setHoveredPoint(index)}
-                                                        onMouseLeave={() => setHoveredPoint(null)}
-                                                        onClick={() => setHoveredPoint(hoveredPoint === index ? null : index)}
-                                                    />
-                                                </g>
-                                            );
-                                        })}
-
-                                        {points.map((p, index) => {
-                                            if (points.length > 10 && index % Math.ceil(points.length / 10) !== 0 && index !== points.length - 1) return null;
-                                            return <text key={index} x={p.x} y={svgHeight - 15} textAnchor="middle" className="text-[9px] fill-gray-500 font-semibold">{p.day}</text>
-                                        })}
-                                    </svg>
-                                ) : (
-                                    <div className="flex h-48 w-full items-center justify-center text-sm text-gray-500 italic">
-                                        Data tidak ditemukan untuk rentang waktu ini.
-                                    </div>
-                                )}
-                                
-                                {hoveredPoint !== null && points[hoveredPoint] && (
-                                    <div 
-                                        className="absolute bg-slate-900 text-white text-[11px] px-3 py-2 rounded-lg shadow-xl border border-slate-700 font-bold pointer-events-none z-50 flex flex-col items-center gap-1"
-                                        style={{
-                                            left: `${(points[hoveredPoint].x / svgWidth) * 100}%`,
-                                            top: `${(points[hoveredPoint].y / svgHeight) * 100}%`,
-                                            transform: 'translate(-50%, -120%)',
-                                            transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)'
-                                        }}
-                                    >
-                                        <span className="text-[9px] text-slate-300 font-medium">{points[hoveredPoint].day}</span>
-                                        <span>{points[hoveredPoint].value}%</span>
-                                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* CHART 2: SUBJECT ATTENDANCE (WORST PERFORMING) */}
+                    <div className="grid grid-cols-1 gap-6">
+                        {/* CHART 3: SUBJECT ATTENDANCE (WORST PERFORMING) */}
                         <div className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col">
                             <div className="mb-4">
                                 <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm">Rata-rata Kehadiran Mata Pelajaran</h3>
-                                <p className="text-[10px] text-gray-500 dark:text-gray-400">10 mata pelajaran dengan persentase kehadiran terendah</p>
+                                <p className="text-[10px] text-gray-500 dark:text-gray-400">15 mata pelajaran dengan persentase kehadiran terendah</p>
                             </div>
                             
-                            <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                            <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
                                 {subjectAverages.length > 0 ? (
                                     subjectAverages.map((item, idx) => {
-                                        // Colored based on percentage (red for very low, amber for medium, green for good)
                                         let colorClass = 'bg-emerald-500';
                                         let textClass = 'text-emerald-700 dark:text-emerald-400';
                                         
@@ -222,7 +241,7 @@ export default function AttendanceMonitoring({ filters, charts, stats }) {
                                         return (
                                             <div key={idx} className="space-y-1.5">
                                                 <div className="flex items-center justify-between text-xs font-semibold text-gray-700 dark:text-gray-300">
-                                                    <span className="truncate max-w-[70%]">{item.subject}</span>
+                                                    <span className="truncate max-w-[80%]">{item.subject}</span>
                                                     <span className={`font-mono font-bold ${textClass}`}>{item.percentage}%</span>
                                                 </div>
                                                 <div className="h-2 w-full rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
@@ -232,7 +251,7 @@ export default function AttendanceMonitoring({ filters, charts, stats }) {
                                         );
                                     })
                                 ) : (
-                                    <div className="flex h-full w-full items-center justify-center text-sm text-gray-500 italic">
+                                    <div className="flex h-32 w-full items-center justify-center text-sm text-gray-500 italic">
                                         Data mata pelajaran tidak ditemukan.
                                     </div>
                                 )}
@@ -243,7 +262,6 @@ export default function AttendanceMonitoring({ filters, charts, stats }) {
                 </div>
             </div>
             
-            {/* Minimal styles for scrollbar if needed */}
             <style jsx>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 4px;

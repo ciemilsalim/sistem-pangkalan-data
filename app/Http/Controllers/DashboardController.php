@@ -106,11 +106,11 @@ class DashboardController extends Controller
 
         if (count($dates) > 0) {
             foreach ($dates as $d) {
-                $totalForDay = Attendance::whereDate('attendance_time', $d)->count();
+                // Gunakan total siswa aktif, bukan total tap kartu, agar persentase akurat (alpa mengurangi persentase)
                 $count = Attendance::whereDate('attendance_time', $d)
                     ->whereIn('status', ['tepat_waktu', 'terlambat'])
                     ->count();
-                $rate = $totalForDay > 0 ? round(($count / $totalForDay) * 100, 1) : 0;
+                $rate = $trendTotalStudents > 0 ? round(($count / $trendTotalStudents) * 100, 1) : 0;
                 $dayName = date('D', strtotime($d));
                 $dayTranslations = [
                     'Mon' => 'Sen', 'Tue' => 'Sel', 'Wed' => 'Rab', 
@@ -122,15 +122,6 @@ class DashboardController extends Controller
                     'percentage' => $rate,
                 ];
             }
-        } else {
-            // Tren fallback realistis
-            $attendanceTrend = [
-                ['day' => 'Sen', 'percentage' => 95.8],
-                ['day' => 'Sel', 'percentage' => 97.2],
-                ['day' => 'Rab', 'percentage' => 96.5],
-                ['day' => 'Kam', 'percentage' => 97.9],
-                ['day' => 'Jum', 'percentage' => 95.0],
-            ];
         }
 
         // 4. Statistik Obrolan & Pengawasan (Keterlibatan Modul Chat Baru)
