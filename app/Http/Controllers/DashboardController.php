@@ -31,7 +31,9 @@ class DashboardController extends Controller
         $activeAcademicYearId = $activeAcademicYear ? $activeAcademicYear->id : null;
 
         // 1. Hitung statistik dasar (Cards)
-        $totalStudents = Student::where('status', 'aktif')->count();
+        $totalStudents = Student::where('status', 'aktif')->whereHas('schoolClass', function($q) use ($activeAcademicYearId) {
+            $q->where('academic_year_id', $activeAcademicYearId);
+        })->count();
         $totalTeachers = Teacher::count(); // Semua guru (termasuk non-aktif jika belum dihapus)
         
         $totalParents = ParentModel::whereHas('students', function ($q) {
