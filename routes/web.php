@@ -25,7 +25,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/attendance-monitoring', [App\Http\Controllers\AttendanceMonitoringController::class, 'index'])->middleware('role:admin|wakasek_kurikulum')->name('monitoring.attendance');
+    Route::get('/attendance-monitoring', [App\Http\Controllers\AttendanceMonitoringController::class, 'index'])->name('monitoring.attendance');
     Route::get('/sso/redirect/{app}', [App\Http\Controllers\Auth\SsoController::class, 'redirect'])->name('sso.redirect');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
