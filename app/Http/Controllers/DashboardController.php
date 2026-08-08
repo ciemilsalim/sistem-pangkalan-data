@@ -26,12 +26,21 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        // Ambil tahun ajaran aktif untuk filter data yang relevan
+        $activeAcademicYear = \App\Models\AcademicYear::where('is_active', true)->first();
+        $activeAcademicYearId = $activeAcademicYear ? $activeAcademicYear->id : null;
+
         // 1. Hitung statistik dasar (Cards)
-        $totalStudents = Student::count();
-        $totalTeachers = Teacher::count();
-        $totalParents = ParentModel::count();
-        $totalClasses = SchoolClass::count();
-        $totalExtracurriculars = Extracurricular::count();
+        $totalStudents = Student::where('status', 'aktif')->count();
+        $totalTeachers = Teacher::count(); // Semua guru (termasuk non-aktif jika belum dihapus)
+        
+        $totalParents = ParentModel::whereHas('students', function ($q) {
+            $q->where('status', 'aktif');
+        })->count();
+        
+        // Hanya hitung kelas dan ekskul di tahun ajaran aktif
+        $totalClasses = SchoolClass::where('academic_year_id', $activeAcademicYearId)->count();
+        $totalExtracurriculars = Extracurricular::where('academic_year_id', $activeAcademicYearId)->count();
 
         // Kehadiran Hari Ini
         $today = now()->toDateString();
@@ -39,33 +48,11 @@ class DashboardController extends Controller
             ->whereIn('status', ['tepat_waktu', 'terlambat'])
             ->count();
         
-        $totalToday = Attendance::whereDate('attendance_time', $today)->count();
-        
-        if ($totalToday > 0) {
-            $attendanceRateToday = round(($presentToday / $totalToday) * 100, 1);
+        if ($totalStudents > 0) {
+            // Dibagi dengan total seluruh siswa aktif, bukan hanya yang tap kartu
+            $attendanceRateToday = round(($presentToday / $totalStudents) * 100, 1);
         } else {
             $attendanceRateToday = 0.0;
-        }
-
-        // Jika tidak ada data hari ini, cari tanggal absensi terakhir untuk memberikan data realistis
-        if ($presentToday === 0 && $totalStudents > 0) {
-            $latestAttendanceDate = Attendance::latest('attendance_time')->value('attendance_time');
-            if ($latestAttendanceDate) {
-                $latestDateStr = $latestAttendanceDate->toDateString();
-                $presentLatest = Attendance::whereDate('attendance_time', $latestDateStr)
-                    ->whereIn('status', ['tepat_waktu', 'terlambat'])
-                    ->count();
-                $totalLatest = Attendance::whereDate('attendance_time', $latestDateStr)->count();
-                if ($totalLatest > 0) {
-                    $attendanceRateToday = round(($presentLatest / $totalLatest) * 100, 1);
-                } else {
-                    $attendanceRateToday = 0.0;
-                }
-            } else {
-                $attendanceRateToday = 96.4; // Fallback realistis untuk demo jika DB kosong
-            }
-        } elseif ($totalStudents === 0) {
-            $attendanceRateToday = 96.4; // Fallback default
         }
 
         // 2. Grafik Distribusi Siswa per Tingkat (Kelas 10, 11, 12)
