@@ -45,6 +45,15 @@ class AttendanceMonitoringController extends Controller
         // 3. Subject Attendance Average 
         $subjectAttendanceAverages = $this->getSubjectAttendanceAverages($startDate, $endDate, $classId, $subjectId);
 
+        // Retrieve active academic year to filter classes
+        $activeAcademicYear = \App\Models\AcademicYear::where('is_active', true)->first();
+        $activeAcademicYearId = $activeAcademicYear ? $activeAcademicYear->id : null;
+        
+        $classesQuery = SchoolClass::select('id', 'name')->orderBy('name');
+        if ($activeAcademicYearId) {
+            $classesQuery->where('academic_year_id', $activeAcademicYearId);
+        }
+
         return Inertia::render('Monitoring/Attendance/Index', [
             'filters' => [
                 'start_date' => $startDate,
@@ -53,7 +62,7 @@ class AttendanceMonitoringController extends Controller
                 'subject_id' => $subjectId,
             ],
             'options' => [
-                'classes' => SchoolClass::select('id', 'name')->orderBy('name')->get(),
+                'classes' => $classesQuery->get(),
                 'subjects' => Subject::select('id', 'name')->orderBy('name')->get(),
             ],
             'charts' => [
