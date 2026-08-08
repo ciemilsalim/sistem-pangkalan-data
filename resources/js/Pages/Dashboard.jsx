@@ -410,18 +410,27 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                                             {linePath && <path d={linePath} fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" filter="url(#shadow)" />}
 
                                             {points.map((p, index) => (
-                                                <circle
-                                                    key={index}
-                                                    cx={p.x}
-                                                    cy={p.y}
-                                                    r={hoveredPoint === index ? "6" : "4"}
-                                                    fill={hoveredPoint === index ? "#059669" : "#ffffff"}
-                                                    stroke="#10b981"
-                                                    strokeWidth={hoveredPoint === index ? "3" : "2"}
-                                                    className="transition-all duration-150 cursor-pointer"
-                                                    onMouseEnter={() => setHoveredPoint(index)}
-                                                    onMouseLeave={() => setHoveredPoint(null)}
-                                                />
+                                                <g key={index}>
+                                                    <circle
+                                                        cx={p.x}
+                                                        cy={p.y}
+                                                        r={hoveredPoint === index ? "6" : "4"}
+                                                        fill={hoveredPoint === index ? "#059669" : "#ffffff"}
+                                                        stroke="#10b981"
+                                                        strokeWidth={hoveredPoint === index ? "3" : "2"}
+                                                        className="transition-all duration-150 pointer-events-none"
+                                                    />
+                                                    <circle
+                                                        cx={p.x}
+                                                        cy={p.y}
+                                                        r="16"
+                                                        fill="transparent"
+                                                        className="cursor-pointer"
+                                                        onMouseEnter={() => setHoveredPoint(index)}
+                                                        onMouseLeave={() => setHoveredPoint(null)}
+                                                        onClick={() => setHoveredPoint(hoveredPoint === index ? null : index)}
+                                                    />
+                                                </g>
                                             ))}
 
                                             {points.map((p, index) => (
