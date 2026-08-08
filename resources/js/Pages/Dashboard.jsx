@@ -387,46 +387,38 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                                                 );
                                             })}
 
-                                            {points.map((p, index) => {
-                                                const barWidth = Math.min(48, (plotWidth / points.length) * 0.6);
-                                                const barHeight = Math.max(0, paddingTop + plotHeight - p.y);
+                                            {(() => {
+                                                let linePath = '';
+                                                let areaPath = '';
+                                                if (points.length > 0) {
+                                                    linePath = 'M ' + points.map(p => `${p.x},${p.y}`).join(' L ');
+                                                    areaPath = linePath + ` L ${points[points.length - 1].x},${paddingTop + plotHeight} L ${points[0].x},${paddingTop + plotHeight} Z`;
+                                                }
                                                 return (
-                                                    <g key={index}>
-                                                        {/* Track Bar */}
-                                                        <rect
-                                                            x={p.x - barWidth / 2}
-                                                            y={paddingTop}
-                                                            width={barWidth}
-                                                            height={plotHeight}
-                                                            fill="#f3f4f6"
-                                                            className="dark:fill-gray-700/50"
-                                                            rx="6"
-                                                        />
-                                                        {/* Value Bar */}
-                                                        <rect
-                                                            x={p.x - barWidth / 2}
-                                                            y={p.y}
-                                                            width={barWidth}
-                                                            height={barHeight}
-                                                            fill={hoveredPoint === index ? "#059669" : "#10b981"}
-                                                            rx="6"
-                                                            className="transition-all duration-300 ease-out"
-                                                        />
-                                                        {/* Hit Area */}
-                                                        <rect
-                                                            x={p.x - barWidth / 2}
-                                                            y={paddingTop}
-                                                            width={barWidth}
-                                                            height={plotHeight}
-                                                            fill="transparent"
-                                                            className="cursor-pointer"
-                                                            onMouseEnter={() => setHoveredPoint(index)}
-                                                            onMouseLeave={() => setHoveredPoint(null)}
-                                                            onClick={() => setHoveredPoint(hoveredPoint === index ? null : index)}
-                                                        />
-                                                    </g>
+                                                    <>
+                                                        <defs>
+                                                            <linearGradient id="colorPercentage" x1="0" y1="0" x2="0" y2="1">
+                                                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                                                                <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                                                            </linearGradient>
+                                                        </defs>
+                                                        
+                                                        {points.length > 0 && (
+                                                            <>
+                                                                <path d={areaPath} fill="url(#colorPercentage)" />
+                                                                <path d={linePath} fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                                                            </>
+                                                        )}
+                                                        
+                                                        {points.map((p, index) => (
+                                                            <g key={index}>
+                                                                <circle cx={p.x} cy={p.y} r={hoveredPoint === index ? "5" : "3"} fill="#10b981" stroke="#ffffff" strokeWidth="2" className="transition-all duration-300 ease-out" />
+                                                                <circle cx={p.x} cy={p.y} r="25" fill="transparent" className="cursor-pointer" onMouseEnter={() => setHoveredPoint(index)} onMouseLeave={() => setHoveredPoint(null)} onClick={() => setHoveredPoint(hoveredPoint === index ? null : index)} />
+                                                            </g>
+                                                        ))}
+                                                    </>
                                                 );
-                                            })}
+                                            })()}
 
                                             {points.map((p, index) => (
                                                 <text key={index} x={p.x} y={svgHeight - 15} textAnchor="middle" className="text-[9px] fill-gray-500 font-semibold">{p.day}</text>
