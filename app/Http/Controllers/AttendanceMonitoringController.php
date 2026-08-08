@@ -87,26 +87,6 @@ class AttendanceMonitoringController extends Controller
                     'percentage' => $rate,
                 ];
             }
-        } else {
-            // Generate empty trend or realistic fallback if no data at all
-            // To ensure the chart doesn't break, we provide dummy data spanning the dates
-            $period = \Carbon\CarbonPeriod::create(Carbon::parse($endDate)->subDays(14), Carbon::parse($endDate));
-            foreach ($period as $date) {
-                if ($date->isWeekday()) {
-                    $dayName = $date->format('D');
-                    $dayTranslations = ['Mon' => 'Sen', 'Tue' => 'Sel', 'Wed' => 'Rab', 'Thu' => 'Kam', 'Fri' => 'Jum'];
-                    $dayLabel = isset($dayTranslations[$dayName]) ? $dayTranslations[$dayName] : $dayName;
-                    
-                    // Random realistic percentage between 92 and 99
-                    $randomRate = rand(920, 990) / 10;
-                    
-                    $trend[] = [
-                        'date' => $date->toDateString(),
-                        'day' => $dayLabel . ' (' . $date->format('d/m') . ')',
-                        'percentage' => $randomRate,
-                    ];
-                }
-            }
         }
 
         return $trend;
@@ -157,22 +137,6 @@ class AttendanceMonitoringController extends Controller
         usort($averages, function($a, $b) {
             return $a['percentage'] <=> $b['percentage'];
         });
-
-        // If no data, provide realistic fallback
-        if (count($averages) === 0) {
-            $averages = [
-                ['subject' => 'Matematika', 'percentage' => 93.5, 'total_records' => 120],
-                ['subject' => 'Fisika', 'percentage' => 91.2, 'total_records' => 110],
-                ['subject' => 'Bahasa Inggris', 'percentage' => 96.8, 'total_records' => 135],
-                ['subject' => 'Biologi', 'percentage' => 94.1, 'total_records' => 118],
-                ['subject' => 'Kimia', 'percentage' => 92.7, 'total_records' => 115],
-                ['subject' => 'Sejarah', 'percentage' => 97.4, 'total_records' => 140],
-            ];
-            
-            usort($averages, function($a, $b) {
-                return $a['percentage'] <=> $b['percentage'];
-            });
-        }
         
         // Limit to top 15 worst performing for the chart to not be overcrowded
         return array_slice($averages, 0, 15);
