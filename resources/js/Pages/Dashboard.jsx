@@ -70,16 +70,8 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
         return { x, y, day: item.day, value: item.percentage };
     });
 
-    // Create SVG Path strings
-    let linePath = '';
-    let areaPath = '';
-    
-    if (points.length > 0) {
-        linePath = `M ${points[0].x} ${points[0].y} ` + points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
-        areaPath = `M ${points[0].x} ${paddingTop + plotHeight} L ${points[0].x} ${points[0].y} ` + 
-                   points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ') + 
-                   ` L ${points[points.length - 1].x} ${paddingTop + plotHeight} Z`;
-    }
+    // State for chart hover tooltip
+    const [hoveredPoint, setHoveredPoint] = useState(null);
 
     // Helper: format date for announcement
     const formatAnnDate = (isoString) => {
@@ -384,71 +376,77 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                                         </span>
                                     </div>
 
-                                    <div className="relative w-full overflow-hidden flex justify-center">
+                                    <div className="relative w-full flex justify-center pb-2 pt-4">
                                         <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full max-w-[550px] h-auto overflow-visible select-none">
-                                            <defs>
-                                                <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
-                                                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
-                                                </linearGradient>
-                                                <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-                                                    <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#059669" floodOpacity="0.2" />
-                                                </filter>
-                                            </defs>
-
                                             {yTicks.map((val) => {
                                                 const y = paddingTop + plotHeight - (((val - yMin) / (yMax - yMin)) * plotHeight);
                                                 return (
                                                     <g key={val}>
-                                                        <line x1={paddingLeft} y1={y} x2={svgWidth - paddingRight} y2={y} stroke="#f3f4f6" strokeWidth="1.2" strokeDasharray={val === yMin ? "none" : "4 4"} />
+                                                        <line x1={paddingLeft} y1={y} x2={svgWidth - paddingRight} y2={y} stroke="#e5e7eb" strokeWidth="1" strokeDasharray="4 4" />
                                                         <text x={paddingLeft - 8} y={y + 4} textAnchor="end" className="text-[10px] fill-gray-400 font-medium font-mono">{val}%</text>
                                                     </g>
                                                 );
                                             })}
 
-                                            {areaPath && <path d={areaPath} fill="url(#areaGradient)" />}
-                                            {linePath && <path d={linePath} fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" filter="url(#shadow)" />}
+                                            {points.map((p, index) => {
+                                                const barWidth = Math.min(48, (plotWidth / points.length) * 0.6);
+                                                const barHeight = Math.max(0, paddingTop + plotHeight - p.y);
+                                                return (
+                                                    <g key={index}>
+                                                        {/* Track Bar */}
+                                                        <rect
+                                                            x={p.x - barWidth / 2}
+                                                            y={paddingTop}
+                                                            width={barWidth}
+                                                            height={plotHeight}
+                                                            fill="#f3f4f6"
+                                                            className="dark:fill-gray-700/50"
+                                                            rx="6"
+                                                        />
+                                                        {/* Value Bar */}
+                                                        <rect
+                                                            x={p.x - barWidth / 2}
+                                                            y={p.y}
+                                                            width={barWidth}
+                                                            height={barHeight}
+                                                            fill={hoveredPoint === index ? "#059669" : "#10b981"}
+                                                            rx="6"
+                                                            className="transition-all duration-300 ease-out"
+                                                        />
+                                                        {/* Hit Area */}
+                                                        <rect
+                                                            x={p.x - barWidth / 2}
+                                                            y={paddingTop}
+                                                            width={barWidth}
+                                                            height={plotHeight}
+                                                            fill="transparent"
+                                                            className="cursor-pointer"
+                                                            onMouseEnter={() => setHoveredPoint(index)}
+                                                            onMouseLeave={() => setHoveredPoint(null)}
+                                                            onClick={() => setHoveredPoint(hoveredPoint === index ? null : index)}
+                                                        />
+                                                    </g>
+                                                );
+                                            })}
 
                                             {points.map((p, index) => (
-                                                <g key={index}>
-                                                    <circle
-                                                        cx={p.x}
-                                                        cy={p.y}
-                                                        r={hoveredPoint === index ? "6" : "4"}
-                                                        fill={hoveredPoint === index ? "#059669" : "#ffffff"}
-                                                        stroke="#10b981"
-                                                        strokeWidth={hoveredPoint === index ? "3" : "2"}
-                                                        className="transition-all duration-150 pointer-events-none"
-                                                    />
-                                                    <circle
-                                                        cx={p.x}
-                                                        cy={p.y}
-                                                        r="16"
-                                                        fill="transparent"
-                                                        className="cursor-pointer"
-                                                        onMouseEnter={() => setHoveredPoint(index)}
-                                                        onMouseLeave={() => setHoveredPoint(null)}
-                                                        onClick={() => setHoveredPoint(hoveredPoint === index ? null : index)}
-                                                    />
-                                                </g>
-                                            ))}
-
-                                            {points.map((p, index) => (
-                                                <text key={index} x={p.x} y={svgHeight - 15} textAnchor="middle" className="text-[9px] fill-gray-400 font-semibold">{p.day}</text>
+                                                <text key={index} x={p.x} y={svgHeight - 15} textAnchor="middle" className="text-[9px] fill-gray-500 font-semibold">{p.day}</text>
                                             ))}
                                         </svg>
                                         
                                         {hoveredPoint !== null && points[hoveredPoint] && (
                                             <div 
-                                                className="absolute bg-slate-900 text-white text-[10px] px-2.5 py-1.5 rounded-lg shadow-md border border-slate-800 font-semibold pointer-events-none"
+                                                className="absolute bg-slate-900 text-white text-[11px] px-3 py-2 rounded-lg shadow-xl border border-slate-700 font-bold pointer-events-none z-50 flex flex-col items-center gap-1"
                                                 style={{
                                                     left: `${(points[hoveredPoint].x / svgWidth) * 100}%`,
-                                                    top: `${(points[hoveredPoint].y / svgHeight) * 105 - 18}%`,
-                                                    transform: 'translate(-50%, -100%)',
-                                                    transition: 'all 0.1s ease-out'
+                                                    top: `${(points[hoveredPoint].y / svgHeight) * 100}%`,
+                                                    transform: 'translate(-50%, -120%)',
+                                                    transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)'
                                                 }}
                                             >
-                                                Kehadiran: {points[hoveredPoint].value}%
+                                                <span className="text-[9px] text-slate-300 font-medium">{points[hoveredPoint].day}</span>
+                                                <span>{points[hoveredPoint].value}%</span>
+                                                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
                                             </div>
                                         )}
                                     </div>
