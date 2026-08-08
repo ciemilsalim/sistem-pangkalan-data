@@ -91,14 +91,15 @@ class DashboardController extends Controller
             ];
         }
 
-        // 3. Grafik Tren Kehadiran Siswa (7 Hari Sekolah Terakhir)
+        // 3. Grafik Tren Kehadiran Siswa (5 Hari Sekolah Terakhir)
         $attendanceTrend = [];
         $trendTotalStudents = $totalStudents > 0 ? $totalStudents : 405;
 
         $dates = Attendance::selectRaw('DATE(attendance_time) as date')
+            ->whereRaw('DAYOFWEEK(attendance_time) NOT IN (1, 7)')
             ->groupBy('date')
             ->orderBy('date', 'desc')
-            ->limit(7)
+            ->limit(5)
             ->pluck('date')
             ->reverse()
             ->toArray();
@@ -129,8 +130,6 @@ class DashboardController extends Controller
                 ['day' => 'Rab', 'percentage' => 96.5],
                 ['day' => 'Kam', 'percentage' => 97.9],
                 ['day' => 'Jum', 'percentage' => 95.0],
-                ['day' => 'Sab', 'percentage' => 92.4],
-                ['day' => 'Min', 'percentage' => 96.8],
             ];
         }
 

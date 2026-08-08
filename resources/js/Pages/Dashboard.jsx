@@ -41,7 +41,7 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
         ? Math.max(...lmsSubjectRemedials.map(item => item.count))
         : 1;
 
-    // SVG Chart Coordinates Calculation for Attendance Trend (7 days)
+    // SVG Chart Coordinates Calculation for Attendance Trend (5 days)
     const svgWidth = 500;
     const svgHeight = 220;
     const paddingLeft = 40;
@@ -377,7 +377,7 @@ export default function Dashboard({ stats = {}, charts = {}, announcements = [],
                                     <div className="flex items-center justify-between mb-4">
                                         <div>
                                             <h3 className="font-bold text-gray-900 dark:text-gray-100 text-sm">Tren Persentase Kehadiran Siswa</h3>
-                                            <p className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-400">Fluktuasi kehadiran 7 hari aktif belajar terakhir</p>
+                                            <p className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-gray-400">Fluktuasi kehadiran 5 hari aktif belajar terakhir</p>
                                         </div>
                                         <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-600 border border-indigo-100">
                                             Skala {yMin === 80 ? "Zoomed (80% - 100%)" : `Dinamis (${yMin}% - 100%)`}
