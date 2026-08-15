@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'absensi' => [
+        'url' => env('SSO_ABSENSI_URL', 'http://localhost:8002'),
+    ],
+
 ];
