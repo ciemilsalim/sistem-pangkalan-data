@@ -26,6 +26,43 @@ class Student extends Model
         'status'
     ];
 
+    protected $appends = ['photo_url'];
+
+    /**
+     * Accessor untuk mendapatkan URL lengkap foto siswa di SIPADA.
+     * Kompatibel dengan cPanel dan integrasi Aplikasi Absensi.
+     */
+    public function getPhotoUrlAttribute()
+    {
+        if (empty($this->photo)) {
+            return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+        }
+
+        if (Str::startsWith($this->photo, ['http://', 'https://'])) {
+            return $this->photo;
+        }
+
+        // 1. Cek file fisik di storage publik SIPADA
+        if (file_exists(public_path('storage/' . $this->photo))) {
+            return asset('storage/' . $this->photo);
+        }
+
+        // 2. Cek file fisik di direktori aplikasi-absensi jika berdampingan
+        $absensiStoragePath = env('ABSENSI_STORAGE_DIR', base_path('../aplikasi-absensi/storage/app/public'));
+        if (file_exists($absensiStoragePath . '/' . $this->photo)) {
+            $absensiUrl = rtrim(env('SSO_ABSENSI_URL', 'http://localhost:8002'), '/');
+            return $absensiUrl . '/storage/' . $this->photo;
+        }
+
+        // 3. Fallback cPanel jika foto diunggah dari absensi ('students/photos/...')
+        if (Str::startsWith($this->photo, 'students/photos/')) {
+            $absensiUrl = rtrim(env('SSO_ABSENSI_URL', 'http://localhost:8002'), '/');
+            return $absensiUrl . '/storage/' . $this->photo;
+        }
+
+        return asset('storage/' . $this->photo);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
