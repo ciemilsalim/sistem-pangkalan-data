@@ -36,7 +36,15 @@ return [
     ],
 
     'absensi' => [
-        'url' => env('SSO_ABSENSI_URL', 'http://localhost:8002'),
+        'local_url' => env('SSO_ABSENSI_LOCAL_URL', 'http://localhost:8000'),
+        'production_url' => env('SSO_ABSENSI_PRODUCTION_URL', 'https://presensi-smpn1biau.zahradev.id'),
+        'url' => env('SSO_ABSENSI_URL', 'http://localhost:8000'),
+    ],
+
+    'lms' => [
+        'local_url' => env('SSO_LMS_LOCAL_URL', 'http://localhost:8001'),
+        'production_url' => env('SSO_LMS_PRODUCTION_URL', 'https://lms-smpn1biau.zahradev.id'),
+        'url' => env('SSO_LMS_URL', 'http://localhost:8001'),
     ],
 
 ];
