@@ -47,13 +47,13 @@ class SsoController extends Controller
         // 1. Generate a secure random token
         $token = Str::random(60);
 
-        // 2. Store the token in the shared database with a 1-minute expiration
+        // 2. Store the token in the shared database with a 10-minute expiration
         DB::table('sso_tokens')->insert([
             'user_id' => $user->id,
             'token' => $token,
-            'expires_at' => Carbon::now('UTC')->addMinute(),
-            'created_at' => Carbon::now('UTC'),
-            'updated_at' => Carbon::now('UTC'),
+            'expires_at' => now()->addMinutes(10),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         // 3. Check authorization & determine the target base URL
