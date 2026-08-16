@@ -29,6 +29,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
     const [activeEntity, setActiveEntity] = useState(null); // 'academicYear', 'semester', 'level', 'schoolClass', 'subject', 'schedule', 'extracurricular'
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [extraStudentSearch, setExtraStudentSearch] = useState('');
+    const [extraTeacherSearch, setExtraTeacherSearch] = useState('');
     const [cocurricularTeacherSearch, setCocurricularTeacherSearch] = useState('');
     const [cocurricularClassSearch, setCocurricularClassSearch] = useState('');
 
@@ -51,7 +52,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
     const extracurricularForm = useForm({
         name: '',
         description: '',
-        teacher_id: '',
+        teacher_ids: [],
         student_ids: [],
     });
     const cocurricularForm = useForm({
@@ -118,11 +119,12 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             extracurricularForm.setData({
                 name: '',
                 description: '',
-                teacher_id: '',
+                teacher_ids: [],
                 student_ids: [],
             });
             extracurricularForm.clearErrors();
             setExtraStudentSearch('');
+            setExtraTeacherSearch('');
         } else if (entityType === 'cocurricular') {
             cocurricularForm.reset();
             cocurricularForm.setData({
@@ -198,14 +200,18 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             scheduleForm.clearErrors();
         } else if (entityType === 'extracurricular') {
             const linkedStudentIds = record.students ? record.students.map(s => s.id) : [];
+            const linkedTeacherIds = record.teachers && record.teachers.length > 0 
+                ? record.teachers.map(t => t.id) 
+                : (record.teacher_id ? [record.teacher_id] : []);
             extracurricularForm.setData({
                 name: record.name,
                 description: record.description || '',
-                teacher_id: record.teacher_id ? record.teacher_id.toString() : '',
+                teacher_ids: linkedTeacherIds,
                 student_ids: linkedStudentIds,
             });
             extracurricularForm.clearErrors();
             setExtraStudentSearch('');
+            setExtraTeacherSearch('');
         } else if (entityType === 'cocurricular') {
             const linkedTeacherIds = record.teachers ? record.teachers.map(t => t.id) : [];
             cocurricularForm.setData({
@@ -891,19 +897,39 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     <InputError message={extracurricularForm.errors.name} className="mt-2" />
                                 </div>
                                 <div className="mb-4">
-                                    <InputLabel htmlFor="extra_coach" value="Guru Pembina / Pelatih" />
-                                    <select
-                                        id="extra_coach"
-                                        value={extracurricularForm.data.teacher_id}
-                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
-                                        onChange={(e) => extracurricularForm.setData('teacher_id', e.target.value)}
-                                    >
-                                        <option value="">-- Tanpa Pembina / Pilih Nanti --</option>
-                                        {teachers.map((t) => (
-                                            <option key={t.id} value={t.id}>{t.name}</option>
+                                    <InputLabel htmlFor="extra_teacher_search" value="Guru Pembina / Pelatih (Pilih satu atau lebih)" />
+                                    <input
+                                        id="extra_teacher_search"
+                                        type="text"
+                                        placeholder="Ketik nama guru pembina..."
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm mb-2"
+                                        value={extraTeacherSearch}
+                                        onChange={(e) => setExtraTeacherSearch(e.target.value)}
+                                    />
+                                    <div className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm max-h-36 overflow-y-auto p-2 bg-white dark:bg-gray-800">
+                                        {teachers.filter(t => t.name.toLowerCase().includes(extraTeacherSearch.toLowerCase())).map((teacher) => (
+                                            <label key={teacher.id} className="flex items-center mb-1.5 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    className="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500 h-4 w-4"
+                                                    checked={extracurricularForm.data.teacher_ids.includes(teacher.id)}
+                                                    onChange={(e) => {
+                                                        const newIds = e.target.checked
+                                                            ? [...extracurricularForm.data.teacher_ids, teacher.id]
+                                                            : extracurricularForm.data.teacher_ids.filter(id => id !== teacher.id);
+                                                        extracurricularForm.setData('teacher_ids', newIds);
+                                                    }}
+                                                />
+                                                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 font-semibold">
+                                                    {teacher.name} <span className="text-xs text-gray-400">({teacher.nip || '-'})</span>
+                                                </span>
+                                            </label>
                                         ))}
-                                    </select>
-                                    <InputError message={extracurricularForm.errors.teacher_id} className="mt-2" />
+                                        {teachers.filter(t => t.name.toLowerCase().includes(extraTeacherSearch.toLowerCase())).length === 0 && (
+                                            <span className="text-sm text-gray-400 italic">Tidak ada guru yang cocok dengan pencarian.</span>
+                                        )}
+                                    </div>
+                                    <InputError message={extracurricularForm.errors.teacher_ids} className="mt-2" />
                                 </div>
                                 <div className="mb-4">
                                     <InputLabel htmlFor="extra_desc" value="Deskripsi / Catatan Tambahan (Opsional)" />
@@ -1628,8 +1654,16 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 extracurriculars.map((extra) => (
                                     <tr key={extra.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-gray-100">{extra.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 font-semibold">
-                                            {extra.coach ? (
+                                        <td className="px-6 py-4 text-sm text-gray-700 dark:text-gray-300 font-semibold">
+                                            {extra.teachers && extra.teachers.length > 0 ? (
+                                                <div className="flex flex-wrap gap-1">
+                                                    {extra.teachers.map((t) => (
+                                                        <span key={t.id} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                                            {t.name}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            ) : extra.coach ? (
                                                 <span>{extra.coach.name} <span className="text-xs text-gray-400 font-normal">({extra.coach.nip || '-'})</span></span>
                                             ) : (
                                                 <span className="text-gray-400 italic font-normal">Belum ditentukan</span>

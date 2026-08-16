@@ -22,6 +22,11 @@ class Extracurricular extends Model
         });
     }
 
+    public function teachers()
+    {
+        return $this->belongsToMany(Teacher::class, 'extracurricular_teacher');
+    }
+
     public function coach()
     {
         return $this->belongsTo(Teacher::class, 'teacher_id');

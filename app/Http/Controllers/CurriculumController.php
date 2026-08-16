@@ -61,8 +61,8 @@ class CurriculumController extends Controller
           ->orderBy('start_time')
           ->get();
 
-        // Fetch extracurriculars with coach and students, filtered by active academic year
-        $extracurriculars = Extracurricular::with(['coach', 'students'])
+        // Fetch extracurriculars with teachers, coach and students, filtered by active academic year
+        $extracurriculars = Extracurricular::with(['teachers', 'coach', 'students'])
             ->when($activeAcademicYearId, function ($query, $activeAcademicYearId) {
                 return $query->where('academic_year_id', $activeAcademicYearId);
             })
@@ -619,17 +619,28 @@ class CurriculumController extends Controller
                 }),
             ],
             'description' => 'nullable|string',
+            'teacher_ids' => 'nullable|array',
+            'teacher_ids.*' => 'exists:teachers,id',
             'teacher_id' => 'nullable|exists:teachers,id',
             'student_ids' => 'nullable|array',
             'student_ids.*' => 'exists:students,id',
         ]);
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+            $teacherIds = $request->input('teacher_ids', []);
+            if (empty($teacherIds) && $request->filled('teacher_id')) {
+                $teacherIds = [$request->teacher_id];
+            }
+
             $extracurricular = Extracurricular::create([
                 'name' => $request->name,
                 'description' => $request->description,
-                'teacher_id' => $request->teacher_id ? $request->teacher_id : null,
+                'teacher_id' => !empty($teacherIds) ? $teacherIds[0] : null,
             ]);
+
+            if (!empty($teacherIds)) {
+                $extracurricular->teachers()->sync($teacherIds);
+            }
 
             if ($request->filled('student_ids')) {
                 $extracurricular->students()->sync($request->student_ids);
@@ -653,17 +664,26 @@ class CurriculumController extends Controller
                 }),
             ],
             'description' => 'nullable|string',
+            'teacher_ids' => 'nullable|array',
+            'teacher_ids.*' => 'exists:teachers,id',
             'teacher_id' => 'nullable|exists:teachers,id',
             'student_ids' => 'nullable|array',
             'student_ids.*' => 'exists:students,id',
         ]);
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($request, $extracurricular) {
+            $teacherIds = $request->input('teacher_ids', []);
+            if (empty($teacherIds) && $request->filled('teacher_id')) {
+                $teacherIds = [$request->teacher_id];
+            }
+
             $extracurricular->update([
                 'name' => $request->name,
                 'description' => $request->description,
-                'teacher_id' => $request->teacher_id ? $request->teacher_id : null,
+                'teacher_id' => !empty($teacherIds) ? $teacherIds[0] : null,
             ]);
+
+            $extracurricular->teachers()->sync($teacherIds);
 
             $studentIds = $request->input('student_ids', []);
             $extracurricular->students()->sync($studentIds);
@@ -675,6 +695,7 @@ class CurriculumController extends Controller
     public function destroyExtracurricular(Extracurricular $extracurricular): RedirectResponse
     {
         \Illuminate\Support\Facades\DB::transaction(function () use ($extracurricular) {
+            $extracurricular->teachers()->detach();
             $extracurricular->students()->detach();
             $extracurricular->delete();
         });
