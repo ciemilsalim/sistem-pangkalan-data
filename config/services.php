@@ -43,7 +43,7 @@ return [
 
     'lms' => [
         'local_url' => env('SSO_LMS_LOCAL_URL', 'http://localhost:8001'),
-        'production_url' => env('SSO_LMS_PRODUCTION_URL', 'https://lms-smpn1biau.zahradev.id'),
+        'production_url' => env('SSO_LMS_PRODUCTION_URL', 'https://mokopani-smpn1biau.zahradev.id'),
         'url' => env('SSO_LMS_URL', 'http://localhost:8001'),
     ],
 

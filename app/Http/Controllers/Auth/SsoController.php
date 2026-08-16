@@ -25,7 +25,7 @@ class SsoController extends Controller
         if ($app === 'lms') {
             return $isLocalHost
                 ? (config('services.lms.local_url') ?: env('SSO_LMS_LOCAL_URL', env('SSO_LMS_URL', 'http://localhost:8001')))
-                : (config('services.lms.production_url') ?: env('SSO_LMS_PRODUCTION_URL', env('SSO_LMS_URL', 'https://lms-smpn1biau.zahradev.id')));
+                : (config('services.lms.production_url') ?: env('SSO_LMS_PRODUCTION_URL', env('SSO_LMS_URL', 'https://mokopani-smpn1biau.zahradev.id')));
         }
 
         if ($app === 'absensi') {
