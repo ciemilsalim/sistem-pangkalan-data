@@ -137,15 +137,20 @@
                     <!-- Footer (Google Logo & QR Code) -->
                     <div class="absolute bottom-[10px] left-[14px] right-[14px] flex items-end justify-between z-10">
                         <!-- Left Side: Email & Google Logo -->
-                        <div class="flex flex-col items-start justify-end min-w-0">
+                        <div class="flex flex-col items-start justify-end min-w-0 max-w-[108px]">
                             @if($student->learning_email)
-                                <div class="student-email font-black font-mono text-[8px] whitespace-nowrap text-left overflow-hidden w-full max-w-[100px] mb-0.5 leading-none" style="color: rgba(0, 0, 0, 0.9);">
+                                <div class="student-email font-black font-mono text-[8px] whitespace-nowrap text-left overflow-hidden w-full max-w-[108px] mb-0.5 leading-none" style="color: rgba(0, 0, 0, 0.9);" title="{{ $student->learning_email }}">
                                     {{ $student->learning_email }}
+                                </div>
+                            @endif
+                            @if($student->user && $student->user->email)
+                                <div class="student-login-email font-black font-mono text-[8px] whitespace-nowrap text-left overflow-hidden w-full max-w-[108px] mb-0.5 leading-none" style="color: rgba(30, 41, 59, 0.9);" title="{{ $student->user->email }}">
+                                    {{ $student->user->email }}
                                 </div>
                             @endif
                             <div class="flex items-center">
                                 @if($googleLogo)
-                                    <img src="{{ $googleLogo }}" class="h-9 max-w-[100px] object-contain object-left" alt="Google for Education">
+                                    <img src="{{ $googleLogo }}" class="h-8 max-w-[108px] object-contain object-left mt-0.5" alt="Google for Education">
                                 @endif
                             </div>
                         </div>
@@ -176,13 +181,24 @@
                 }
             });
 
-            // Adjust Student Emails
+            // Adjust Student Belajar Emails
             document.querySelectorAll('.student-email').forEach(el => {
                 let fontSize = 8; // max font size in px
                 el.style.fontSize = fontSize + 'px';
-                // Reduce font size if text overflows its container (max width 100px)
+                // Reduce font size if text overflows its container (max width 108px)
                 while (el.scrollWidth > el.clientWidth && fontSize > 4) {
-                    fontSize -= 0.5;
+                    fontSize -= 0.3;
+                    el.style.fontSize = fontSize + 'px';
+                }
+            });
+
+            // Adjust Student Login Emails
+            document.querySelectorAll('.student-login-email').forEach(el => {
+                let fontSize = 8; // max font size in px
+                el.style.fontSize = fontSize + 'px';
+                // Reduce font size if text overflows its container (max width 108px)
+                while (el.scrollWidth > el.clientWidth && fontSize > 4) {
+                    fontSize -= 0.3;
                     el.style.fontSize = fontSize + 'px';
                 }
             });
@@ -195,6 +211,8 @@
             adjustFontSizes();
         }
         window.addEventListener('load', adjustFontSizes);
+        window.addEventListener('resize', adjustFontSizes);
+        window.addEventListener('beforeprint', adjustFontSizes);
     </script>
 </body>
 </html>
