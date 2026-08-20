@@ -20,7 +20,7 @@ class AttendanceMonitoringController extends Controller
      */
     public function index(Request $request)
     {
-        if (!\Illuminate\Support\Facades\Auth::user()->hasAnyRole(['admin', 'wakasek_kurikulum'])) {
+        if (!\Illuminate\Support\Facades\Auth::user()->hasAnyRole(['admin', 'wakasek_kurikulum', 'kepala_sekolah', 'Kepala Sekolah', 'headmaster'])) {
             abort(403, 'Anda tidak memiliki hak akses ke halaman monitoring kehadiran.');
         }
 

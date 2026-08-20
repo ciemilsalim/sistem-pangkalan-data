@@ -34,6 +34,9 @@ class AuthenticatedSessionController extends Controller
         // Validate if user has permission to access SIPADA (Admin & Management roles)
         $allowedRoles = [
             'admin', 
+            'kepala_sekolah',
+            'Kepala Sekolah',
+            'headmaster',
             'wakasek_kurikulum', 
             'wakasek_kesiswaan', 
             'wakasek_sarana', 

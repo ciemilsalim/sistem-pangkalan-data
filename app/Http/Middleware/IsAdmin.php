@@ -17,6 +17,9 @@ class IsAdmin
     {
         $allowedRoles = [
             'admin', 
+            'kepala_sekolah',
+            'Kepala Sekolah',
+            'headmaster',
             'wakasek_kurikulum', 
             'wakasek_kesiswaan', 
             'wakasek_sarana', 
