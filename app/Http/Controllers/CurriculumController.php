@@ -50,6 +50,7 @@ class CurriculumController extends Controller
             'teachingAssignment.schoolClass',
             'teachingAssignment.subject',
             'teachingAssignment.teacher',
+            'teachingAssignment.students:id,name,nis,religion,school_class_id',
             'cocurricular',
             'schoolClass',
             'teacher'
@@ -69,11 +70,11 @@ class CurriculumController extends Controller
             ->orderBy('name')
             ->get();
 
-        // Fetch students list for extracurricular member selection (id, name, nis, and class)
+        // Fetch students list for extracurricular & subject enrollment selection
         // Hanya tampilkan siswa dengan status 'aktif'
         $studentsList = Student::with('schoolClass:id,name')
             ->where('status', 'aktif')
-            ->select('id', 'name', 'nis', 'school_class_id')
+            ->select('id', 'name', 'nis', 'school_class_id', 'religion')
             ->orderBy('name')
             ->get();
 
@@ -350,12 +351,16 @@ class CurriculumController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:subjects,code',
+            'category' => 'nullable|in:general,religion',
+            'religion_key' => 'nullable|string|max:50',
             'description' => 'nullable|string',
         ]);
 
         Subject::create([
             'name' => $request->name,
             'code' => $request->code,
+            'category' => $request->category ?? 'general',
+            'religion_key' => $request->category === 'religion' ? $request->religion_key : null,
             'description' => $request->description,
         ]);
 
@@ -367,12 +372,16 @@ class CurriculumController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:subjects,code,' . $subject->id,
+            'category' => 'nullable|in:general,religion',
+            'religion_key' => 'nullable|string|max:50',
             'description' => 'nullable|string',
         ]);
 
         $subject->update([
             'name' => $request->name,
             'code' => $request->code,
+            'category' => $request->category ?? 'general',
+            'religion_key' => $request->category === 'religion' ? $request->religion_key : null,
             'description' => $request->description,
         ]);
 
@@ -390,7 +399,7 @@ class CurriculumController extends Controller
     /*                                6. SCHEDULES                                */
     /* -------------------------------------------------------------------------- */
 
-    private function checkScheduleConflict($dayOfWeek, $startTime, $endTime, $semesterId, $schoolClassId, $teacherId, $ignoreScheduleId = null)
+    private function checkScheduleConflict($dayOfWeek, $startTime, $endTime, $semesterId, $schoolClassId, $teacherId, $ignoreScheduleId = null, $subjectId = null, $scheduleType = 'regular')
     {
         // Find any schedule in the same semester and day that overlaps in time
         // Back-to-back schedules (end_time == start_time) are NOT considered conflicts
@@ -413,6 +422,7 @@ class CurriculumController extends Controller
         }
 
         $conflicts = $query->get();
+        $targetSubject = ($scheduleType === 'regular' && $subjectId) ? Subject::find($subjectId) : null;
 
         foreach ($conflicts as $conflict) {
             $conflictTime = substr($conflict->start_time, 0, 5) . '-' . substr($conflict->end_time, 0, 5);
@@ -420,24 +430,49 @@ class CurriculumController extends Controller
             if (($conflict->schedule_type === 'regular' || !$conflict->schedule_type) && $conflict->teachingAssignment) {
                 $ta = $conflict->teachingAssignment;
 
-                if ($ta->school_class_id == $schoolClassId) {
-                    $className = $ta->schoolClass->name ?? 'Kelas';
-                    $subjectName = $ta->subject->name ?? 'Mapel';
-                    return "Kelas {$className} sudah memiliki jadwal {$subjectName} pada jam {$conflictTime}.";
-                }
+                // 1. Bentrok Guru: Guru yang sama tidak bisa mengajar 2 jadwal di jam yang sama
                 if ($ta->teacher_id == $teacherId) {
                     $teacherName = $ta->teacher->name ?? 'Guru';
                     $className = $ta->schoolClass->name ?? 'Kelas';
                     return "Guru {$teacherName} sudah dijadwalkan di {$className} pada jam {$conflictTime}.";
                 }
-            } elseif ($conflict->schedule_type === 'cocurricular' && $conflict->cocurricular) {
-                if ($conflict->school_class_id == $schoolClassId) {
-                    $className = $conflict->schoolClass->name ?? 'Kelas';
-                    return "Kelas {$className} sudah memiliki jadwal proyek kokurikuler \"{$conflict->cocurricular->title}\" pada jam {$conflictTime}.";
+
+                // 2. Bentrok Kelas
+                if ($ta->school_class_id == $schoolClassId) {
+                    $existingSubject = $ta->subject;
+
+                    // Pengecualian: Jadwal paralel mapel agama diperbolehkan jika:
+                    // - Kedua mapel bertipe 'religion'
+                    // - Memiliki religion_key yang berbeda
+                    // - Guru yang mengajar berbeda
+                    $isBothReligion = (
+                        $targetSubject && 
+                        $existingSubject && 
+                        $targetSubject->category === 'religion' && 
+                        $existingSubject->category === 'religion' &&
+                        !empty($targetSubject->religion_key) &&
+                        !empty($existingSubject->religion_key) &&
+                        strtolower(trim($targetSubject->religion_key)) !== strtolower(trim($existingSubject->religion_key)) &&
+                        $ta->teacher_id != $teacherId
+                    );
+
+                    if ($isBothReligion) {
+                        // Diizinkan berjalan bersamaan di kelas yang sama
+                        continue;
+                    }
+
+                    $className = $ta->schoolClass->name ?? 'Kelas';
+                    $subjectName = $ta->subject->name ?? 'Mapel';
+                    return "Kelas {$className} sudah memiliki jadwal {$subjectName} pada jam {$conflictTime}.";
                 }
+            } elseif ($conflict->schedule_type === 'cocurricular' && $conflict->cocurricular) {
                 if ($conflict->teacher_id == $teacherId) {
                     $teacherName = $conflict->teacher->name ?? 'Guru';
                     return "Guru {$teacherName} sudah menjadi fasilitator proyek \"{$conflict->cocurricular->title}\" pada jam {$conflictTime}.";
+                }
+                if ($conflict->school_class_id == $schoolClassId) {
+                    $className = $conflict->schoolClass->name ?? 'Kelas';
+                    return "Kelas {$className} sudah memiliki jadwal proyek kokurikuler \"{$conflict->cocurricular->title}\" pada jam {$conflictTime}.";
                 }
             }
         }
@@ -469,7 +504,10 @@ class CurriculumController extends Controller
             $request->end_time, 
             $activeSemesterId, 
             $schoolClassId, 
-            $teacherId
+            $teacherId,
+            null,
+            $request->subject_id,
+            $request->schedule_type
         );
 
         if ($conflictError) {
@@ -544,7 +582,9 @@ class CurriculumController extends Controller
             $activeSemesterId, 
             $schoolClassId, 
             $teacherId,
-            $schedule->id
+            $schedule->id,
+            $request->subject_id,
+            $request->schedule_type
         );
 
         if ($conflictError) {
@@ -599,6 +639,18 @@ class CurriculumController extends Controller
     {
         $schedule->delete();
         return redirect()->back()->with('message', 'Jadwal Pelajaran berhasil dihapus.');
+    }
+
+    public function updateTeachingAssignmentStudents(Request $request, TeachingAssignment $teachingAssignment): RedirectResponse
+    {
+        $request->validate([
+            'student_ids' => 'nullable|array',
+            'student_ids.*' => 'exists:students,id',
+        ]);
+
+        $teachingAssignment->students()->sync($request->input('student_ids', []));
+
+        return redirect()->back()->with('message', 'Daftar siswa pada penugasan ini berhasil diperbarui.');
     }
 
     /* -------------------------------------------------------------------------- */

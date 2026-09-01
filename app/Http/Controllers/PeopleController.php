@@ -140,6 +140,7 @@ class PeopleController extends Controller
             'nis' => 'required|string|max:50|unique:students,nis',
             'learning_email' => 'nullable|string|email|max:255|unique:students,learning_email',
             'school_class_id' => 'nullable|exists:school_classes,id',
+            'religion' => 'nullable|string|max:50',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => ['required', Rules\Password::defaults()],
             'parent_ids' => 'nullable|array',
@@ -164,6 +165,7 @@ class PeopleController extends Controller
                 'nis' => $request->nis,
                 'learning_email' => $request->learning_email,
                 'school_class_id' => $request->school_class_id,
+                'religion' => $request->religion,
                 'status' => $request->status,
             ]);
 
@@ -219,6 +221,7 @@ class PeopleController extends Controller
             'nis' => 'required|string|max:50|unique:students,nis,' . $student->id,
             'learning_email' => 'nullable|string|email|max:255|unique:students,learning_email,' . $student->id,
             'school_class_id' => 'nullable|exists:school_classes,id',
+            'religion' => 'nullable|string|max:50',
             'email' => 'required|string|email|max:255|unique:users,email,' . $student->user_id,
             'status' => 'required|in:aktif,lulus,pindah,tidak_aktif',
             'parent_ids' => 'nullable|array',
@@ -239,6 +242,7 @@ class PeopleController extends Controller
                 'nis' => $request->nis,
                 'learning_email' => $request->learning_email,
                 'school_class_id' => $request->school_class_id,
+                'religion' => $request->religion,
                 'status' => $request->status,
             ]);
 

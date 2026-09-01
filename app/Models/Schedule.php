@@ -74,4 +74,18 @@ class Schedule extends Model
     {
         return $this->belongsTo(Teacher::class, 'teacher_id');
     }
+
+    /**
+     * Mendapatkan daftar siswa yang mengikuti jadwal ini.
+     */
+    public function getEnrolledStudents()
+    {
+        if ($this->teachingAssignment) {
+            return $this->teachingAssignment->getEnrolledStudents();
+        }
+        if ($this->school_class_id) {
+            return Student::where('school_class_id', $this->school_class_id)->orderBy('name')->get();
+        }
+        return collect();
+    }
 }

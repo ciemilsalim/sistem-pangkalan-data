@@ -68,12 +68,13 @@ export default function WeeklyGrid({ schedules, onScheduleClick, viewMode }) {
                         </div>
                         
                         {/* Day Vertical Dividers */}
-                        {DAYS.map((day, dayIndex) => (
-                            <div key={`col-${day}`} className="flex-1 border-r border-gray-100/50 last:border-0 relative">
-                                {/* Render Schedules for this Day */}
-                                {schedules
-                                    .filter(s => s.day_of_week == (dayIndex + 1))
-                                    .map(schedule => {
+                        {DAYS.map((day, dayIndex) => {
+                            const daySchedules = schedules.filter(s => s.day_of_week == (dayIndex + 1));
+
+                            return (
+                                <div key={`col-${day}`} className="flex-1 border-r border-gray-100/50 last:border-0 relative">
+                                    {/* Render Schedules for this Day */}
+                                    {daySchedules.map(schedule => {
                                         const startDec = timeToDecimal(schedule.start_time);
                                         const endDec = timeToDecimal(schedule.end_time);
                                         
@@ -91,7 +92,7 @@ export default function WeeklyGrid({ schedules, onScheduleClick, viewMode }) {
                                         
                                         const isCocurricular = schedule.schedule_type === 'cocurricular';
                                         
-                                        let title, secondaryText, color;
+                                        let title, secondaryText, color, isReligion = false, religionKey = '';
 
                                         if (isCocurricular) {
                                             const cocur = schedule.cocurricular;
@@ -109,19 +110,48 @@ export default function WeeklyGrid({ schedules, onScheduleClick, viewMode }) {
                                                 ? (assignment.school_class?.name || '-')
                                                 : (assignment.teacher?.name || '-');
                                             color = getSubjectColor(assignment.subject_id);
+                                            isReligion = assignment.subject?.category === 'religion';
+                                            religionKey = assignment.subject?.religion_key || '';
+                                        }
+
+                                        // Cek apakah ada jadwal bersamaan (overlap) di hari yang sama
+                                        const overlapping = daySchedules.filter(other => {
+                                            const oStart = timeToDecimal(other.start_time);
+                                            const oEnd = timeToDecimal(other.end_time);
+                                            return !(endDec <= oStart || startDec >= oEnd);
+                                        });
+
+                                        let styleLeft = '4px';
+                                        let styleWidth = 'calc(100% - 8px)';
+
+                                        if (overlapping.length > 1) {
+                                            const sorted = [...overlapping].sort((a, b) => a.id - b.id);
+                                            const index = sorted.findIndex(s => s.id === schedule.id);
+                                            const count = sorted.length;
+                                            const widthPercent = 100 / count;
+                                            const leftPercent = index * widthPercent;
+                                            styleLeft = `calc(${leftPercent}% + 2px)`;
+                                            styleWidth = `calc(${widthPercent}% - 4px)`;
                                         }
                                             
                                         return (
                                             <div
                                                 key={schedule.id}
                                                 onClick={() => onScheduleClick && onScheduleClick(schedule)}
-                                                className={`absolute left-1 right-1 rounded-md p-2 text-xs overflow-y-auto shadow-sm hover:shadow-md transition-all duration-200 border-l-4 group z-10 hover:z-20 scrollbar-thin ${color.bg} ${color.hoverBg} ${color.scrollThumb} ${onScheduleClick ? 'cursor-pointer' : 'cursor-default'}`}
+                                                className={`absolute rounded-md p-2 text-xs overflow-y-auto shadow-sm hover:shadow-md transition-all duration-200 border-l-4 group z-10 hover:z-20 scrollbar-thin ${color.bg} ${color.hoverBg} ${color.scrollThumb} ${onScheduleClick ? 'cursor-pointer' : 'cursor-default'}`}
                                                 style={{
                                                     top: `${topPercent}%`,
                                                     height: `${heightPercent}%`,
+                                                    left: styleLeft,
+                                                    width: styleWidth,
                                                     borderColor: color.border,
                                                 }}
                                             >
+                                                {isReligion && (
+                                                    <span className="inline-block rounded px-1.5 py-0.5 text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200 capitalize mb-1">
+                                                        {religionKey || 'Agama'}
+                                                    </span>
+                                                )}
                                                 <div className={`font-semibold leading-tight mb-1 ${color.text} ${color.textHover}`}>
                                                     {title}
                                                 </div>
@@ -135,8 +165,9 @@ export default function WeeklyGrid({ schedules, onScheduleClick, viewMode }) {
                                             </div>
                                         );
                                     })}
-                            </div>
-                        ))}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

@@ -38,7 +38,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
     const semesterForm = useForm({ academic_year_id: '', name: '', is_active: false });
     const levelForm = useForm({ name: '' });
     const schoolClassForm = useForm({ name: '', level_id: '', teacher_id: '' });
-    const subjectForm = useForm({ name: '', code: '', description: '' });
+    const subjectForm = useForm({ name: '', code: '', category: 'general', religion_key: '', description: '' });
     const scheduleForm = useForm({
         schedule_type: 'regular',
         cocurricular_id: '',
@@ -100,6 +100,13 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             schoolClassForm.clearErrors();
         } else if (entityType === 'subject') {
             subjectForm.reset();
+            subjectForm.setData({
+                name: '',
+                code: '',
+                category: 'general',
+                religion_key: '',
+                description: '',
+            });
             subjectForm.clearErrors();
         } else if (entityType === 'schedule') {
             scheduleForm.reset();
@@ -177,6 +184,8 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
             subjectForm.setData({
                 name: record.name,
                 code: record.code,
+                category: record.category || 'general',
+                religion_key: record.religion_key || '',
                 description: record.description || '',
             });
             subjectForm.clearErrors();
@@ -655,7 +664,7 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                         {activeEntity === 'subject' && (
                             <>
                                 <div className="mb-4">
-                                    <InputLabel htmlFor="sub_name" value="Nama Mata Pelajaran (Contoh: Matematika Wajib)" />
+                                    <InputLabel htmlFor="sub_name" value="Nama Mata Pelajaran (Contoh: Pendidikan Agama Islam)" />
                                     <TextInput
                                         id="sub_name"
                                         type="text"
@@ -666,18 +675,66 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                     />
                                     <InputError message={subjectForm.errors.name} className="mt-2" />
                                 </div>
-                                <div className="mb-4">
-                                    <InputLabel htmlFor="sub_code" value="Kode Mata Pelajaran (Contoh: MTK-X)" />
-                                    <TextInput
-                                        id="sub_code"
-                                        type="text"
-                                        className="mt-1 block w-full"
-                                        value={subjectForm.data.code}
-                                        onChange={(e) => subjectForm.setData('code', e.target.value)}
-                                        required
-                                    />
-                                    <InputError message={subjectForm.errors.code} className="mt-2" />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <InputLabel htmlFor="sub_code" value="Kode Mata Pelajaran (Contoh: PAI-8)" />
+                                        <TextInput
+                                            id="sub_code"
+                                            type="text"
+                                            className="mt-1 block w-full"
+                                            value={subjectForm.data.code}
+                                            onChange={(e) => subjectForm.setData('code', e.target.value)}
+                                            required
+                                        />
+                                        <InputError message={subjectForm.errors.code} className="mt-2" />
+                                    </div>
+                                    <div>
+                                        <InputLabel htmlFor="sub_category" value="Kategori Mata Pelajaran" />
+                                        <select
+                                            id="sub_category"
+                                            value={subjectForm.data.category || 'general'}
+                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                subjectForm.setData({
+                                                    ...subjectForm.data,
+                                                    category: val,
+                                                    religion_key: val === 'religion' ? (subjectForm.data.religion_key || 'islam') : ''
+                                                });
+                                            }}
+                                        >
+                                            <option value="general">Umum (Reguler Seluruh Kelas)</option>
+                                            <option value="religion">Agama / Paralel (Split Rombel)</option>
+                                        </select>
+                                        <InputError message={subjectForm.errors.category} className="mt-2" />
+                                    </div>
                                 </div>
+
+                                {subjectForm.data.category === 'religion' && (
+                                    <div className="mb-4 p-3 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-lg border border-indigo-200/60 dark:border-indigo-800/60">
+                                        <InputLabel htmlFor="sub_religion_key" value="Pilihan Agama yang Ditargetkan" className="text-indigo-900 dark:text-indigo-200 font-semibold" />
+                                        <p className="text-xs text-indigo-700/80 dark:text-indigo-300/80 mb-2">
+                                            Siswa di kelas yang agamanya cocok akan otomatis terdaftar di mapel ini dan jadwal mapel agama yang berbeda dapat berjalan bersamaan.
+                                        </p>
+                                        <select
+                                            id="sub_religion_key"
+                                            value={subjectForm.data.religion_key || 'islam'}
+                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                            onChange={(e) => subjectForm.setData('religion_key', e.target.value)}
+                                            required={subjectForm.data.category === 'religion'}
+                                        >
+                                            <option value="islam">Islam (Pendidikan Agama Islam)</option>
+                                            <option value="kristen">Kristen Protestan (Pendidikan Agama Kristen)</option>
+                                            <option value="katolik">Katolik (Pendidikan Agama Katolik)</option>
+                                            <option value="hindu">Hindu (Pendidikan Agama Hindu)</option>
+                                            <option value="buddha">Buddha (Pendidikan Agama Buddha)</option>
+                                            <option value="konghucu">Konghucu (Pendidikan Agama Konghucu)</option>
+                                            <option value="lainnya">Lainnya / Kepercayaan</option>
+                                        </select>
+                                        <InputError message={subjectForm.errors.religion_key} className="mt-2" />
+                                    </div>
+                                )}
+
                                 <div className="mb-4">
                                     <InputLabel htmlFor="sub_desc" value="Deskripsi Singkat (Opsional)" />
                                     <textarea
@@ -1488,7 +1545,16 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 subjects.map((sub) => (
                                     <tr key={sub.id} className="hover:bg-gray-50 dark:bg-gray-900/50">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-600">{sub.code}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">{sub.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                            <div className="flex items-center gap-2">
+                                                <span>{sub.name}</span>
+                                                {sub.category === 'religion' && (
+                                                    <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/40 px-2.5 py-0.5 text-xs font-semibold text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800 capitalize">
+                                                        Agama: {sub.religion_key || 'Multi'}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </td>
                                         <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{sub.description || '-'}</td>
                                         {canManageCurriculum && (
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

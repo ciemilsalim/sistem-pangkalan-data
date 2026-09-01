@@ -84,6 +84,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/curriculum/schedules', [CurriculumController::class, 'storeSchedule'])->name('curriculum.schedules.store');
         Route::put('/curriculum/schedules/{schedule}', [CurriculumController::class, 'updateSchedule'])->name('curriculum.schedules.update');
         Route::delete('/curriculum/schedules/{schedule}', [CurriculumController::class, 'destroySchedule'])->name('curriculum.schedules.destroy');
+        Route::post('/curriculum/teaching-assignments/{teachingAssignment}/students', [CurriculumController::class, 'updateTeachingAssignmentStudents'])->name('curriculum.teaching-assignments.students');
     });
 
     Route::middleware('can:manage_curriculum')->group(function () {

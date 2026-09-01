@@ -35,6 +35,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         nis: '',
         learning_email: '',
         school_class_id: '',
+        religion: '',
         email: '',
         password: '',
         parent_ids: [],
@@ -172,19 +173,18 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
 
         if (entityType === 'student') {
             studentForm.reset();
-            if (schoolClasses.length > 0) {
-                studentForm.setData({
-                    name: '',
-                    nis: '',
-                    learning_email: '',
-                    school_class_id: schoolClasses[0].id.toString(),
-                    email: '',
-                    password: '',
-                    parent_ids: [],
-                    photo: null,
-                    status: 'aktif',
-                });
-            }
+            studentForm.setData({
+                name: '',
+                nis: '',
+                learning_email: '',
+                school_class_id: schoolClasses.length > 0 ? schoolClasses[0].id.toString() : '',
+                religion: 'islam',
+                email: '',
+                password: '',
+                parent_ids: [],
+                photo: null,
+                status: 'aktif',
+            });
             studentForm.clearErrors();
         } else if (entityType === 'teacher') {
             teacherForm.reset();
@@ -216,6 +216,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                 nis: record.nis,
                 learning_email: record.learning_email || '',
                 school_class_id: record.school_class_id ? record.school_class_id.toString() : '',
+                religion: record.religion || '',
                 email: record.user?.email || '',
                 password: '', // optional on update
                 parent_ids: linkedParentIds,
@@ -640,6 +641,26 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                         </div>
                                     </div>
 
+                                    <div className="mb-4">
+                                        <InputLabel htmlFor="stud_religion" value="Agama Siswa" />
+                                        <select
+                                            id="stud_religion"
+                                            value={studentForm.data.religion || ''}
+                                            className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"
+                                            onChange={(e) => studentForm.setData('religion', e.target.value)}
+                                        >
+                                            <option value="">-- Pilih Agama --</option>
+                                            <option value="islam">Islam</option>
+                                            <option value="kristen">Kristen Protestan</option>
+                                            <option value="katolik">Katolik</option>
+                                            <option value="hindu">Hindu</option>
+                                            <option value="buddha">Buddha</option>
+                                            <option value="konghucu">Konghucu</option>
+                                            <option value="lainnya">Lainnya / Kepercayaan</option>
+                                        </select>
+                                        <InputError message={studentForm.errors.religion} className="mt-2" />
+                                    </div>
+
                                     <div>
                                         <InputLabel htmlFor="stud_email" value="Email Login Akun" />
                                         <TextInput
@@ -1019,6 +1040,10 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                                 <div>
                                     <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Kelas</h4>
                                     <p className="mt-1 text-base text-gray-900 dark:text-gray-100 font-bold">{selectedRecord.school_class?.name || '-'}</p>
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Agama</h4>
+                                    <p className="mt-1 text-base text-gray-900 dark:text-gray-100 capitalize">{selectedRecord.religion || '-'}</p>
                                 </div>
                                 <div>
                                     <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Email Akun Login</h4>

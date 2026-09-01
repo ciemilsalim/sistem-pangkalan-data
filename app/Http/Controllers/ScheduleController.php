@@ -122,6 +122,15 @@ class ScheduleController extends Controller
                 $classOverlap = array_intersect($aClassIds, $bClassIds);
                 $teacherOverlap = array_intersect($aTeacherIds, $bTeacherIds);
 
+                // Toleransi jadwal paralel mapel agama: Jika kelas sama, tetapi kedua mapel adalah mapel agama dengan agama berbeda dan guru berbeda
+                if (!empty($classOverlap) && empty($teacherOverlap)) {
+                    $aSub = $a->teachingAssignment?->subject;
+                    $bSub = $b->teachingAssignment?->subject;
+                    if ($aSub && $bSub && $aSub->category === 'religion' && $bSub->category === 'religion' && !empty($aSub->religion_key) && !empty($bSub->religion_key) && strtolower(trim($aSub->religion_key)) !== strtolower(trim($bSub->religion_key))) {
+                        continue; // Bukan bentrok, melainkan rombel paralel agama
+                    }
+                }
+
                 if (empty($classOverlap) && empty($teacherOverlap)) continue;
 
                 // Prevent duplicate pair reports
@@ -137,7 +146,9 @@ class ScheduleController extends Controller
                 $bTime = substr($b->start_time, 0, 5) . '-' . substr($b->end_time, 0, 5);
 
                 $reason = '';
-                if (!empty($classOverlap)) {
+                if (!empty($classOverlap) && !empty($teacherOverlap)) {
+                    $reason = 'kelas & guru sama';
+                } elseif (!empty($classOverlap)) {
                     $reason = 'kelas sama';
                 } elseif (!empty($teacherOverlap)) {
                     $reason = 'guru sama';

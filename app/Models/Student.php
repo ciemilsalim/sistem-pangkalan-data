@@ -20,6 +20,7 @@ class Student extends Model
         'nis',
         'learning_email',
         'school_class_id',
+        'religion',
         'unique_id',
         'photo',
         'face_descriptor',
