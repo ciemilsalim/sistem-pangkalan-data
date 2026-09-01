@@ -165,7 +165,7 @@ class PeopleController extends Controller
                 'nis' => $request->nis,
                 'learning_email' => $request->learning_email,
                 'school_class_id' => $request->school_class_id,
-                'religion' => $request->religion,
+                'religion' => $request->religion ?: 'islam',
                 'status' => $request->status,
             ]);
 
@@ -242,7 +242,7 @@ class PeopleController extends Controller
                 'nis' => $request->nis,
                 'learning_email' => $request->learning_email,
                 'school_class_id' => $request->school_class_id,
-                'religion' => $request->religion,
+                'religion' => $request->religion ?: 'islam',
                 'status' => $request->status,
             ]);
 

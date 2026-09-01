@@ -58,6 +58,7 @@ class StudentsImport implements ToModel, WithHeadingRow, WithValidation
             'nis'             => $nis,
             'learning_email'  => isset($row['email_belajar']) ? $row['email_belajar'] : null,
             'school_class_id' => $schoolClassId,
+            'religion'        => !empty($row['agama']) ? strtolower(trim($row['agama'])) : 'islam',
             'unique_id'       => (string) Str::uuid(),
         ]);
     }

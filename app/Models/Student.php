@@ -27,6 +27,10 @@ class Student extends Model
         'status'
     ];
 
+    protected $attributes = [
+        'religion' => 'islam',
+    ];
+
     protected $appends = ['photo_url'];
 
     /**

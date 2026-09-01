@@ -35,7 +35,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
         nis: '',
         learning_email: '',
         school_class_id: '',
-        religion: '',
+        religion: 'islam',
         email: '',
         password: '',
         parent_ids: [],
@@ -216,7 +216,7 @@ export default function Index({ auth, students, teachers, parents, schoolClasses
                 nis: record.nis,
                 learning_email: record.learning_email || '',
                 school_class_id: record.school_class_id ? record.school_class_id.toString() : '',
-                religion: record.religion || '',
+                religion: record.religion || 'islam',
                 email: record.user?.email || '',
                 password: '', // optional on update
                 parent_ids: linkedParentIds,
