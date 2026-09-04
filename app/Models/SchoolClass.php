@@ -25,6 +25,13 @@ class SchoolClass extends Model
 
     public function students() 
     { 
+        $activeSemesterId = session('active_semester_id') 
+            ?? \App\Models\Semester::where('is_active', true)->value('id');
+
+        if ($activeSemesterId && \Illuminate\Support\Facades\Schema::hasTable('class_student')) {
+            return $this->belongsToMany(Student::class, 'class_student')
+                        ->wherePivot('semester_id', $activeSemesterId);
+        }
         return $this->hasMany(Student::class); 
     }
 
