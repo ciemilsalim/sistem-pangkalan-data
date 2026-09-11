@@ -535,7 +535,7 @@ export default function Index({
                                                 <td className="px-5 py-3.5 whitespace-nowrap text-right">
                                                     <div className="flex items-center justify-end gap-1.5">
                                                         <a
-                                                            href={route('student-mutations.print-acceptance', m.id)}
+                                                            href={route('student-mutations.print-acceptance-record', m.id)}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             title="Cetak Surat Lolos Butuh"

@@ -426,6 +426,10 @@ class StudentMutationController extends Controller
      */
     public function printAcceptanceLetter(Request $request, ?StudentMutation $studentMutation = null)
     {
+        if ($studentMutation) {
+            $studentMutation->load(['student', 'schoolClass', 'academicYear']);
+        }
+
         $settings = Setting::pluck('value', 'key')->all();
 
         $schoolName = $settings['school_name'] ?? 'SMP NEGERI 1 BIAU';
@@ -434,16 +438,19 @@ class StudentMutationController extends Controller
         $headmasterNip = $settings['school_headmaster_nip'] ?? '-';
         $schoolLogo = isset($settings['school_logo']) ? asset('storage/' . $settings['school_logo']) : null;
 
+        $activeSemester = Semester::where('is_active', true)->with('academicYear')->first();
+        $defaultAcademicYear = $activeSemester?->academicYear?->name ?? (date('Y') . '/' . (date('Y') + 1));
+
         // Data can come from mutation record or query params for pre-registration letter
         $data = [
-            'letter_number' => $request->input('letter_number', $studentMutation?->reference_number ?? '421.3/     /SMP.01/TU/' . date('Y')),
+            'letter_number' => $request->input('letter_number', $studentMutation?->reference_number ?: ('421.3/' . str_pad($studentMutation?->id ?? '001', 3, '0', STR_PAD_LEFT) . '/SMP.01/TU/' . date('Y'))),
             'student_name' => $request->input('student_name', $studentMutation?->student?->name ?? ''),
             'nisn' => $request->input('nisn', $studentMutation?->student?->nis ?? ''),
             'origin_school' => $request->input('origin_school', $studentMutation?->school_name ?? ''),
             'target_class' => $request->input('target_class', $studentMutation?->schoolClass?->name ?? 'Kelas VII / VIII / IX'),
             'parent_name' => $request->input('parent_name', $studentMutation?->parent_name ?? ''),
             'reason' => $request->input('reason', $studentMutation?->reason ?? 'Mengikuti Orang Tua / Pindah Domisili'),
-            'academic_year' => $request->input('academic_year', $studentMutation?->academicYear?->name ?? (date('Y') . '/' . (date('Y') + 1))),
+            'academic_year' => $request->input('academic_year', $studentMutation?->academicYear?->name ?? $defaultAcademicYear),
             'print_date' => now()->translatedFormat('d F Y'),
         ];
 

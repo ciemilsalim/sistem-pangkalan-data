@@ -127,10 +127,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/student-mutations', [StudentMutationController::class, 'index'])->name('student-mutations.index');
     Route::post('/student-mutations/incoming', [StudentMutationController::class, 'storeIncoming'])->name('student-mutations.incoming');
     Route::post('/student-mutations/outgoing', [StudentMutationController::class, 'storeOutgoing'])->name('student-mutations.outgoing');
+    Route::get('/student-mutations/print-acceptance', [StudentMutationController::class, 'printAcceptanceLetter'])->name('student-mutations.print-acceptance');
+    Route::get('/student-mutations/{studentMutation}/print-acceptance', [StudentMutationController::class, 'printAcceptanceLetter'])->name('student-mutations.print-acceptance-record');
+    Route::get('/student-mutations/{studentMutation}/print-transfer', [StudentMutationController::class, 'printTransferLetter'])->name('student-mutations.print-transfer');
     Route::put('/student-mutations/{studentMutation}', [StudentMutationController::class, 'update'])->name('student-mutations.update');
     Route::delete('/student-mutations/{studentMutation}', [StudentMutationController::class, 'destroy'])->name('student-mutations.destroy');
-    Route::get('/student-mutations/{studentMutation}/print-transfer', [StudentMutationController::class, 'printTransferLetter'])->name('student-mutations.print-transfer');
-    Route::get('/student-mutations/{studentMutation?}/print-acceptance', [StudentMutationController::class, 'printAcceptanceLetter'])->name('student-mutations.print-acceptance');
 
     // Announcement Routes
     Route::resource('announcements', AnnouncementController::class);
