@@ -72,6 +72,16 @@ export default function AuthenticatedLayout({ header, children }) {
 
     const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
+    // Helper to determine if a feature is still considered new (within 30 days / 1 month of releaseDate)
+    const isFeatureNew = (releaseDate) => {
+        if (!releaseDate) return false;
+        const release = new Date(releaseDate);
+        const now = new Date();
+        const diffTime = now.getTime() - release.getTime();
+        const diffDays = diffTime / (1000 * 3600 * 24);
+        return diffDays >= 0 && diffDays <= 30;
+    };
+
     let navigation = [
         { name: 'Dashboard', href: route('dashboard'), active: route().current('dashboard'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg> },
     ];
@@ -105,7 +115,13 @@ export default function AuthenticatedLayout({ header, children }) {
     }
 
     if (isAdmin || hasRole('kepala_tata_usaha') || hasPermission('manage_student_mutations') || hasPermission('manage_students')) {
-        navigation.push({ name: 'Mutasi Siswa', href: route('student-mutations.index'), active: route().current('student-mutations.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg> });
+        navigation.push({
+            name: 'Mutasi Siswa',
+            href: route('student-mutations.index'),
+            active: route().current('student-mutations.*'),
+            releaseDate: '2026-09-10',
+            icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg>
+        });
     }
 
     if (isAdmin || hasPermission('manage_announcements')) {
@@ -163,15 +179,40 @@ export default function AuthenticatedLayout({ header, children }) {
                         )}
                     </button>
                 </div>
-                <nav className={`flex-1 py-4 space-y-1 overflow-x-hidden transition-all duration-300 ${isSidebarCollapsed ? 'px-4' : 'px-4'}`}>
-                    {navigation.map((item) => (
-                        <NavLink key={item.name} href={item.href} active={item.active} className={isSidebarCollapsed ? 'justify-center px-0' : ''} title={isSidebarCollapsed ? item.name : undefined}>
-                            <div className="shrink-0">{item.icon}</div>
-                            <div className={`flex items-center overflow-hidden transition-all duration-300 ${isSidebarCollapsed ? 'max-w-0 opacity-0 -ml-3' : 'max-w-[200px] opacity-100'}`}>
-                                <span className="whitespace-nowrap">{item.name}</span>
-                            </div>
-                        </NavLink>
-                    ))}
+                <nav className={`flex-1 py-4 space-y-1 overflow-x-hidden transition-all duration-300 ${isSidebarCollapsed ? 'px-3' : 'px-4'}`}>
+                    {navigation.map((item) => {
+                        const isNew = Boolean(item.badge || isFeatureNew(item.releaseDate));
+                        return (
+                            <NavLink
+                                key={item.name}
+                                href={item.href}
+                                active={item.active}
+                                className={`relative ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-between'}`}
+                                title={isSidebarCollapsed ? `${item.name}${isNew ? ' (Fitur Baru)' : ''}` : undefined}
+                            >
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="shrink-0 relative">
+                                        {item.icon}
+                                        {isSidebarCollapsed && isNew && (
+                                            <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className={`flex items-center overflow-hidden transition-all duration-300 ${isSidebarCollapsed ? 'max-w-0 opacity-0 -ml-3' : 'max-w-[150px] opacity-100'}`}>
+                                        <span className="whitespace-nowrap truncate">{item.name}</span>
+                                    </div>
+                                </div>
+
+                                {!isSidebarCollapsed && isNew && (
+                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-xs shrink-0 animate-pulse">
+                                        {item.badge || 'BARU'}
+                                    </span>
+                                )}
+                            </NavLink>
+                        );
+                    })}
                 </nav>
             </aside>
 
@@ -368,23 +409,31 @@ export default function AuthenticatedLayout({ header, children }) {
                             {/* Drawer Links Body */}
                             <div className="p-5 flex-1 overflow-y-auto space-y-4 pb-8">
                                 <div className="grid grid-cols-2 gap-2">
-                                    {navigation.map((item) => (
-                                        <Link
-                                            key={item.name}
-                                            href={item.href}
-                                            onClick={() => setShowingNavigationDropdown(false)}
-                                            className={`group flex flex-col items-center justify-center gap-1.5 text-center p-3.5 rounded-xl text-xs font-semibold border transition-all duration-300 ${
-                                                item.active
-                                                    ? 'bg-indigo-50 border-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:border-indigo-900/50 dark:text-indigo-400 shadow-sm'
-                                                    : 'bg-gray-50/50 border-gray-200/60 text-gray-700 dark:bg-gray-800/30 dark:border-gray-800/60 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
-                                            }`}
-                                        >
-                                            <div className="opacity-80 group-hover:opacity-100 transition-opacity">
-                                                {item.icon}
-                                            </div>
-                                            <span>{item.name}</span>
-                                        </Link>
-                                    ))}
+                                    {navigation.map((item) => {
+                                        const isNew = Boolean(item.badge || isFeatureNew(item.releaseDate));
+                                        return (
+                                            <Link
+                                                key={item.name}
+                                                href={item.href}
+                                                onClick={() => setShowingNavigationDropdown(false)}
+                                                className={`group relative flex flex-col items-center justify-center gap-1.5 text-center p-3.5 rounded-xl text-xs font-semibold border transition-all duration-300 ${
+                                                    item.active
+                                                        ? 'bg-indigo-50 border-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:border-indigo-900/50 dark:text-indigo-400 shadow-sm'
+                                                        : 'bg-gray-50/50 border-gray-200/60 text-gray-700 dark:bg-gray-800/30 dark:border-gray-800/60 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                                }`}
+                                            >
+                                                {isNew && (
+                                                    <span className="absolute top-1.5 right-1.5 inline-flex items-center px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-xs animate-pulse">
+                                                        {item.badge || 'BARU'}
+                                                    </span>
+                                                )}
+                                                <div className="opacity-80 group-hover:opacity-100 transition-opacity">
+                                                    {item.icon}
+                                                </div>
+                                                <span>{item.name}</span>
+                                            </Link>
+                                        );
+                                    })}
                                 </div>
                                 
                                 {/* Profile, Dark Mode Toggle & Log Out Actions */}

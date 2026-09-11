@@ -266,6 +266,9 @@ export default function Index({
                                 </svg>
                             </span>
                             Manajemen Mutasi Siswa
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-xs animate-pulse">
+                                FITUR BARU
+                            </span>
                         </h2>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                             Pencatatan siswa pindahan masuk, mutasi keluar, rekam jejak rombel, dan penerbitan surat resmi kedinasan.
