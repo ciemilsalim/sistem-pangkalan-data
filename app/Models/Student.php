@@ -146,4 +146,9 @@ class Student extends Model
     {
         return $this->hasMany(ExtracurricularAttendance::class);
     }
+
+    public function mutations()
+    {
+        return $this->hasMany(StudentMutation::class);
+    }
 }

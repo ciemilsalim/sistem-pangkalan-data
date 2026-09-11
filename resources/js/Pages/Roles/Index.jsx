@@ -101,6 +101,7 @@ export default function RolesIndex({ auth, roles, permissions }) {
             'manage_cp': 'Kelola Capaian Pembelajaran',
             'manage_promotions': 'Kenaikan Kelas',
             'manage_students': 'Data Siswa',
+            'manage_student_mutations': 'Mutasi Siswa',
             'manage_teachers': 'Data Guru',
             'manage_parents': 'Data Wali Murid',
             'manage_announcements': 'Pengumuman',

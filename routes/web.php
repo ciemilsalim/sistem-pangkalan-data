@@ -15,6 +15,7 @@ use App\Http\Controllers\AcademicAuditController;
 use App\Http\Controllers\LmsModerationController;
 use App\Http\Controllers\AcademicPeriodController;
 use App\Http\Controllers\RolePermissionController;
+use App\Http\Controllers\StudentMutationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -122,6 +123,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::put('/people/parents/{parent}', [PeopleController::class, 'updateParent'])->name('people.parents.update');
     Route::delete('/people/parents/{parent}', [PeopleController::class, 'destroyParent'])->name('people.parents.destroy');
 
+    // Student Mutation Routes (Mutasi Masuk & Keluar)
+    Route::get('/student-mutations', [StudentMutationController::class, 'index'])->name('student-mutations.index');
+    Route::post('/student-mutations/incoming', [StudentMutationController::class, 'storeIncoming'])->name('student-mutations.incoming');
+    Route::post('/student-mutations/outgoing', [StudentMutationController::class, 'storeOutgoing'])->name('student-mutations.outgoing');
+    Route::put('/student-mutations/{studentMutation}', [StudentMutationController::class, 'update'])->name('student-mutations.update');
+    Route::delete('/student-mutations/{studentMutation}', [StudentMutationController::class, 'destroy'])->name('student-mutations.destroy');
+    Route::get('/student-mutations/{studentMutation}/print-transfer', [StudentMutationController::class, 'printTransferLetter'])->name('student-mutations.print-transfer');
+    Route::get('/student-mutations/{studentMutation?}/print-acceptance', [StudentMutationController::class, 'printAcceptanceLetter'])->name('student-mutations.print-acceptance');
+
     // Announcement Routes
     Route::resource('announcements', AnnouncementController::class);
 
@@ -186,6 +196,7 @@ Route::get('/fix-admin', function () {
         "manage_schedules",
         "manage_settings",
         "manage_students",
+        "manage_student_mutations",
         "manage_subjects",
         "manage_teachers",
         "manage_users",

@@ -104,6 +104,10 @@ export default function AuthenticatedLayout({ header, children }) {
         navigation.push({ name: 'Kenaikan Kelas', href: route('promotions.index'), active: route().current('promotions.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg> });
     }
 
+    if (isAdmin || hasRole('kepala_tata_usaha') || hasPermission('manage_student_mutations') || hasPermission('manage_students')) {
+        navigation.push({ name: 'Mutasi Siswa', href: route('student-mutations.index'), active: route().current('student-mutations.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg> });
+    }
+
     if (isAdmin || hasPermission('manage_announcements')) {
         navigation.push({ name: 'Manajemen Pengumuman', href: route('announcements.index'), active: route().current('announcements.*'), icon: <svg className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" /></svg> });
     }
