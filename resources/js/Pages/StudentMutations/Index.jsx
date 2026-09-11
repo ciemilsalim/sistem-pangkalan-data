@@ -15,6 +15,7 @@ export default function Index({
     outgoingMutations,
     stats,
     schoolClasses,
+    activeAcademicYear,
     activeStudents,
     schoolSettings,
     filters
@@ -748,19 +749,37 @@ export default function Index({
                                 </div>
 
                                 <div>
-                                    <InputLabel htmlFor="in_school_class_id" value="Rombel / Kelas Penempatan *" />
+                                    <div className="flex items-center justify-between mb-1">
+                                        <InputLabel htmlFor="in_school_class_id" value="Rombel / Kelas Penempatan *" />
+                                        {activeAcademicYear && (
+                                            <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/50 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-800 tracking-tight">
+                                                T.A. {activeAcademicYear.name} ({activeAcademicYear.semester_name})
+                                            </span>
+                                        )}
+                                    </div>
                                     <select
                                         id="in_school_class_id"
-                                        className="mt-1 block w-full text-sm rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
+                                        className="mt-1 block w-full text-sm rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500"
                                         value={incomingForm.data.school_class_id}
                                         onChange={(e) => incomingForm.setData('school_class_id', e.target.value)}
                                         required
                                     >
-                                        <option value="">Pilih Kelas Tujuan...</option>
-                                        {schoolClasses.map((c) => (
-                                            <option key={c.id} value={c.id}>{c.name} ({c.level ? `Tingkat ${c.level.name}` : ''})</option>
-                                        ))}
+                                        <option value="">Pilih Kelas Tujuan (T.A. Aktif)...</option>
+                                        {schoolClasses.length === 0 ? (
+                                            <option value="" disabled>Tidak ada kelas di tahun ajaran aktif</option>
+                                        ) : (
+                                            schoolClasses.map((c) => (
+                                                <option key={c.id} value={c.id}>
+                                                    {c.name} {c.level ? `(Tingkat ${c.level.name})` : ''}
+                                                </option>
+                                            ))
+                                        )}
                                     </select>
+                                    {schoolClasses.length === 0 && (
+                                        <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1">
+                                            * Belum ada kelas yang dibuat untuk Tahun Ajaran aktif ini. Silakan buat kelas di menu Manajemen Kurikulum &gt; Kelas.
+                                        </p>
+                                    )}
                                     <InputError message={incomingForm.errors.school_class_id} className="mt-1 text-xs" />
                                 </div>
 

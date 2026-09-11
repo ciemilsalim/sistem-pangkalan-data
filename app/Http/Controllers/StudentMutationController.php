@@ -74,8 +74,12 @@ class StudentMutationController extends Controller
         $totalIncomingAll = StudentMutation::where('type', 'masuk')->count();
         $totalOutgoingAll = StudentMutation::where('type', 'keluar')->count();
 
-        // Dropdown data
-        $schoolClasses = SchoolClass::with('level')->orderBy('name')->get();
+        // Dropdown data: Filter classes by active academic year
+        $schoolClasses = SchoolClass::with('level')
+            ->when($activeAcademicYearId, fn($q) => $q->where('academic_year_id', $activeAcademicYearId))
+            ->orderBy('name')
+            ->get();
+
         $activeStudents = Student::where('status', 'aktif')
             ->with('schoolClass')
             ->orderBy('name')
@@ -93,6 +97,11 @@ class StudentMutationController extends Controller
                 'total_outgoing_all' => $totalOutgoingAll,
             ],
             'schoolClasses' => $schoolClasses,
+            'activeAcademicYear' => $activeSemester?->academicYear ? [
+                'id' => $activeSemester->academicYear->id,
+                'name' => $activeSemester->academicYear->name,
+                'semester_name' => $activeSemester->name,
+            ] : null,
             'activeStudents' => $activeStudents,
             'schoolSettings' => [
                 'school_name' => $settings['school_name'] ?? 'SMP NEGERI 1 BIAU',
