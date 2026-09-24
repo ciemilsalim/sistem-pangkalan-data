@@ -3,58 +3,57 @@
 namespace App\Http\Controllers;
 
 use App\Models\TeachingAssignment;
-use App\Models\SchoolClass;
-use App\Models\Subject;
-use App\Models\Teacher;
-use App\Models\Student;
 use App\Models\LmsMaterial;
-use App\Models\LmsAssignment;
-use App\Models\LmsRemedialRecord;
-use App\Models\GradebookFinalScore;
-use App\Models\StudentDiagnosticResult;
-use App\Models\StudentNonCognitiveDiagnostic;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AcademicAuditController extends Controller
 {
+    /**
+     * Audit Akademik LMS (100% Data Riil dari Database).
+     * Memantau kepatuhan dan aktivitas guru dalam mengunggah bahan ajar LMS untuk setiap rombel.
+     */
     public function index(Request $request)
     {
-        // 1. DATA TAB 1: PEMANTAUAN KBM GURU
-        $assignments = TeachingAssignment::with(['schoolClass', 'subject', 'teacher.user', 'semester', 'academicYear'])->get();
-        
+        $assignments = TeachingAssignment::with([
+            'schoolClass',
+            'subject',
+            'teacher.user',
+            'semester',
+            'academicYear'
+        ])->get();
+
         $kbmAudit = $assignments->map(function ($assign) {
-            // Hitung bahan ajar yang diunggah untuk kelas & mapel spesifik ini
-            $materialsCount = LmsMaterial::where('teacher_id', $assign->teacher_id)
+            // Ambil bahan ajar yang riil diunggah untuk kelas & mapel spesifik ini
+            $materials = LmsMaterial::where('teacher_id', $assign->teacher_id)
                 ->where('subject_id', $assign->subject_id)
-                ->whereHas('schoolClasses', function($q) use ($assign) {
+                ->whereHas('schoolClasses', function ($q) use ($assign) {
                     $q->where('school_classes.id', $assign->school_class_id);
                 })
-                ->count();
+                ->get();
 
-            // Hitung tugas yang diunggah untuk kelas & mapel spesifik ini
-            $assignmentsCount = LmsAssignment::where('teacher_id', $assign->teacher_id)
-                ->where('subject_id', $assign->subject_id)
-                ->whereHas('schoolClasses', function($q) use ($assign) {
-                    $q->where('school_classes.id', $assign->school_class_id);
-                })
-                ->count();
+            $materialsCount = $materials->count();
+            $materialTitles = $materials->pluck('title')->unique()->values()->all();
 
-            // Tentukan status kepatuhan mengajar
-            $complianceStatus = 'Lengkap';
-            if ($materialsCount === 0 && $assignmentsCount === 0) {
-                $complianceStatus = 'Belum Mulai';
-            } elseif ($materialsCount === 0) {
-                $complianceStatus = 'Materi Kosong';
-            } elseif ($assignmentsCount === 0) {
-                $complianceStatus = 'Tugas Kosong';
-            }
+            $status = $materialsCount > 0 ? 'Aktif Mengunggah' : 'Belum Mengunggah';
 
             return [
                 'id' => $assign->id,
-                'teacher' => $assign->teacher,
-                'school_class' => $assign->schoolClass,
-                'subject' => $assign->subject,
+                'teacher' => $assign->teacher ? [
+                    'id' => $assign->teacher->id,
+                    'name' => $assign->teacher->name,
+                    'nip' => $assign->teacher->nip,
+                    'email' => $assign->teacher->user?->email,
+                ] : null,
+                'school_class' => $assign->schoolClass ? [
+                    'id' => $assign->schoolClass->id,
+                    'name' => $assign->schoolClass->name,
+                ] : null,
+                'subject' => $assign->subject ? [
+                    'id' => $assign->subject->id,
+                    'name' => $assign->subject->name,
+                    'code' => $assign->subject->code ?? null,
+                ] : null,
                 'semester' => $assign->semester ? [
                     'id' => $assign->semester->id,
                     'name' => $assign->semester->name,
@@ -64,310 +63,13 @@ class AcademicAuditController extends Controller
                     'name' => $assign->academicYear->name,
                 ] : null,
                 'materials_count' => $materialsCount,
-                'assignments_count' => $assignmentsCount,
-                'status' => $complianceStatus,
+                'material_titles' => $materialTitles,
+                'status' => $status,
             ];
         });
 
-        // Demo Fallback jika KBM audit kosong
-        if ($kbmAudit->isEmpty()) {
-            $kbmAudit = collect([
-                [
-                    'id' => 1,
-                    'teacher' => ['name' => 'Drs. Jalil, M.Pd'],
-                    'school_class' => ['name' => 'Kelas X-A'],
-                    'subject' => ['name' => 'Matematika'],
-                    'materials_count' => 12,
-                    'assignments_count' => 4,
-                    'status' => 'Lengkap',
-                ],
-                [
-                    'id' => 2,
-                    'teacher' => ['name' => 'Dra. Ani Suryani'],
-                    'school_class' => ['name' => 'Kelas X-A'],
-                    'subject' => ['name' => 'Fisika'],
-                    'materials_count' => 0,
-                    'assignments_count' => 2,
-                    'status' => 'Materi Kosong',
-                ],
-                [
-                    'id' => 3,
-                    'teacher' => ['name' => 'Budi Santoso, S.Kom'],
-                    'school_class' => ['name' => 'Kelas X-B'],
-                    'subject' => ['name' => 'Informatika'],
-                    'materials_count' => 8,
-                    'assignments_count' => 0,
-                    'status' => 'Tugas Kosong',
-                ],
-                [
-                    'id' => 4,
-                    'teacher' => ['name' => 'Hasan Basri, S.Pd'],
-                    'school_class' => ['name' => 'Kelas XI-A'],
-                    'subject' => ['name' => 'Sejarah'],
-                    'materials_count' => 0,
-                    'assignments_count' => 0,
-                    'status' => 'Belum Mulai',
-                ]
-            ]);
-        }
-
-
-        // 2. DATA TAB 2: LAPORAN NILAI & REMEDIAL
-        $remedialRecords = LmsRemedialRecord::with(['student', 'subject', 'teacher', 'assignment'])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($rem) {
-                return [
-                    'id' => $rem->id,
-                    'student_name' => $rem->student?->name ?? 'Siswa',
-                    'subject_name' => $rem->subject?->name ?? 'Mapel',
-                    'teacher_name' => $rem->teacher?->name ?? 'Guru',
-                    'assignment_title' => $rem->assignment?->title ?? 'Tugas',
-                    'initial_score' => $rem->initial_score,
-                    'remedial_score' => $rem->remedial_score,
-                    'strategy' => $rem->remedial_strategy ?? 'Ujian Ulang',
-                    'status' => $rem->status ?? 'pending',
-                    'created_at' => $rem->created_at ? $rem->created_at->toISOString() : null,
-                ];
-            });
-
-        // Demo Fallback jika data remedial kosong
-        if ($remedialRecords->isEmpty()) {
-            $remedialRecords = collect([
-                [
-                    'id' => 1,
-                    'student_name' => 'Emil Salim',
-                    'subject_name' => 'Matematika',
-                    'teacher_name' => 'Drs. Jalil, M.Pd',
-                    'assignment_title' => 'Kuis Trigonometri Dasar',
-                    'initial_score' => 62,
-                    'remedial_score' => 78,
-                    'strategy' => 'Ujian Ulang Tertulis',
-                    'status' => 'completed',
-                    'created_at' => now()->subDays(2)->toISOString(),
-                ],
-                [
-                    'id' => 2,
-                    'student_name' => 'Ahmad Rian',
-                    'subject_name' => 'Fisika',
-                    'teacher_name' => 'Dra. Ani Suryani',
-                    'assignment_title' => 'Tugas Dinamika Gerak',
-                    'initial_score' => 55,
-                    'remedial_score' => null,
-                    'strategy' => 'Tugas Portofolio',
-                    'status' => 'pending',
-                    'created_at' => now()->subDays(1)->toISOString(),
-                ],
-                [
-                    'id' => 3,
-                    'student_name' => 'Ratih Kumala',
-                    'subject_name' => 'Kimia',
-                    'teacher_name' => 'Drs. H. Mulyadi',
-                    'assignment_title' => 'Praktikum Reaksi Redoks',
-                    'initial_score' => 68,
-                    'remedial_score' => 85,
-                    'strategy' => 'Ujian Lisan & Tugas',
-                    'status' => 'completed',
-                    'created_at' => now()->subDays(5)->toISOString(),
-                ],
-                [
-                    'id' => 4,
-                    'student_name' => 'Dewi Lestari',
-                    'subject_name' => 'Matematika',
-                    'teacher_name' => 'Drs. Jalil, M.Pd',
-                    'assignment_title' => 'Kuis Trigonometri Dasar',
-                    'initial_score' => 50,
-                    'remedial_score' => null,
-                    'strategy' => 'Pendampingan Sebaya & Uji Ulang',
-                    'status' => 'scheduled',
-                    'created_at' => now()->toISOString(),
-                ]
-            ]);
-        }
-
-
-        // 3. DATA TAB 3: DIAGNOSTIK SISWA
-        // Ambil data non-kognitif
-        $nonCognitive = StudentNonCognitiveDiagnostic::with(['student', 'subject'])->get();
-        // Ambil data kognitif
-        $cognitive = StudentDiagnosticResult::with(['student', 'subject'])->get();
-
-        // Gabungkan profil diagnostik siswa
-        $diagnosticAudit = [];
-
-        if ($nonCognitive->isNotEmpty() || $cognitive->isNotEmpty()) {
-            // Loop over students who have diagnostic data
-            $studentIds = $nonCognitive->pluck('student_id')->merge($cognitive->pluck('student_id'))->unique();
-            $students = Student::whereIn('id', $studentIds)->with('schoolClass')->get();
-
-            foreach ($students as $stu) {
-                $stuNonCog = $nonCognitive->where('student_id', $stu->id)->first();
-                $stuCog = $cognitive->where('student_id', $stu->id)->first();
-                $subject = $stuNonCog?->subject ?? $stuCog?->subject;
-
-                // Standardize Learning Style
-                $learningStyle = $stuNonCog?->learning_style ? ucfirst(strtolower($stuNonCog->learning_style)) : 'Belum Diisi';
-
-                // Robust motivation parsing
-                $motivation = 'Sedang';
-                if ($stuNonCog) {
-                    $mot = $stuNonCog->motivation_level;
-                    if (is_array($mot)) {
-                        if (isset($mot['level'])) {
-                            $motivation = ucfirst(strtolower($mot['level']));
-                        } elseif (isset($mot['intrinsik']) || isset($mot['ekstrinsik'])) {
-                            $in = !empty($mot['intrinsik']) ? ucfirst(strtolower($mot['intrinsik'])) : '';
-                            $ek = !empty($mot['ekstrinsik']) ? ucfirst(strtolower($mot['ekstrinsik'])) : '';
-                            if ($in && $ek) {
-                                $motivation = ($in === $ek) ? $in : "{$in} / {$ek}";
-                            } else {
-                                $motivation = $in ?: ($ek ?: 'Sedang');
-                            }
-                        } elseif (isset($mot[0])) {
-                            $motivation = ucfirst(strtolower((string)$mot[0]));
-                        }
-                    } elseif (is_string($mot) && !empty($mot)) {
-                        $motivation = ucfirst(strtolower($mot));
-                    }
-                }
-
-                // Robust interests parsing (returns array of clean string tags)
-                $interests = ['Umum'];
-                if ($stuNonCog) {
-                    $raw = $stuNonCog->interests;
-                    if (is_string($raw)) {
-                        $decoded = json_decode($raw, true);
-                        if (json_last_error() === JSON_ERROR_NONE) {
-                            $raw = $decoded;
-                        }
-                    }
-                    $list = [];
-                    if (is_array($raw)) {
-                        if (isset($raw['daftar']) && is_array($raw['daftar'])) {
-                            foreach ($raw['daftar'] as $d) {
-                                if ($d) $list[] = ucwords(str_replace(['_', '-'], ' ', (string)$d));
-                            }
-                        } else {
-                            foreach ($raw as $val) {
-                                if (is_array($val)) {
-                                    foreach ($val as $subVal) {
-                                        if ($subVal) $list[] = ucwords(str_replace(['_', '-'], ' ', (string)$subVal));
-                                    }
-                                } elseif ($val) {
-                                    $list[] = ucwords(str_replace(['_', '-'], ' ', (string)$val));
-                                }
-                            }
-                        }
-                        if (!empty($raw['lainnya'])) {
-                            $list[] = ucwords(str_replace(['_', '-'], ' ', (string)$raw['lainnya']));
-                        }
-                    } elseif (is_string($raw) && !empty($raw)) {
-                        $list[] = ucwords(str_replace(['_', '-'], ' ', $raw));
-                    }
-
-                    if (!empty($list)) {
-                        $interests = array_values(array_unique($list));
-                    }
-                }
-
-                // Pedagogically aligned recommendation parsing
-                $recommendation = 'Pendampingan umum.';
-                if ($stuCog && !empty($stuCog->recommendations)) {
-                    $recs = $stuCog->recommendations;
-                    if (is_array($recs)) {
-                        $recItems = [];
-                        foreach ($recs as $r) {
-                            if (is_array($r)) {
-                                $recItems[] = implode(', ', array_filter($r, 'is_string'));
-                            } elseif (is_string($r)) {
-                                $recItems[] = $r;
-                            }
-                        }
-                        $recommendation = implode('; ', array_filter($recItems));
-                    } elseif (is_string($recs)) {
-                        $recommendation = $recs;
-                    }
-                } elseif ($stuNonCog) {
-                    $style = strtolower($stuNonCog->learning_style ?? '');
-                    if ($style === 'visual') {
-                        $recommendation = 'Gunakan materi visual, infografis, modul bergambar, dan ringkasan terstruktur.';
-                    } elseif ($style === 'auditorial' || $style === 'auditori') {
-                        $recommendation = 'Gunakan penjelasan lisan, diskusi kelompok, podcast, dan rekaman materi.';
-                    } elseif ($style === 'kinestetik') {
-                        $recommendation = 'Gunakan simulasi interaktif, praktikum langsung, dan aktivitas pemecahan masalah.';
-                    } elseif (!empty($stuNonCog->notes) && strtolower(trim($stuNonCog->notes)) !== 'ok') {
-                        $recommendation = $stuNonCog->notes;
-                    }
-                }
-
-                $diagnosticAudit[] = [
-                    'student_name' => $stu->name,
-                    'school_class' => $stu->schoolClass?->name ?? 'Kelas',
-                    'subject' => $subject?->name ?? 'Umum',
-                    'learning_style' => $learningStyle,
-                    'motivation' => $motivation,
-                    'interests' => $interests,
-                    'cognitive_score' => $stuCog ? (float)$stuCog->total_score : null,
-                    'is_passed' => $stuCog ? (bool)$stuCog->is_passed : null,
-                    'recommendation' => $recommendation,
-                ];
-            }
-        }
-
-        // Demo Fallback jika data diagnostik kosong
-        if (empty($diagnosticAudit)) {
-            $diagnosticAudit = [
-                [
-                    'student_name' => 'Emil Salim',
-                    'school_class' => 'Kelas X-A',
-                    'subject' => 'Asesmen Awal Matematika',
-                    'learning_style' => 'Visual',
-                    'motivation' => 'Tinggi',
-                    'interests' => 'Sains, Teknologi',
-                    'cognitive_score' => 82.5,
-                    'is_passed' => true,
-                    'recommendation' => 'Dapat melanjutkan ke materi pengayaan geometri lanjut.',
-                ],
-                [
-                    'student_name' => 'Ahmad Rian',
-                    'school_class' => 'Kelas X-A',
-                    'subject' => 'Asesmen Awal Fisika',
-                    'learning_style' => 'Kinestetik',
-                    'motivation' => 'Sedang',
-                    'interests' => 'Olahraga, Musik',
-                    'cognitive_score' => 58.0,
-                    'is_passed' => false,
-                    'recommendation' => 'Perlu metode pembelajaran praktikum fisik; diberikan remedial terbimbing.',
-                ],
-                [
-                    'student_name' => 'Ratih Kumala',
-                    'school_class' => 'Kelas X-B',
-                    'subject' => 'Asesmen Awal Kimia',
-                    'learning_style' => 'Auditorial',
-                    'motivation' => 'Tinggi',
-                    'interests' => 'Kesenian, Menulis',
-                    'cognitive_score' => 74.0,
-                    'is_passed' => true,
-                    'recommendation' => 'Pemahaman konsep baik; direkomendasikan latihan soal mandiri.',
-                ],
-                [
-                    'student_name' => 'Dewi Lestari',
-                    'school_class' => 'Kelas X-A',
-                    'subject' => 'Asesmen Awal Matematika',
-                    'learning_style' => 'Visual',
-                    'motivation' => 'Rendah',
-                    'interests' => 'Desain Grafis, Game',
-                    'cognitive_score' => 45.0,
-                    'is_passed' => false,
-                    'recommendation' => 'Diberikan pendampingan psikologis motivasi; visualisasi materi melalui infografis.',
-                ]
-            ];
-        }
-
         return Inertia::render('AcademicAudit/Index', [
             'kbm_audit' => $kbmAudit,
-            'remedial_audit' => $remedialRecords,
-            'diagnostic_audit' => $diagnosticAudit,
         ]);
     }
 }

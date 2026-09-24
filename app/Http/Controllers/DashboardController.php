@@ -164,37 +164,16 @@ class DashboardController extends Controller
             $lmsSubmissionRate = round(($lmsSubmissionsCount / ($lmsAssignmentsCount * $totalStudents)) * 100, 1);
         }
 
-        // Fallbacks jika database LMS kosong/baru agar tampilan tetap informatif
-        if ($lmsMaterialsCount === 0 && $lmsAssignmentsCount === 0) {
-            $lmsMaterialsCount = 312;
-            $lmsAssignmentsCount = 78;
-            $lmsSubmissionsCount = 8624;
-            $lmsSubmissionRate = 88.5;
-            $lmsRemedialCount = 48;
-            $lmsActiveRemedialCount = 16;
-        }
-
-        // Tambahan data chart untuk LMS: Kasus remedial per mata pelajaran
         $lmsSubjectRemedials = [];
         $subjects = Subject::limit(5)->get();
         foreach ($subjects as $sub) {
             $count = LmsRemedialRecord::where('subject_id', $sub->id)->count();
-            $lmsSubjectRemedials[] = [
-                'subject' => $sub->name,
-                'count' => $count,
-            ];
-        }
-
-        // Fallback untuk chart remedial jika data kosong
-        $totalRem = collect($lmsSubjectRemedials)->sum('count');
-        if ($totalRem === 0) {
-            $lmsSubjectRemedials = [
-                ['subject' => 'Matematika', 'count' => 18],
-                ['subject' => 'Fisika', 'count' => 12],
-                ['subject' => 'Bahasa Inggris', 'count' => 8],
-                ['subject' => 'Kimia', 'count' => 10],
-                ['subject' => 'Biologi', 'count' => 4],
-            ];
+            if ($count > 0) {
+                $lmsSubjectRemedials[] = [
+                    'subject' => $sub->name,
+                    'count' => $count,
+                ];
+            }
         }
 
         return Inertia::render('Dashboard', [
