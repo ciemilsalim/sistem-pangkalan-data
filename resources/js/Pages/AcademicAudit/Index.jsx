@@ -5,10 +5,61 @@ import { useState } from 'react';
 export default function Index({ kbm_audit = [], remedial_audit = [], diagnostic_audit = [] }) {
     const [activeTab, setActiveTab] = useState('kbm');
 
+    // Filter states
+    const [kbmSearch, setKbmSearch] = useState('');
+    const [kbmStatusFilter, setKbmStatusFilter] = useState('all');
+
+    const [remedialSearch, setRemedialSearch] = useState('');
+    const [remedialStatusFilter, setRemedialStatusFilter] = useState('all');
+
+    const [diagnosticSearch, setDiagnosticSearch] = useState('');
+    const [diagnosticStyleFilter, setDiagnosticStyleFilter] = useState('all');
+
     // 1. KBM Tab Stats Calculation
     const totalAssignments = kbm_audit.length;
     const completedCompliance = kbm_audit.filter(item => item.status === 'Lengkap').length;
     const incompleteCompliance = totalAssignments - completedCompliance;
+
+    // Filtered KBM Data
+    const filteredKbm = kbm_audit.filter(row => {
+        const matchesStatus = kbmStatusFilter === 'all' || row.status === kbmStatusFilter;
+        const q = kbmSearch.toLowerCase().trim();
+        const matchesSearch = !q || 
+            (row.teacher?.name || '').toLowerCase().includes(q) ||
+            (row.school_class?.name || '').toLowerCase().includes(q) ||
+            (row.subject?.name || '').toLowerCase().includes(q) ||
+            (row.semester?.name || '').toLowerCase().includes(q) ||
+            (row.academic_year?.name || '').toLowerCase().includes(q);
+        return matchesStatus && matchesSearch;
+    });
+
+    // Filtered Remedial Data
+    const filteredRemedial = remedial_audit.filter(row => {
+        const matchesStatus = remedialStatusFilter === 'all' || row.status === remedialStatusFilter;
+        const q = remedialSearch.toLowerCase().trim();
+        const matchesSearch = !q ||
+            (row.student_name || '').toLowerCase().includes(q) ||
+            (row.subject_name || '').toLowerCase().includes(q) ||
+            (row.assignment_title || '').toLowerCase().includes(q) ||
+            (row.teacher_name || '').toLowerCase().includes(q) ||
+            (row.strategy || '').toLowerCase().includes(q);
+        return matchesStatus && matchesSearch;
+    });
+
+    // Filtered Diagnostic Data
+    const filteredDiagnostic = diagnostic_audit.filter(row => {
+        const matchesStyle = diagnosticStyleFilter === 'all' || 
+            (row.learning_style || '').toLowerCase() === diagnosticStyleFilter.toLowerCase();
+        const q = diagnosticSearch.toLowerCase().trim();
+        const interestsStr = Array.isArray(row.interests) ? row.interests.join(' ') : String(row.interests || '');
+        const matchesSearch = !q ||
+            (row.student_name || '').toLowerCase().includes(q) ||
+            (row.school_class || '').toLowerCase().includes(q) ||
+            (row.subject || '').toLowerCase().includes(q) ||
+            interestsStr.toLowerCase().includes(q) ||
+            (row.motivation || '').toLowerCase().includes(q);
+        return matchesStyle && matchesSearch;
+    });
 
     // Helper: format status badge for KBM Compliance
     const getKbmBadge = (status) => {
@@ -103,18 +154,18 @@ export default function Index({ kbm_audit = [], remedial_audit = [], diagnostic_
                                 </svg>
                             </div>
                             <div className="ml-3">
-                                <h3 className="text-sm font-semibold text-indigo-900 dark:text-indigo-200">
-                                    Audit Kepatuhan Pembelajaran & Diagnostik Siswa
-                                </h3>
-                                <p className="text-xs text-indigo-700 dark:text-indigo-300/90 mt-0.5 leading-relaxed">
-                                    Halaman audit ini mensinkronisasikan penugasan mengajar guru dengan bahan ajar yang diunggah ke LMS Mokopani, hasil remedial evaluasi siswa, serta profil asesmen diagnostik awal tahun pelajaran.
+                                <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-200">
+                                    Modul Pengawasan Akademik & Kepatuhan KBM LMS
+                                </p>
+                                <p className="text-xs text-indigo-700/80 dark:text-indigo-300/80 mt-0.5">
+                                    Pantau konsistensi guru dalam mengunggah materi, modul ajar, tugas, rekam jejak remedial siswa, serta hasil pemetaan asesmen awal diagnostik Kurikulum Merdeka.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    {/* INTER-TAB NAVIGATION */}
-                    <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6 bg-white dark:bg-gray-800 p-1 rounded-xl shadow-sm max-w-2xl">
+                    {/* Navigation Tabs */}
+                    <div className="flex rounded-xl bg-white dark:bg-gray-800 p-1.5 shadow-xs border border-gray-200 dark:border-gray-700/80 mb-6">
                         <button
                             onClick={() => setActiveTab('kbm')}
                             className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-bold rounded-lg transition duration-150 ${
@@ -123,7 +174,10 @@ export default function Index({ kbm_audit = [], remedial_audit = [], diagnostic_
                                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:bg-gray-900/50'
                             }`}
                         >
-                            Pemantauan KBM Guru
+                            Pemanfaatan KBM Guru
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'kbm' ? 'bg-indigo-700 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
+                                {totalAssignments}
+                            </span>
                         </button>
                         <button
                             onClick={() => setActiveTab('remedial')}
@@ -134,6 +188,9 @@ export default function Index({ kbm_audit = [], remedial_audit = [], diagnostic_
                             }`}
                         >
                             Laporan Nilai & Remedial
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'remedial' ? 'bg-indigo-700 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
+                                {remedial_audit.length}
+                            </span>
                         </button>
                         <button
                             onClick={() => setActiveTab('diagnostic')}
@@ -144,6 +201,9 @@ export default function Index({ kbm_audit = [], remedial_audit = [], diagnostic_
                             }`}
                         >
                             Hasil Diagnostik Siswa
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] ${activeTab === 'diagnostic' ? 'bg-indigo-700 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
+                                {diagnostic_audit.length}
+                            </span>
                         </button>
                     </div>
 
@@ -189,10 +249,43 @@ export default function Index({ kbm_audit = [], remedial_audit = [], diagnostic_
 
                             {/* Data Table */}
                             <div className="overflow-hidden bg-white dark:bg-gray-800 shadow-xs sm:rounded-xl border border-gray-200 dark:border-gray-700">
-                                <div className="p-5 border-b border-gray-200 dark:border-gray-700">
-                                    <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                                        Laporan Unggah Bahan Ajar & Tugas LMS Guru
-                                    </h3>
+                                <div className="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div>
+                                        <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                                            Laporan Unggah Bahan Ajar & Tugas LMS Guru
+                                        </h3>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                            Menampilkan {filteredKbm.length} dari {totalAssignments} penugasan mengajar
+                                        </p>
+                                    </div>
+
+                                    {/* Search & Filter */}
+                                    <div className="flex flex-wrap items-center gap-2.5">
+                                        <div className="relative min-w-[200px]">
+                                            <input
+                                                type="text"
+                                                value={kbmSearch}
+                                                onChange={(e) => setKbmSearch(e.target.value)}
+                                                placeholder="Cari guru, kelas, mapel..."
+                                                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500"
+                                            />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                            </svg>
+                                        </div>
+
+                                        <select
+                                            value={kbmStatusFilter}
+                                            onChange={(e) => setKbmStatusFilter(e.target.value)}
+                                            className="py-1.5 px-3 text-xs rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500"
+                                        >
+                                            <option value="all">Semua Status</option>
+                                            <option value="Lengkap">Lengkap</option>
+                                            <option value="Materi Kosong">Materi Kosong</option>
+                                            <option value="Tugas Kosong">Tugas Kosong</option>
+                                            <option value="Belum Mulai">Belum Mulai</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left border-collapse">
@@ -206,25 +299,40 @@ export default function Index({ kbm_audit = [], remedial_audit = [], diagnostic_
                                                 <th className="px-6 py-3.5 text-right">Kepatuhan</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-100 dark:divide-gray-750 text-sm text-gray-700 dark:text-gray-300">
-                                            {kbm_audit.map((row) => (
-                                                <tr key={row.id} className="hover:bg-indigo-50/30 dark:hover:bg-gray-750 transition-colors">
-                                                    <td className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{row.teacher?.name}</td>
-                                                    <td className="px-6 py-4">{row.school_class?.name}</td>
-                                                    <td className="px-6 py-4">
-                                                        <span className="inline-flex items-center rounded bg-slate-100 dark:bg-slate-700 px-2 py-0.5 text-xs font-medium text-slate-800 dark:text-slate-200">
-                                                            {row.subject?.name}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-center font-mono font-bold text-gray-800 dark:text-gray-200">{row.materials_count}</td>
-                                                    <td className="px-6 py-4 text-center font-mono font-bold text-gray-800 dark:text-gray-200">{row.assignments_count}</td>
-                                                    <td className="px-6 py-4 text-right">
-                                                        <span className={`inline-flex items-center rounded px-2.5 py-0.5 text-xs font-bold border ${getKbmBadge(row.status)}`}>
-                                                            {row.status}
-                                                        </span>
+                                        <tbody className="divide-y divide-gray-100 dark:divide-gray-700 text-sm text-gray-700 dark:text-gray-300">
+                                            {filteredKbm.length > 0 ? (
+                                                filteredKbm.map((row) => (
+                                                    <tr key={row.id} className="hover:bg-indigo-50/30 dark:hover:bg-gray-700/40 transition-colors">
+                                                        <td className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{row.teacher?.name}</td>
+                                                        <td className="px-6 py-4">
+                                                            <div className="font-medium">{row.school_class?.name}</div>
+                                                            {row.semester && (
+                                                                <span className="text-[10px] text-gray-400 dark:text-gray-500">
+                                                                    {row.semester.name} {row.academic_year?.name ? `(${row.academic_year.name})` : ''}
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <span className="inline-flex items-center rounded bg-slate-100 dark:bg-slate-700 px-2 py-0.5 text-xs font-medium text-slate-800 dark:text-slate-200">
+                                                                {row.subject?.name}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-center font-mono font-bold text-gray-800 dark:text-gray-200">{row.materials_count}</td>
+                                                        <td className="px-6 py-4 text-center font-mono font-bold text-gray-800 dark:text-gray-200">{row.assignments_count}</td>
+                                                        <td className="px-6 py-4 text-right">
+                                                            <span className={`inline-flex items-center rounded px-2.5 py-0.5 text-xs font-bold border ${getKbmBadge(row.status)}`}>
+                                                                {row.status}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="6" className="px-6 py-10 text-center text-gray-400 dark:text-gray-500">
+                                                        Tidak ada data penugasan KBM yang cocok dengan pencarian / filter.
                                                     </td>
                                                 </tr>
-                                            ))}
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>
@@ -235,10 +343,42 @@ export default function Index({ kbm_audit = [], remedial_audit = [], diagnostic_
                     {/* TAB 2: LAPORAN NILAI & REMEDIAL */}
                     {activeTab === 'remedial' && (
                         <div className="overflow-hidden bg-white dark:bg-gray-800 shadow-xs sm:rounded-xl border border-gray-200 dark:border-gray-700">
-                            <div className="p-5 border-b border-gray-200 dark:border-gray-700">
-                                <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                                    Log Kasus & Perkembangan Ujian Remedial Siswa
-                                </h3>
+                            <div className="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div>
+                                    <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                                        Log Kasus & Perkembangan Ujian Remedial Siswa
+                                    </h3>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                        Menampilkan {filteredRemedial.length} dari {remedial_audit.length} rekam jejak remedial
+                                    </p>
+                                </div>
+
+                                {/* Search & Filter */}
+                                <div className="flex flex-wrap items-center gap-2.5">
+                                    <div className="relative min-w-[200px]">
+                                        <input
+                                            type="text"
+                                            value={remedialSearch}
+                                            onChange={(e) => setRemedialSearch(e.target.value)}
+                                            placeholder="Cari siswa, mapel, tugas..."
+                                            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500"
+                                        />
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                        </svg>
+                                    </div>
+
+                                    <select
+                                        value={remedialStatusFilter}
+                                        onChange={(e) => setRemedialStatusFilter(e.target.value)}
+                                        className="py-1.5 px-3 text-xs rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500"
+                                    >
+                                        <option value="all">Semua Status</option>
+                                        <option value="completed">Selesai</option>
+                                        <option value="pending">Proses</option>
+                                        <option value="scheduled">Dijadwalkan</option>
+                                    </select>
+                                </div>
                             </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
@@ -253,30 +393,38 @@ export default function Index({ kbm_audit = [], remedial_audit = [], diagnostic_
                                             <th className="px-6 py-3.5 text-right">Status</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-750 text-sm text-gray-700 dark:text-gray-300">
-                                        {remedial_audit.map((row) => (
-                                            <tr key={row.id} className="hover:bg-indigo-50/30 dark:hover:bg-gray-750 transition-colors">
-                                                <td className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{row.student_name}</td>
-                                                <td className="px-6 py-4">
-                                                    <span className="inline-flex items-center rounded bg-indigo-50 dark:bg-indigo-900/40 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:text-indigo-300">
-                                                        {row.subject_name}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 truncate max-w-[200px]" title={row.assignment_title}>
-                                                    {row.assignment_title}
-                                                </td>
-                                                <td className="px-6 py-4 text-center font-mono font-bold text-rose-600 dark:text-rose-400">{row.initial_score}</td>
-                                                <td className="px-6 py-4 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                                                    {row.remedial_score !== null ? row.remedial_score : '-'}
-                                                </td>
-                                                <td className="px-6 py-4 text-xs font-medium text-gray-600 dark:text-gray-400">{row.strategy}</td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <span className={`inline-flex items-center rounded px-2.5 py-0.5 text-xs font-bold border ${getRemedialBadge(row.status)}`}>
-                                                        {getRemedialLabel(row.status)}
-                                                    </span>
+                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700 text-sm text-gray-700 dark:text-gray-300">
+                                        {filteredRemedial.length > 0 ? (
+                                            filteredRemedial.map((row) => (
+                                                <tr key={row.id} className="hover:bg-indigo-50/30 dark:hover:bg-gray-700/40 transition-colors">
+                                                    <td className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{row.student_name}</td>
+                                                    <td className="px-6 py-4">
+                                                        <span className="inline-flex items-center rounded bg-indigo-50 dark:bg-indigo-900/40 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:text-indigo-300">
+                                                            {row.subject_name}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 truncate max-w-[200px]" title={row.assignment_title}>
+                                                        {row.assignment_title}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-center font-mono font-bold text-rose-600 dark:text-rose-400">{row.initial_score}</td>
+                                                    <td className="px-6 py-4 text-center font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                                        {row.remedial_score !== null ? row.remedial_score : '-'}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-xs font-medium text-gray-600 dark:text-gray-400">{row.strategy}</td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <span className={`inline-flex items-center rounded px-2.5 py-0.5 text-xs font-bold border ${getRemedialBadge(row.status)}`}>
+                                                            {getRemedialLabel(row.status)}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="7" className="px-6 py-10 text-center text-gray-400 dark:text-gray-500">
+                                                    Tidak ada catatan remedial yang sesuai dengan pencarian / filter.
                                                 </td>
                                             </tr>
-                                        ))}
+                                        )}
                                     </tbody>
                                 </table>
                             </div>
@@ -286,10 +434,42 @@ export default function Index({ kbm_audit = [], remedial_audit = [], diagnostic_
                     {/* TAB 3: DIAGNOSTIK SISWA */}
                     {activeTab === 'diagnostic' && (
                         <div className="overflow-hidden bg-white dark:bg-gray-800 shadow-xs sm:rounded-xl border border-gray-200 dark:border-gray-700">
-                            <div className="p-5 border-b border-gray-200 dark:border-gray-700">
-                                <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                                    Profil Profiling Asesmen Awal Siswa (Kurikulum Merdeka)
-                                </h3>
+                            <div className="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div>
+                                    <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                                        Profil Profiling Asesmen Awal Siswa (Kurikulum Merdeka)
+                                    </h3>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                        Menampilkan {filteredDiagnostic.length} dari {diagnostic_audit.length} profil diagnostik siswa
+                                    </p>
+                                </div>
+
+                                {/* Search & Filter */}
+                                <div className="flex flex-wrap items-center gap-2.5">
+                                    <div className="relative min-w-[200px]">
+                                        <input
+                                            type="text"
+                                            value={diagnosticSearch}
+                                            onChange={(e) => setDiagnosticSearch(e.target.value)}
+                                            placeholder="Cari siswa, kelas, minat..."
+                                            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500"
+                                        />
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                        </svg>
+                                    </div>
+
+                                    <select
+                                        value={diagnosticStyleFilter}
+                                        onChange={(e) => setDiagnosticStyleFilter(e.target.value)}
+                                        className="py-1.5 px-3 text-xs rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500"
+                                    >
+                                        <option value="all">Semua Gaya Belajar</option>
+                                        <option value="Visual">Visual</option>
+                                        <option value="Auditorial">Auditorial</option>
+                                        <option value="Kinestetik">Kinestetik</option>
+                                    </select>
+                                </div>
                             </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
@@ -304,46 +484,60 @@ export default function Index({ kbm_audit = [], remedial_audit = [], diagnostic_
                                             <th className="px-6 py-3.5 text-right">Rekomendasi Pedagogi</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-750 text-sm text-gray-700 dark:text-gray-300">
-                                        {diagnostic_audit.map((row, idx) => (
-                                            <tr key={idx} className="hover:bg-indigo-50/30 dark:hover:bg-gray-750 transition-colors">
-                                                <td className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{row.student_name}</td>
-                                                <td className="px-6 py-4">{row.school_class}</td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`inline-flex items-center rounded px-2.5 py-0.5 text-xs font-bold border ${
-                                                        row.learning_style === 'Visual' 
-                                                            ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800' 
-                                                            : row.learning_style === 'Auditorial'
-                                                            ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
-                                                            : 'bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
-                                                    }`}>
-                                                        {row.learning_style}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 text-center">
-                                                    <span className={`inline-flex items-center rounded px-2 py-0.5 text-[11px] font-bold border ${
-                                                        row.motivation === 'Tinggi'
-                                                            ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                                                            : row.motivation === 'Sedang'
-                                                            ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
-                                                            : 'bg-orange-50 dark:bg-orange-950/50 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800'
-                                                    }`}>
-                                                        {row.motivation}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    {formatInterests(row.interests)}
-                                                </td>
-                                                <td className="px-6 py-4 text-center">
-                                                    <span className={`font-mono font-bold text-sm ${row.is_passed === true ? 'text-emerald-600 dark:text-emerald-400' : row.is_passed === false ? 'text-rose-600 dark:text-rose-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                                                        {row.cognitive_score !== null ? row.cognitive_score : '-'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 text-xs text-gray-500 dark:text-gray-400 max-w-xs leading-relaxed italic" title={row.recommendation}>
-                                                    {row.recommendation}
+                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700 text-sm text-gray-700 dark:text-gray-300">
+                                        {filteredDiagnostic.length > 0 ? (
+                                            filteredDiagnostic.map((row, idx) => {
+                                                const styleLower = (row.learning_style || '').toLowerCase();
+                                                const motLower = (row.motivation || '').toLowerCase();
+                                                return (
+                                                    <tr key={idx} className="hover:bg-indigo-50/30 dark:hover:bg-gray-700/40 transition-colors">
+                                                        <td className="px-6 py-4 font-semibold text-gray-900 dark:text-gray-100">{row.student_name}</td>
+                                                        <td className="px-6 py-4">{row.school_class}</td>
+                                                        <td className="px-6 py-4">
+                                                            <span className={`inline-flex items-center rounded px-2.5 py-0.5 text-xs font-bold border ${
+                                                                styleLower === 'visual' 
+                                                                    ? 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800' 
+                                                                    : styleLower === 'auditorial' || styleLower === 'auditori'
+                                                                    ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
+                                                                    : styleLower === 'kinestetik'
+                                                                    ? 'bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
+                                                                    : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700'
+                                                            }`}>
+                                                                {row.learning_style}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-center">
+                                                            <span className={`inline-flex items-center rounded px-2 py-0.5 text-[11px] font-bold border ${
+                                                                motLower.includes('tinggi')
+                                                                    ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                                                                    : motLower.includes('sedang')
+                                                                    ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                                                                    : 'bg-orange-50 dark:bg-orange-950/50 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800'
+                                                            }`}>
+                                                                {row.motivation}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            {formatInterests(row.interests)}
+                                                        </td>
+                                                        <td className="px-6 py-4 text-center">
+                                                            <span className={`font-mono font-bold text-sm ${row.is_passed === true ? 'text-emerald-600 dark:text-emerald-400' : row.is_passed === false ? 'text-rose-600 dark:text-rose-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                                                                {row.cognitive_score !== null ? row.cognitive_score : '-'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-xs text-gray-500 dark:text-gray-400 max-w-xs leading-relaxed italic" title={row.recommendation}>
+                                                            {row.recommendation}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="7" className="px-6 py-10 text-center text-gray-400 dark:text-gray-500">
+                                                    Tidak ada data diagnostik siswa yang sesuai dengan pencarian / filter.
                                                 </td>
                                             </tr>
-                                        ))}
+                                        )}
                                     </tbody>
                                 </table>
                             </div>

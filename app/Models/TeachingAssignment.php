@@ -37,6 +37,16 @@ class TeachingAssignment extends Model
         return $this->belongsTo(Teacher::class);
     }
 
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class);
+    }
+
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
+    }
+
     /**
      * Siswa yang terdaftar secara manual (override pivot) pada penugasan ini.
      */

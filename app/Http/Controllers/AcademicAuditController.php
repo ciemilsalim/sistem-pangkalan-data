@@ -21,7 +21,7 @@ class AcademicAuditController extends Controller
     public function index(Request $request)
     {
         // 1. DATA TAB 1: PEMANTAUAN KBM GURU
-        $assignments = TeachingAssignment::with(['schoolClass', 'subject', 'teacher.user'])->get();
+        $assignments = TeachingAssignment::with(['schoolClass', 'subject', 'teacher.user', 'semester', 'academicYear'])->get();
         
         $kbmAudit = $assignments->map(function ($assign) {
             // Hitung bahan ajar yang diunggah untuk kelas & mapel spesifik ini
@@ -55,6 +55,14 @@ class AcademicAuditController extends Controller
                 'teacher' => $assign->teacher,
                 'school_class' => $assign->schoolClass,
                 'subject' => $assign->subject,
+                'semester' => $assign->semester ? [
+                    'id' => $assign->semester->id,
+                    'name' => $assign->semester->name,
+                ] : null,
+                'academic_year' => $assign->academicYear ? [
+                    'id' => $assign->academicYear->id,
+                    'name' => $assign->academicYear->name,
+                ] : null,
                 'materials_count' => $materialsCount,
                 'assignments_count' => $assignmentsCount,
                 'status' => $complianceStatus,
@@ -197,49 +205,98 @@ class AcademicAuditController extends Controller
                 $stuCog = $cognitive->where('student_id', $stu->id)->first();
                 $subject = $stuNonCog?->subject ?? $stuCog?->subject;
 
-                // Defensive motivation parsing
+                // Standardize Learning Style
+                $learningStyle = $stuNonCog?->learning_style ? ucfirst(strtolower($stuNonCog->learning_style)) : 'Belum Diisi';
+
+                // Robust motivation parsing
                 $motivation = 'Sedang';
                 if ($stuNonCog) {
-                    if (is_array($stuNonCog->motivation_level)) {
-                        $motivation = $stuNonCog->motivation_level['level'] ?? (isset($stuNonCog->motivation_level[0]) ? $stuNonCog->motivation_level[0] : 'Sedang');
-                    } elseif (is_string($stuNonCog->motivation_level)) {
-                        $motivation = $stuNonCog->motivation_level;
+                    $mot = $stuNonCog->motivation_level;
+                    if (is_array($mot)) {
+                        if (isset($mot['level'])) {
+                            $motivation = ucfirst(strtolower($mot['level']));
+                        } elseif (isset($mot['intrinsik']) || isset($mot['ekstrinsik'])) {
+                            $in = !empty($mot['intrinsik']) ? ucfirst(strtolower($mot['intrinsik'])) : '';
+                            $ek = !empty($mot['ekstrinsik']) ? ucfirst(strtolower($mot['ekstrinsik'])) : '';
+                            if ($in && $ek) {
+                                $motivation = ($in === $ek) ? $in : "{$in} / {$ek}";
+                            } else {
+                                $motivation = $in ?: ($ek ?: 'Sedang');
+                            }
+                        } elseif (isset($mot[0])) {
+                            $motivation = ucfirst(strtolower((string)$mot[0]));
+                        }
+                    } elseif (is_string($mot) && !empty($mot)) {
+                        $motivation = ucfirst(strtolower($mot));
                     }
                 }
 
-                // Defensive interests parsing
-                $interests = 'Umum';
+                // Robust interests parsing (returns array of clean string tags)
+                $interests = ['Umum'];
                 if ($stuNonCog) {
-                    if (is_array($stuNonCog->interests)) {
-                        $flatInt = [];
-                        foreach ($stuNonCog->interests as $item) {
-                            if (is_array($item)) {
-                                $flatInt[] = json_encode($item);
-                            } else {
-                                $flatInt[] = (string)$item;
+                    $raw = $stuNonCog->interests;
+                    if (is_string($raw)) {
+                        $decoded = json_decode($raw, true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $raw = $decoded;
+                        }
+                    }
+                    $list = [];
+                    if (is_array($raw)) {
+                        if (isset($raw['daftar']) && is_array($raw['daftar'])) {
+                            foreach ($raw['daftar'] as $d) {
+                                if ($d) $list[] = ucwords(str_replace(['_', '-'], ' ', (string)$d));
+                            }
+                        } else {
+                            foreach ($raw as $val) {
+                                if (is_array($val)) {
+                                    foreach ($val as $subVal) {
+                                        if ($subVal) $list[] = ucwords(str_replace(['_', '-'], ' ', (string)$subVal));
+                                    }
+                                } elseif ($val) {
+                                    $list[] = ucwords(str_replace(['_', '-'], ' ', (string)$val));
+                                }
                             }
                         }
-                        $interests = implode(', ', $flatInt);
-                    } elseif (is_string($stuNonCog->interests)) {
-                        $interests = $stuNonCog->interests;
+                        if (!empty($raw['lainnya'])) {
+                            $list[] = ucwords(str_replace(['_', '-'], ' ', (string)$raw['lainnya']));
+                        }
+                    } elseif (is_string($raw) && !empty($raw)) {
+                        $list[] = ucwords(str_replace(['_', '-'], ' ', $raw));
+                    }
+
+                    if (!empty($list)) {
+                        $interests = array_values(array_unique($list));
                     }
                 }
 
-                // Defensive recommendation parsing
+                // Pedagogically aligned recommendation parsing
                 $recommendation = 'Pendampingan umum.';
-                if ($stuCog) {
-                    if (is_array($stuCog->recommendations)) {
-                        $flatRec = [];
-                        foreach ($stuCog->recommendations as $item) {
-                            if (is_array($item)) {
-                                $flatRec[] = json_encode($item);
-                            } else {
-                                $flatRec[] = (string)$item;
+                if ($stuCog && !empty($stuCog->recommendations)) {
+                    $recs = $stuCog->recommendations;
+                    if (is_array($recs)) {
+                        $recItems = [];
+                        foreach ($recs as $r) {
+                            if (is_array($r)) {
+                                $recItems[] = implode(', ', array_filter($r, 'is_string'));
+                            } elseif (is_string($r)) {
+                                $recItems[] = $r;
                             }
                         }
-                        $recommendation = implode('; ', $flatRec);
-                    } elseif (is_string($stuCog->recommendations)) {
-                        $recommendation = $stuCog->recommendations;
+                        $recommendation = implode('; ', array_filter($recItems));
+                    } elseif (is_string($recs)) {
+                        $recommendation = $recs;
+                    }
+                } elseif ($stuNonCog) {
+                    $style = strtolower($stuNonCog->learning_style ?? '');
+                    if ($style === 'visual') {
+                        $recommendation = 'Gunakan materi visual, infografis, modul bergambar, dan ringkasan terstruktur.';
+                    } elseif ($style === 'auditorial' || $style === 'auditori') {
+                        $recommendation = 'Gunakan penjelasan lisan, diskusi kelompok, podcast, dan rekaman materi.';
+                    } elseif ($style === 'kinestetik') {
+                        $recommendation = 'Gunakan simulasi interaktif, praktikum langsung, dan aktivitas pemecahan masalah.';
+                    } elseif (!empty($stuNonCog->notes) && strtolower(trim($stuNonCog->notes)) !== 'ok') {
+                        $recommendation = $stuNonCog->notes;
                     }
                 }
 
@@ -247,7 +304,7 @@ class AcademicAuditController extends Controller
                     'student_name' => $stu->name,
                     'school_class' => $stu->schoolClass?->name ?? 'Kelas',
                     'subject' => $subject?->name ?? 'Umum',
-                    'learning_style' => $stuNonCog?->learning_style ?? 'Belum Diisi',
+                    'learning_style' => $learningStyle,
                     'motivation' => $motivation,
                     'interests' => $interests,
                     'cognitive_score' => $stuCog ? (float)$stuCog->total_score : null,
