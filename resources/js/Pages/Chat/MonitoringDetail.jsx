@@ -95,14 +95,14 @@ export default function MonitoringDetail({ conversation, messages }) {
                     </div>
 
                     {/* Messages Thread container */}
-                    <div className="rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-150 overflow-hidden">
-                        <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50/70 px-6 py-4">
+                    <div className="rounded-xl bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/70 px-6 py-4">
                             <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">
                                 Log Riwayat Pesan ({messages.length} pesan)
                             </h3>
                         </div>
 
-                        <div className="p-6 space-y-6 bg-slate-50/50">
+                        <div className="p-6 space-y-6 bg-slate-50/50 dark:bg-gray-900/40">
                             {messages.length > 0 ? (
                                 messages.map((msg) => {
                                     const isTeacher = msg.user_id === conversation.teacher?.user_id;
@@ -114,12 +114,12 @@ export default function MonitoringDetail({ conversation, messages }) {
 
                                     if (isTeacher) {
                                         senderLabel = `Guru: ${teacherName}`;
-                                        bubbleStyle = 'bg-indigo-50/40 border-indigo-500 border-l-4 border-l-indigo-';
-                                        badgeStyle = 'bg-indigo-600 text-indigo-600';
+                                        bubbleStyle = 'bg-indigo-50/50 dark:bg-indigo-950/20 border-indigo-200 dark:border-indigo-800 border-l-4 border-l-indigo-600';
+                                        badgeStyle = 'bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300';
                                     } else if (isParent) {
                                         senderLabel = `Orang Tua: ${parentName}`;
-                                        bubbleStyle = 'bg-sky-50/40 border-sky-100 border-l-4 border-l-sky-500';
-                                        badgeStyle = 'bg-sky-100 text-sky-800';
+                                        bubbleStyle = 'bg-sky-50/50 dark:bg-sky-950/20 border-sky-200 dark:border-sky-800 border-l-4 border-l-sky-500';
+                                        badgeStyle = 'bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-300';
                                     }
 
                                     return (

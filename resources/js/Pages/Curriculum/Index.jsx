@@ -418,13 +418,13 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
 
                     {/* Tabs navigation */}
                     <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
-                        <div className="border-b border-gray-200 dark:border-gray-700">
-                            <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+                        <div className="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+                            <nav className="-mb-px flex space-x-8 px-6 min-w-max" aria-label="Tabs">
                                 <button
                                     onClick={() => setActiveTab('academicYears')}
-                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
+                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors ${
                                         activeTab === 'academicYears'
-                                            ? 'border-indigo-500 text-indigo-600'
+                                            ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400 font-semibold'
                                             : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
@@ -432,9 +432,9 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('semesters')}
-                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
+                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors ${
                                         activeTab === 'semesters'
-                                            ? 'border-indigo-500 text-indigo-600'
+                                            ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400 font-semibold'
                                             : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
@@ -442,9 +442,9 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('levels')}
-                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
+                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors ${
                                         activeTab === 'levels'
-                                            ? 'border-indigo-500 text-indigo-600'
+                                            ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400 font-semibold'
                                             : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
@@ -452,9 +452,9 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('schoolClasses')}
-                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
+                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors ${
                                         activeTab === 'schoolClasses'
-                                            ? 'border-indigo-500 text-indigo-600'
+                                            ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400 font-semibold'
                                             : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
@@ -462,9 +462,9 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('subjects')}
-                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
+                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors ${
                                         activeTab === 'subjects'
-                                            ? 'border-indigo-500 text-indigo-600'
+                                            ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400 font-semibold'
                                             : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
@@ -473,9 +473,9 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
 
                                 <button
                                     onClick={() => setActiveTab('extracurriculars')}
-                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
+                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors ${
                                         activeTab === 'extracurriculars'
-                                            ? 'border-indigo-500 text-indigo-600'
+                                            ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400 font-semibold'
                                             : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
@@ -483,9 +483,9 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('cocurriculars')}
-                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
+                                    className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors ${
                                         activeTab === 'cocurriculars'
-                                            ? 'border-indigo-500 text-indigo-600'
+                                            ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400 font-semibold'
                                             : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:border-gray-600 hover:text-gray-700 dark:text-gray-300'
                                     }`}
                                 >
@@ -1256,10 +1256,11 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                 <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Tahun Akademik</h3>
                     {canManageCurriculum && (
-                        <PrimaryButton onClick={() => openCreateModal('academicYear')} className="text-xs" title="Tambah Tahun Akademik">
+                        <PrimaryButton onClick={() => openCreateModal('academicYear')} className="text-xs inline-flex items-center gap-1.5 shadow-xs" title="Tambah Tahun Akademik">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
+                            <span>Tambah Tahun Akademik</span>
                         </PrimaryButton>
                     )}
                 </div>
@@ -1322,10 +1323,11 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                     {canManageCurriculum && (academicYears.length === 0 ? (
                         <p className="text-xs text-red-500 font-semibold">Tambahkan Tahun Akademik terlebih dahulu sebelum membuat Semester.</p>
                     ) : (
-                        <PrimaryButton onClick={() => openCreateModal('semester')} className="text-xs" title="Tambah Semester">
+                        <PrimaryButton onClick={() => openCreateModal('semester')} className="text-xs inline-flex items-center gap-1.5 shadow-xs" title="Tambah Semester">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
+                            <span>Tambah Semester</span>
                         </PrimaryButton>
                     ))}
                 </div>
@@ -1388,10 +1390,11 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                 <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Tingkat Kelas</h3>
                     {canManageCurriculum && (
-                        <PrimaryButton onClick={() => openCreateModal('level')} className="text-xs" title="Tambah Tingkat Kelas">
+                        <PrimaryButton onClick={() => openCreateModal('level')} className="text-xs inline-flex items-center gap-1.5 shadow-xs" title="Tambah Tingkat Kelas">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
+                            <span>Tambah Tingkat</span>
                         </PrimaryButton>
                     )}
                 </div>
@@ -1446,10 +1449,11 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                     {canManageCurriculum && (levels.length === 0 ? (
                         <p className="text-xs text-red-500 font-semibold">Tambahkan Tingkat Kelas terlebih dahulu sebelum membuat Kelas.</p>
                     ) : (
-                        <PrimaryButton onClick={() => openCreateModal('schoolClass')} className="text-xs" title="Tambah Kelas">
+                        <PrimaryButton onClick={() => openCreateModal('schoolClass')} className="text-xs inline-flex items-center gap-1.5 shadow-xs" title="Tambah Kelas">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
+                            <span>Tambah Kelas</span>
                         </PrimaryButton>
                     ))}
                 </div>
@@ -1513,15 +1517,16 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                     <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Mata Pelajaran</h3>
                     <div className="flex gap-2 w-full md:w-auto">
                         {canManageCp && (
-                            <Link href={route('curriculum.capaian-pembelajaran.index')} className="inline-flex items-center px-4 py-2 bg-indigo-50 border border-indigo-200 rounded-md font-semibold text-xs text-indigo-700 uppercase tracking-widest shadow-sm hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 w-full md:w-auto justify-center">
+                            <Link href={route('curriculum.capaian-pembelajaran.index')} className="inline-flex items-center px-4 py-2 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 rounded-md font-semibold text-xs text-indigo-700 dark:text-indigo-300 uppercase tracking-widest shadow-xs hover:bg-indigo-100 dark:hover:bg-indigo-900/60 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150 w-full md:w-auto justify-center">
                                 Kelola Capaian Pembelajaran (CP)
                             </Link>
                         )}
                         {canManageCurriculum && (
-                            <PrimaryButton onClick={() => openCreateModal('subject')} className="text-xs w-full md:w-auto justify-center" title="Tambah Mata Pelajaran">
+                            <PrimaryButton onClick={() => openCreateModal('subject')} className="text-xs w-full md:w-auto inline-flex items-center justify-center gap-1.5 shadow-xs" title="Tambah Mata Pelajaran">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                 </svg>
+                                <span>Tambah Mapel</span>
                             </PrimaryButton>
                         )}
                     </div>
@@ -1605,10 +1610,11 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                             Pastikan data Kelas, Mata Pelajaran, dan Guru sudah tersedia sebelum membuat jadwal.
                         </p>
                     ) : (
-                        <PrimaryButton onClick={() => openCreateModal('schedule')} className="text-xs" title="Tambah Jadwal Pelajaran">
+                        <PrimaryButton onClick={() => openCreateModal('schedule')} className="text-xs inline-flex items-center gap-1.5 shadow-xs" title="Tambah Jadwal Pelajaran">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
+                            <span>Tambah Jadwal</span>
                         </PrimaryButton>
                     ))}
                 </div>
@@ -1693,10 +1699,11 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                 <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Kegiatan Ekstrakurikuler</h3>
                     {canManageCurriculum && (
-                        <PrimaryButton onClick={() => openCreateModal('extracurricular')} className="text-xs" title="Tambah Ekstrakurikuler">
+                        <PrimaryButton onClick={() => openCreateModal('extracurricular')} className="text-xs inline-flex items-center gap-1.5 shadow-xs" title="Tambah Ekstrakurikuler">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
+                            <span>Tambah Ekskul</span>
                         </PrimaryButton>
                     )}
                 </div>
@@ -1770,10 +1777,11 @@ export default function Index({ auth, academicYears, semesters, levels, schoolCl
                 <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300">Daftar Proyek Kokurikuler</h3>
                     {canManageCurriculum && (
-                        <PrimaryButton onClick={() => openCreateModal('cocurricular')} className="text-xs" title="Tambah Proyek Kokurikuler">
+                        <PrimaryButton onClick={() => openCreateModal('cocurricular')} className="text-xs inline-flex items-center gap-1.5 shadow-xs" title="Tambah Proyek Kokurikuler">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
+                            <span>Tambah Proyek Kokurikuler</span>
                         </PrimaryButton>
                     )}
                 </div>

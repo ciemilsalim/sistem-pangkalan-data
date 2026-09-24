@@ -381,7 +381,7 @@ export default function Index({
                     <div className="p-5 border-b border-gray-100 dark:border-gray-700/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         
                         {/* Tabs */}
-                        <div className="flex bg-gray-100 dark:bg-gray-700/50 p-1 rounded-xl w-fit">
+                        <div className="flex overflow-x-auto max-w-full bg-gray-100 dark:bg-gray-700/50 p-1 rounded-xl w-full sm:w-fit shrink-0">
                             <button
                                 onClick={() => handleTabChange('masuk')}
                                 className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${

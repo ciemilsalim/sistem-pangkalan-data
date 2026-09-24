@@ -128,14 +128,14 @@ export default function Monitoring({ conversations, filters }) {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="border-b border-gray-100 bg-gray-50 dark:bg-gray-900/50/50 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                    <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50/90 dark:bg-gray-900/80 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                                         <th className="px-6 py-3">Pihak Terlibat & Siswa</th>
                                         <th className="px-6 py-3">Pesan Terakhir</th>
                                         <th className="px-6 py-3 text-center">Jumlah Pesan</th>
                                         <th className="px-6 py-3 text-right">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-100 text-sm">
+                                <tbody className="divide-y divide-gray-100 dark:divide-gray-700 text-sm">
                                     {conversations.length > 0 ? (
                                         conversations.map((conv) => {
                                             const teacherName = conv.teacher?.name || 'Guru';
@@ -143,16 +143,16 @@ export default function Monitoring({ conversations, filters }) {
                                             const studentName = conv.student?.name || 'Siswa';
 
                                             return (
-                                                <tr key={conv.id} className="hover:bg-slate-50/70 transition-colors">
+                                                <tr key={conv.id} className="hover:bg-slate-50/70 dark:hover:bg-gray-700/40 transition-colors">
                                                     {/* Involving Parties */}
                                                     <td className="px-6 py-4">
                                                         <div className="flex flex-col gap-1.5">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="inline-flex items-center rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600 border border-indigo-500">
+                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                <span className="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-950/40 px-2.5 py-0.5 text-xs font-medium text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
                                                                     Guru: {teacherName}
                                                                 </span>
                                                                 <span className="text-gray-400">↔</span>
-                                                                <span className="inline-flex items-center rounded-md bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-700 border border-sky-100">
+                                                                <span className="inline-flex items-center rounded-md bg-sky-50 dark:bg-sky-950/40 px-2.5 py-0.5 text-xs font-medium text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                                                                     Ortu: {parentName}
                                                                 </span>
                                                             </div>
@@ -180,7 +180,7 @@ export default function Monitoring({ conversations, filters }) {
 
                                                     {/* Total Messages Count */}
                                                     <td className="px-6 py-4 text-center">
-                                                        <span className="inline-flex items-center justify-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700 border border-slate-200">
+                                                        <span className="inline-flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 px-2.5 py-1 text-xs font-bold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
                                                             {conv.total_messages}
                                                         </span>
                                                     </td>
@@ -190,14 +190,14 @@ export default function Monitoring({ conversations, filters }) {
                                                         <div className="flex justify-end items-center gap-2">
                                                             <Link
                                                                 href={route('monitoring.chats.show', { conversation: conv.id })}
-                                                                className="inline-flex items-center justify-center rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-600 hover:bg-indigo-600 hover:text-indigo-600 transition shadow-sm border border-blue-150"
+                                                                className="inline-flex items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950/50 px-3 py-1.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-600 hover:text-white transition shadow-sm border border-indigo-200 dark:border-indigo-800"
                                                             >
                                                                 Audit Percakapan
                                                             </Link>
                                                             
                                                             <button
                                                                 onClick={() => handleDeleteConversation(conv.id, teacherName, parentName)}
-                                                                className="inline-flex items-center justify-center rounded-lg bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 hover:text-red-800 transition shadow-sm border border-red-150"
+                                                                className="inline-flex items-center justify-center rounded-lg bg-red-50 dark:bg-red-950/40 px-3 py-1.5 text-xs font-semibold text-red-700 dark:text-red-300 hover:bg-red-600 hover:text-white transition shadow-sm border border-red-200 dark:border-red-800"
                                                             >
                                                                 Hapus Utas
                                                             </button>
