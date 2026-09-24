@@ -2,30 +2,107 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 
+// Reusable Sortable Column Header Component
+function SortHeader({ label, field, currentKey, direction, onSort, align = 'left' }) {
+    const isActive = currentKey === field;
+    return (
+        <th
+            scope="col"
+            onClick={() => onSort(field)}
+            title={`Klik untuk mengurutkan berdasarkan ${label}`}
+            className={`px-6 py-3.5 select-none cursor-pointer group transition-colors text-xs font-semibold uppercase tracking-wider ${
+                align === 'right' ? 'text-right' : 'text-left'
+            } ${isActive ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/30' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100/50 dark:hover:bg-gray-800/50'}`}
+        >
+            <div className={`inline-flex items-center gap-1.5 ${align === 'right' ? 'justify-end' : ''}`}>
+                <span>{label}</span>
+                <span className={`inline-flex items-center transition-opacity ${
+                    isActive ? 'opacity-100 text-indigo-600 dark:text-indigo-400' : 'opacity-0 group-hover:opacity-40 text-gray-400'
+                }`}>
+                    {isActive ? (
+                        direction === 'asc' ? (
+                            <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                            </svg>
+                        ) : (
+                            <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                        )
+                    ) : (
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M5 8l5-5 5 5H5zm10 4l-5 5-5-5h10z" />
+                        </svg>
+                    )}
+                </span>
+            </div>
+        </th>
+    );
+}
+
 export default function Index({ kbm_audit = [] }) {
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+    const [sortKey, setSortKey] = useState('teacher'); // 'teacher' | 'class' | 'subject' | 'materials' | 'status'
+    const [sortDirection, setSortDirection] = useState('asc'); // 'asc' | 'desc'
 
     // Stats Calculation from 100% real database records
     const totalAssignments = kbm_audit.length;
     const activeUploads = kbm_audit.filter(item => item.status === 'Aktif Mengunggah').length;
     const pendingUploads = totalAssignments - activeUploads;
 
-    // Filtered KBM Data
-    const filteredKbm = kbm_audit.filter(row => {
-        const matchesStatus = statusFilter === 'all' || row.status === statusFilter;
-        const q = search.toLowerCase().trim();
-        const titlesStr = Array.isArray(row.material_titles) ? row.material_titles.join(' ') : '';
-        const matchesSearch = !q ||
-            (row.teacher?.name || '').toLowerCase().includes(q) ||
-            (row.teacher?.email || '').toLowerCase().includes(q) ||
-            (row.school_class?.name || '').toLowerCase().includes(q) ||
-            (row.subject?.name || '').toLowerCase().includes(q) ||
-            (row.semester?.name || '').toLowerCase().includes(q) ||
-            (row.academic_year?.name || '').toLowerCase().includes(q) ||
-            titlesStr.toLowerCase().includes(q);
-        return matchesStatus && matchesSearch;
-    });
+    // Handle column sort toggle
+    const handleSort = (key) => {
+        if (sortKey === key) {
+            setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
+        } else {
+            setSortKey(key);
+            // Default to descending for numeric materials, ascending for text columns
+            setSortDirection(key === 'materials' ? 'desc' : 'asc');
+        }
+    };
+
+    // Filtered and Sorted KBM Data
+    const processedKbm = kbm_audit
+        .filter(row => {
+            const matchesStatus = statusFilter === 'all' || row.status === statusFilter;
+            const q = search.toLowerCase().trim();
+            const titlesStr = Array.isArray(row.material_titles) ? row.material_titles.join(' ') : '';
+            const matchesSearch = !q ||
+                (row.teacher?.name || '').toLowerCase().includes(q) ||
+                (row.teacher?.email || '').toLowerCase().includes(q) ||
+                (row.school_class?.name || '').toLowerCase().includes(q) ||
+                (row.subject?.name || '').toLowerCase().includes(q) ||
+                (row.semester?.name || '').toLowerCase().includes(q) ||
+                (row.academic_year?.name || '').toLowerCase().includes(q) ||
+                titlesStr.toLowerCase().includes(q);
+            return matchesStatus && matchesSearch;
+        })
+        .sort((a, b) => {
+            let res = 0;
+            if (sortKey === 'teacher') {
+                const nameA = a.teacher?.name || '';
+                const nameB = b.teacher?.name || '';
+                res = nameA.localeCompare(nameB, 'id', { sensitivity: 'base' });
+            } else if (sortKey === 'class') {
+                const classA = a.school_class?.name || '';
+                const classB = b.school_class?.name || '';
+                res = classA.localeCompare(classB, 'id', { numeric: true, sensitivity: 'base' });
+            } else if (sortKey === 'subject') {
+                const subA = a.subject?.name || '';
+                const subB = b.subject?.name || '';
+                res = subA.localeCompare(subB, 'id', { sensitivity: 'base' });
+            } else if (sortKey === 'materials') {
+                const countA = a.materials_count || 0;
+                const countB = b.materials_count || 0;
+                res = countA - countB;
+            } else if (sortKey === 'status') {
+                const statusA = a.status || '';
+                const statusB = b.status || '';
+                res = statusA.localeCompare(statusB, 'id', { sensitivity: 'base' });
+            }
+            return sortDirection === 'asc' ? res : -res;
+        });
 
     return (
         <AuthenticatedLayout
@@ -100,19 +177,27 @@ export default function Index({ kbm_audit = [] }) {
 
                     {/* Data Table Container */}
                     <div className="overflow-hidden bg-white dark:bg-gray-800 shadow-xs sm:rounded-xl border border-gray-200 dark:border-gray-700">
-                        <div className="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div>
-                                <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                                    Daftar Penugasan Mengajar & Ketersediaan Bahan Ajar
-                                </h3>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                    Menampilkan {filteredKbm.length} dari {totalAssignments} data penugasan riil
+                        <div className="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-700 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+                            <div className="space-y-1">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                                        Daftar Penugasan Mengajar & Ketersediaan Bahan Ajar
+                                    </h3>
+                                    <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                                        <svg className="w-3 h-3 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                                        </svg>
+                                        <span>Urutan: <strong>{sortKey === 'teacher' ? 'Nama Guru' : sortKey === 'class' ? 'Rombel/Kelas' : sortKey === 'subject' ? 'Mata Pelajaran' : sortKey === 'materials' ? 'Bahan Ajar' : 'Status'}</strong> ({sortDirection.toUpperCase()})</span>
+                                    </span>
+                                </div>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    Menampilkan {processedKbm.length} dari {totalAssignments} data penugasan riil database
                                 </p>
                             </div>
 
-                            {/* Search & Filter */}
+                            {/* Search, Filter & Quick Sort */}
                             <div className="flex flex-wrap items-center gap-2.5">
-                                <div className="relative min-w-[220px]">
+                                <div className="relative min-w-[200px] flex-1 sm:flex-none">
                                     <input
                                         type="text"
                                         value={search}
@@ -134,23 +219,76 @@ export default function Index({ kbm_audit = [] }) {
                                     <option value="Aktif Mengunggah">Aktif Mengunggah</option>
                                     <option value="Belum Mengunggah">Belum Mengunggah</option>
                                 </select>
+
+                                {/* Quick Sort Dropdown */}
+                                <select
+                                    value={`${sortKey}-${sortDirection}`}
+                                    onChange={(e) => {
+                                        const [k, d] = e.target.value.split('-');
+                                        setSortKey(k);
+                                        setSortDirection(d);
+                                    }}
+                                    className="py-1.5 px-3 text-xs rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500"
+                                >
+                                    <option value="teacher-asc">Urutkan: Guru (A - Z)</option>
+                                    <option value="teacher-desc">Urutkan: Guru (Z - A)</option>
+                                    <option value="class-asc">Urutkan: Kelas (7 - 9)</option>
+                                    <option value="class-desc">Urutkan: Kelas (9 - 7)</option>
+                                    <option value="subject-asc">Urutkan: Mapel (A - Z)</option>
+                                    <option value="subject-desc">Urutkan: Mapel (Z - A)</option>
+                                    <option value="materials-desc">Urutkan: Bahan Ajar Terbanyak</option>
+                                    <option value="materials-asc">Urutkan: Bahan Ajar Tersedikit</option>
+                                    <option value="status-asc">Urutkan: Status (Aktif Dahulu)</option>
+                                </select>
                             </div>
                         </div>
 
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50/90 dark:bg-gray-900/80 text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400">
-                                        <th className="px-6 py-3.5">Nama Guru</th>
-                                        <th className="px-6 py-3.5">Rombel / Kelas</th>
-                                        <th className="px-6 py-3.5">Mata Pelajaran</th>
-                                        <th className="px-6 py-3.5">Bahan Ajar LMS</th>
-                                        <th className="px-6 py-3.5 text-right">Status KBM</th>
+                                    <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50/90 dark:bg-gray-900/80">
+                                        <SortHeader
+                                            label="Nama Guru"
+                                            field="teacher"
+                                            currentKey={sortKey}
+                                            direction={sortDirection}
+                                            onSort={handleSort}
+                                        />
+                                        <SortHeader
+                                            label="Rombel / Kelas"
+                                            field="class"
+                                            currentKey={sortKey}
+                                            direction={sortDirection}
+                                            onSort={handleSort}
+                                        />
+                                        <SortHeader
+                                            label="Mata Pelajaran"
+                                            field="subject"
+                                            currentKey={sortKey}
+                                            direction={sortDirection}
+                                            onSort={handleSort}
+                                        />
+                                        <SortHeader
+                                            label="Bahan Ajar LMS"
+                                            field="materials"
+                                            currentKey={sortKey}
+                                            direction={sortDirection}
+                                            onSort={handleSort}
+                                        />
+                                        <SortHeader
+                                            label="Status KBM"
+                                            field="status"
+                                            currentKey={sortKey}
+                                            direction={sortDirection}
+                                            onSort={handleSort}
+                                            align="right"
+                                        />
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 dark:divide-gray-750 text-sm text-gray-700 dark:text-gray-300">
-                                    {filteredKbm.length > 0 ? (
-                                        filteredKbm.map((row) => (
+                                    {processedKbm.length > 0 ? (
+                                        processedKbm.map((row) => (
+
                                             <tr key={row.id} className="hover:bg-indigo-50/30 dark:hover:bg-gray-700/40 transition-colors">
                                                 <td className="px-6 py-4">
                                                     <div className="font-semibold text-gray-900 dark:text-gray-100">{row.teacher?.name}</div>
