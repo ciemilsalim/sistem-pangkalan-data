@@ -337,6 +337,13 @@ class CurriculumController extends Controller
             ]);
         }
 
+        // Clean up orphaned teaching assignments and schedules for this class
+        $assignmentIds = \App\Models\TeachingAssignment::where('school_class_id', $schoolClass->id)->pluck('id');
+        if ($assignmentIds->isNotEmpty()) {
+            \App\Models\Schedule::whereIn('teaching_assignment_id', $assignmentIds)->delete();
+            \App\Models\TeachingAssignment::where('school_class_id', $schoolClass->id)->delete();
+        }
+
         $schoolClass->delete();
 
         return redirect()->route('curriculum.index')->with('message', 'Kelas berhasil dihapus.');
